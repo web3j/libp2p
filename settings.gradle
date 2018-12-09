@@ -1,0 +1,6 @@
+rootProject.name = 'libp2p'
+
+include 'libp2p-net'
+include 'libp2p-peer'
+include 'libp2p-tcp'
+include 'libp2p-transport'

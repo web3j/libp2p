@@ -1,12 +1,16 @@
 package io.web3j.libp2p.peer
 
-var (
-// ErrEmptyPeerID is an error for empty peer ID.
-ErrEmptyPeerID = errors.New("empty peer ID")
-// ErrNoPublickKey is an error for peer IDs that don't embed public keys
-ErrNoPublicKey = errors.New("public key is not embedded in peer ID")
-)
+import java.lang.Exception
 
+/**
+ * Empty peer ID exception.
+ */
+class EmptyPeerIdException : Exception("empty peer ID")
+
+/**
+ * Exception for peer IDs that don't embed public keys.
+ */
+class NoPublicKeyException : Exception("public key is not embedded in peer ID")
 
 
 /**
@@ -69,7 +73,17 @@ data class ID(val id: String) {
      * the public key.
      */
     fun extractPublicKey() {
-        
+
+    }
+
+    fun validate() {
+        if (id.isNullOrEmpty()) {
+            throw EmptyPeerIdException()
+        }
+    }
+
+    fun IDB58Encode(): String {
+        Base58
     }
 }
 
@@ -90,14 +104,6 @@ func (id ID) ExtractPublicKey() (ic.PubKey, error) {
     return pk, nil
 }
 
-// Validate check if ID is empty or not
-func (id ID) Validate() error {
-    if id == ID("") {
-        return ErrEmptyPeerID
-    }
-
-    return nil
-}
 
 // IDFromString cast a string to ID type, and validate
 // the id to make sure it is a multihash.
@@ -160,9 +166,17 @@ func IDFromPrivateKey(sk ic.PrivKey) (ID, error) {
     return IDFromPublicKey(sk.GetPublic())
 }
 
-// IDSlice for sorting peers
-type IDSlice []ID
+/**
+ * IDSlice for sorting peers
+ */
+class IDSlice(val ids: MutableList<ID>) {
+    fun len(): Int = ids.size
 
-func (es IDSlice) Len() int           { return len(es) }
-func (es IDSlice) Swap(i, j int)      { es[i], es[j] = es[j], es[i] }
-func (es IDSlice) Less(i, j int) bool { return string(es[i]) < string(es[j]) }
+    fun swap(i: Int, j: Int) {
+        val tmp = ids[i]
+        ids[i] = ids[j]
+        ids[j] = tmp
+    }
+
+    fun less(i: Int, j: Int): Boolean = ids[i].id < ids[j].id
+}

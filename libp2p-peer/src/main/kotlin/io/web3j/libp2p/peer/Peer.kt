@@ -2,6 +2,9 @@ package io.web3j.libp2p.peer
 
 import java.lang.Exception
 
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
+
 /**
  * Empty peer ID exception.
  */
@@ -12,7 +15,6 @@ class EmptyPeerIdException : Exception("empty peer ID")
  */
 class NoPublicKeyException : Exception("public key is not embedded in peer ID")
 
-
 /**
  * ID is a libp2p peer identity.
  */
@@ -22,7 +24,7 @@ data class ID(val id: String) {
      * Pretty returns a b58-encoded string of the ID
      */
     fun pretty(): String {
-        return IDB58Encode(id)
+        return idB58Encode()
     }
 
     /**
@@ -40,8 +42,7 @@ data class ID(val id: String) {
      * IDs safely. Then any peer.ID type found in the
      * codebase is known to be correct.
      */
-    @Override
-    fun toString(): String {
+    override fun toString(): String {
         val pid = pretty()
         if (pid.length <= 10) {
             return "<peer.ID $pid>"
@@ -54,14 +55,14 @@ data class ID(val id: String) {
      * MatchesPrivateKey tests whether this ID was derived from shared-key
      */
     fun matchesPrivateKey(sharedKey: PrivKey): Boolean {
-        return matchesPrivateKey(sharedKey.publicKey)
+        return matchesPublickKey(sharedKey.publicKey())
     }
 
     /**
      * MatchesPublicKey tests whether this ID was derived from pk
      */
     fun matchesPublickKey(publicKey: PubKey): Boolean {
-        val otherId = idFromPublickKey(publicKey)
+        val otherId = idFromPublicKey(publicKey)
         // TODO: Check no error
         return otherId == this
     }
@@ -72,23 +73,75 @@ data class ID(val id: String) {
      * This method returns ErrNoPublicKey if the peer ID looks valid but it can't extract
      * the public key.
      */
-    fun extractPublicKey() {
+    fun extractPublicKey(): PubKey = TODO()
 
-    }
+    /**
+     * IDFromString cast a string to ID type, and validate
+     * the id to make sure it is a multihash.
+     */
+    fun idFromString(value: String): ID = TODO()
+
+    /**
+     * IDFromBytes cast a string to ID type, and validate
+     * the id to make sure it is a multihash.
+     */
+    fun idFromBytes(value: ByteArray): ID = TODO()
+
+    /**
+     * IDB58Decode returns a b58-decoded Peer.
+     */
+    fun idB58Decode(value: String): ID = TODO()
+
+    /**
+     * IDB58Encode returns b58-encoded string
+     */
+    fun idB58Encode(): String = TODO()
+
+    /**
+     * IDHexDecode returns a hex-decoded Peer
+     */
+    fun idHexDecode(value: String): ID = TODO()
+
+    /**
+     * IDHexEncode returns hex-encoded string
+     */
+    fun idHexEncode(id: ID): String = TODO()
+
+    /**
+     * IDFromPublicKey returns the Peer ID corresponding to pk
+     */
+    fun idFromPublicKey(pubKey: PubKey): ID = TODO()
+
+    /**
+     * IDFromPrivateKey returns the Peer ID corresponding to sk
+     */
+    fun idFromPrivateKey(privKey: PrivKey): ID = TODO()
 
     fun validate() {
         if (id.isNullOrEmpty()) {
             throw EmptyPeerIdException()
         }
     }
+}
 
-    fun IDB58Encode(): String {
-        Base58
+/**
+ * IDSlice for sorting peers
+ */
+class IDSlice(val ids: MutableList<ID>) {
+    fun len(): Int = ids.size
+
+    fun swap(i: Int, j: Int) {
+        val tmp = ids[i]
+        ids[i] = ids[j]
+        ids[j] = tmp
     }
+
+    fun less(i: Int, j: Int): Boolean = ids[i].id < ids[j].id
 }
 
 
 
+/*
 func (id ID) ExtractPublicKey() (ic.PubKey, error) {
     decoded, err := mh.Decode([]byte(id))
     if err != nil {
@@ -165,18 +218,4 @@ func IDFromPublicKey(pk ic.PubKey) (ID, error) {
 func IDFromPrivateKey(sk ic.PrivKey) (ID, error) {
     return IDFromPublicKey(sk.GetPublic())
 }
-
-/**
- * IDSlice for sorting peers
- */
-class IDSlice(val ids: MutableList<ID>) {
-    fun len(): Int = ids.size
-
-    fun swap(i: Int, j: Int) {
-        val tmp = ids[i]
-        ids[i] = ids[j]
-        ids[j] = tmp
-    }
-
-    fun less(i: Int, j: Int): Boolean = ids[i].id < ids[j].id
-}
+*/

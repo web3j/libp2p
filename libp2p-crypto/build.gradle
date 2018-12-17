@@ -1,1 +1,23 @@
+
+plugins {
+    id "com.google.protobuf" version "0.8.7"
+}
+
 description 'libp2p crypto'
+
+dependencies {
+    compile "com.google.protobuf:protobuf-java:$protobufVersion"
+//            "com.google.protobuf:protobuf-java-util:$protobufVersion"
+}
+
+sourceSets {
+    generated{
+        java.srcDir "${buildDir}/generated/source/proto/main/java/"
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$protocVersion"
+    }
+}

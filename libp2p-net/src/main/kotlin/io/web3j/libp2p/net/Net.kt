@@ -6,6 +6,7 @@ package io.web3j.libp2p.net
 // a single, large serialized object.
 val MESSAGE_SIZE_MAX = 1 shl 22 // 4 MB
 
+/*
 // Stream represents a bidirectional channel between two agents in
 // the IPFS network. "agent" is as granular as desired, potentially
 // being a "request -> reply" pair, or whole protocols.
@@ -202,3 +203,4 @@ type Notifiee interface {
     // PeerConnected(Network, peer.ID)    // called when a peer connected
     // PeerDisconnected(Network, peer.ID) // called when a peer disconnected
 }
+*/

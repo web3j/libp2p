@@ -1,6 +1,7 @@
 package io.web3j.libp2p.transport
 
 import io.ipfs.multiformats.multiaddr.Multiaddr
+import io.web3j.libp2p.peer.ID
 import java.io.IOException
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -51,7 +52,7 @@ interface Transport {
      * addresses if possible but it may choose not to.
      */
     @Throws(IOException::class)
-    fun dial(context: CoroutineContext, remoteMultiaddr: Multiaddr, peer: PeerId): Conn
+    fun dial(context: CoroutineContext, remoteMultiaddr: Multiaddr, peer: ID): Conn
 
     /**
      * canDial returns true if this transport knows how to dial the given

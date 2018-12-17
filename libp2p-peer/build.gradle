@@ -1,1 +1,5 @@
 description 'libp2p common peer representation in the network'
+
+dependencies {
+    compile project(':libp2p-crypto')
+}

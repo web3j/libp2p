@@ -2,6 +2,8 @@ package io.web3j.libp2p.peer
 
 import java.lang.Exception
 
+import org.kethereum.encodings.decodeBase58
+
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 
@@ -95,7 +97,9 @@ data class ID(val id: String) {
     /**
      * IDB58Encode returns b58-encoded string
      */
-    fun idB58Encode(): String = TODO()
+    fun idB58Encode(): String {
+        return id.decodeBase58()
+    }
 
     /**
      * IDHexDecode returns a hex-decoded Peer

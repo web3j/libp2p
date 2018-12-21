@@ -1,6 +1,7 @@
 buildscript {
     ext.kotlin_version = '1.3.10'
     ext.kotlinMultiaddrVersion = '1.0.0'
+    ext.kotlinMultihashVersion = '1.1.0'
     ext.nettyVersion = '4.1.32.Final'
     ext.protobufVersion = '3.6.1'
     ext.protocVersion = '3.0.0'

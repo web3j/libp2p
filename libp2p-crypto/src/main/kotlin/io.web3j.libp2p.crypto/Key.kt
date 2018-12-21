@@ -73,7 +73,7 @@ interface PubKey : Key {
 /**
  * Creates a PubKey from a given byte array.
  */
-interface PublicKeyUnmarshaller {
+interface PublicKeyMarshaller {
     fun unmarshall(data: ByteArray): PubKey
 }
 
@@ -103,6 +103,32 @@ fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
         KEY_TYPE.ECDSA -> generateEcdsaKeyPair()
     }
 }
+
+/**
+ * UnmarshalPublicKey converts a protobuf serialized public key into its
+ * representative object
+ */
+fun unmarshalPublicKey(data: ByteArray): PubKey = TODO()
+
+/**
+ * MarshalPublicKey converts a public key object into a protobuf serialized
+ * public key
+ */
+fun marshalPublicKey(pubKey: PubKey): ByteArray = TODO()
+
+/**
+ * UnmarshalPrivateKey converts a protobuf serialized private key into its
+ * representative object
+ */
+fun unmarshalPrivateKey(data: ByteArray): PrivKey = TODO()
+
+/**
+ * MarshalPrivateKey converts a public key object into a protobuf serialized
+ * private key
+ */
+fun marshalPrivateKey(privKey: PrivKey): ByteArray = TODO()
+
+
 
 fun generateRsaKeyPair(): Pair<PrivKey, PubKey> = TODO()
 fun generateEd25519KeyPair(): Pair<PrivKey, PubKey> = TODO()

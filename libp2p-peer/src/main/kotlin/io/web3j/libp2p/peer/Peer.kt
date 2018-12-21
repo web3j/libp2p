@@ -1,11 +1,15 @@
 package io.web3j.libp2p.peer
 
+import io.ipfs.multiformats.multihash.Multihash
+import io.ipfs.multiformats.multihash.Type
 import java.lang.Exception
 
 import org.kethereum.encodings.decodeBase58
 
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
+import io.web3j.libp2p.crypto.unmarshalPublicKey
+
 
 /**
  * Empty peer ID exception.
@@ -20,7 +24,7 @@ class NoPublicKeyException : Exception("public key is not embedded in peer ID")
 /**
  * ID is a libp2p peer identity.
  */
-data class ID(val id: String) {
+data class ID(val id: Multihash) {
 
     /**
      * Pretty returns a b58-encoded string of the ID
@@ -46,10 +50,10 @@ data class ID(val id: String) {
      */
     override fun toString(): String {
         val pid = pretty()
-        if (pid.length <= 10) {
-            return "<peer.ID $pid>"
+        return if (pid.length <= 10) {
+            "<peer.ID $pid>"
         } else {
-            return "<peer.ID ${pid.subSequence(0, 2)}*${pid.subSequence(pid.length-6, pid.length)}"
+            "<peer.ID ${pid.subSequence(0, 2)}*${pid.subSequence(pid.length-6, pid.length)}"
         }
     }
 
@@ -75,56 +79,76 @@ data class ID(val id: String) {
      * This method returns ErrNoPublicKey if the peer ID looks valid but it can't extract
      * the public key.
      */
-    fun extractPublicKey(): PubKey = TODO()
+    fun extractPublicKey(): PubKey {
+        val decoded = Multihash.decode(id.raw)
+        if (decoded.code != Type.ID.code) {
+            throw NoPublicKeyException()
+        }
+
+        return unmarshalPublicKey(decoded.digest)
+    }
 
     /**
      * IDFromString cast a string to ID type, and validate
      * the id to make sure it is a multihash.
      */
-    fun idFromString(value: String): ID = TODO()
+    fun idFromString(value: String): ID {
+        val multihash = Multihash.fromHexString(value)
+        return ID(multihash)
+    }
 
     /**
      * IDFromBytes cast a string to ID type, and validate
      * the id to make sure it is a multihash.
      */
-    fun idFromBytes(value: ByteArray): ID = TODO()
+    fun idFromBytes(value: ByteArray): ID {
+        val multihash = Multihash.cast(value)
+        return ID(multihash)
+    }
 
     /**
      * IDB58Decode returns a b58-decoded Peer.
      */
-    fun idB58Decode(value: String): ID = TODO()
+    fun idB58Decode(value: String): ID {
+        val multihash = Multihash.fromBase58String(value)
+        return ID(multihash)
+    }
 
     /**
      * IDB58Encode returns b58-encoded string
      */
     fun idB58Encode(): String {
-        return id.decodeBase58()
+        return id.toBase58String()
     }
 
     /**
      * IDHexDecode returns a hex-decoded Peer
      */
-    fun idHexDecode(value: String): ID = TODO()
+    fun idHexDecode(value: String): ID {
+        val multihash = Multihash.fromHexString(value)
+        return ID(multihash)
+    }
 
     /**
      * IDHexEncode returns hex-encoded string
      */
-    fun idHexEncode(id: ID): String = TODO()
+    fun idHexEncode(id: ID): String {
+        return id.id.toHexString()
+    }
 
     /**
-     * IDFromPublicKey returns the Peer ID corresponding to pk
+     * IDFromPublicKey returns the Peer ID corresponding to the provided public key.
      */
-    fun idFromPublicKey(pubKey: PubKey): ID = TODO()
+    fun idFromPublicKey(pubKey: PubKey): ID {
+        val hash = Multihash.encode(pubKey.bytes(), Type.SHA2_256.code)
+        return idFromBytes(hash)
+    }
 
     /**
-     * IDFromPrivateKey returns the Peer ID corresponding to sk
+     * Return peer id corresponding to the provided private key.
      */
-    fun idFromPrivateKey(privKey: PrivKey): ID = TODO()
-
-    fun validate() {
-        if (id.isNullOrEmpty()) {
-            throw EmptyPeerIdException()
-        }
+    fun idFromPrivateKey(privKey: PrivKey): ID {
+        return idFromPublicKey(privKey.publicKey())
     }
 }
 
@@ -140,86 +164,5 @@ class IDSlice(val ids: MutableList<ID>) {
         ids[j] = tmp
     }
 
-    fun less(i: Int, j: Int): Boolean = ids[i].id < ids[j].id
+    fun less(i: Int, j: Int): Boolean = ids[i].id.toHexString() < ids[j].id.toHexString()
 }
-
-
-
-/*
-func (id ID) ExtractPublicKey() (ic.PubKey, error) {
-    decoded, err := mh.Decode([]byte(id))
-    if err != nil {
-        return nil, err
-    }
-    if decoded.Code != mh.ID {
-        return nil, ErrNoPublicKey
-    }
-    pk, err := ic.UnmarshalPublicKey(decoded.Digest)
-    if err != nil {
-        return nil, err
-    }
-    return pk, nil
-}
-
-
-// IDFromString cast a string to ID type, and validate
-// the id to make sure it is a multihash.
-func IDFromString(s string) (ID, error) {
-    if _, err := mh.Cast([]byte(s)); err != nil {
-        return ID(""), err
-    }
-    return ID(s), nil
-}
-
-// IDFromBytes cast a string to ID type, and validate
-// the id to make sure it is a multihash.
-func IDFromBytes(b []byte) (ID, error) {
-    if _, err := mh.Cast(b); err != nil {
-        return ID(""), err
-    }
-    return ID(b), nil
-}
-
-// IDB58Decode returns a b58-decoded Peer
-func IDB58Decode(s string) (ID, error) {
-    m, err := mh.FromB58String(s)
-    if err != nil {
-        return "", err
-    }
-    return ID(m), err
-}
-
-// IDB58Encode returns b58-encoded string
-func IDB58Encode(id ID) string {
-    return b58.Encode([]byte(id))
-}
-
-// IDHexDecode returns a hex-decoded Peer
-func IDHexDecode(s string) (ID, error) {
-    m, err := mh.FromHexString(s)
-    if err != nil {
-        return "", err
-    }
-    return ID(m), err
-}
-
-// IDHexEncode returns hex-encoded string
-func IDHexEncode(id ID) string {
-    return hex.EncodeToString([]byte(id))
-}
-
-// IDFromPublicKey returns the Peer ID corresponding to pk
-func IDFromPublicKey(pk ic.PubKey) (ID, error) {
-    b, err := pk.Bytes()
-    if err != nil {
-        return "", err
-    }
-    hash, _ := mh.Sum(b, mh.SHA2_256, -1)
-    return ID(hash), nil
-}
-
-// IDFromPrivateKey returns the Peer ID corresponding to sk
-func IDFromPrivateKey(sk ic.PrivKey) (ID, error) {
-    return IDFromPublicKey(sk.GetPublic())
-}
-*/

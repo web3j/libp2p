@@ -4,8 +4,6 @@ import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
 import java.lang.Exception
 
-import org.kethereum.encodings.decodeBase58
-
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.unmarshalPublicKey
@@ -53,7 +51,7 @@ data class ID(val id: Multihash) {
         return if (pid.length <= 10) {
             "<peer.ID $pid>"
         } else {
-            "<peer.ID ${pid.subSequence(0, 2)}*${pid.subSequence(pid.length-6, pid.length)}"
+            "<peer.ID ${pid.subSequence(0, 2)}*${pid.subSequence(pid.length - 6, pid.length)}"
         }
     }
 
@@ -89,32 +87,6 @@ data class ID(val id: Multihash) {
     }
 
     /**
-     * IDFromString cast a string to ID type, and validate
-     * the id to make sure it is a multihash.
-     */
-    fun idFromString(value: String): ID {
-        val multihash = Multihash.fromHexString(value)
-        return ID(multihash)
-    }
-
-    /**
-     * IDFromBytes cast a string to ID type, and validate
-     * the id to make sure it is a multihash.
-     */
-    fun idFromBytes(value: ByteArray): ID {
-        val multihash = Multihash.cast(value)
-        return ID(multihash)
-    }
-
-    /**
-     * IDB58Decode returns a b58-decoded Peer.
-     */
-    fun idB58Decode(value: String): ID {
-        val multihash = Multihash.fromBase58String(value)
-        return ID(multihash)
-    }
-
-    /**
      * IDB58Encode returns b58-encoded string
      */
     fun idB58Encode(): String {
@@ -122,33 +94,62 @@ data class ID(val id: Multihash) {
     }
 
     /**
-     * IDHexDecode returns a hex-decoded Peer
-     */
-    fun idHexDecode(value: String): ID {
-        val multihash = Multihash.fromHexString(value)
-        return ID(multihash)
-    }
-
-    /**
      * IDHexEncode returns hex-encoded string
      */
-    fun idHexEncode(id: ID): String {
-        return id.id.toHexString()
+    fun idHexEncode(): String {
+        return id.toHexString()
     }
 
-    /**
-     * IDFromPublicKey returns the Peer ID corresponding to the provided public key.
-     */
-    fun idFromPublicKey(pubKey: PubKey): ID {
-        val hash = Multihash.encode(pubKey.bytes(), Type.SHA2_256.code)
-        return idFromBytes(hash)
-    }
+    companion object {
 
-    /**
-     * Return peer id corresponding to the provided private key.
-     */
-    fun idFromPrivateKey(privKey: PrivKey): ID {
-        return idFromPublicKey(privKey.publicKey())
+        /**
+         * IDFromString cast a string to ID type, and validate
+         * the id to make sure it is a multihash.
+         */
+        fun idFromString(value: String): ID {
+            val multihash = Multihash.fromHexString(value)
+            return ID(multihash)
+        }
+
+        /**
+         * IDFromBytes cast a string to ID type, and validate
+         * the id to make sure it is a multihash.
+         */
+        fun idFromBytes(value: ByteArray): ID {
+            val multihash = Multihash.cast(value)
+            return ID(multihash)
+        }
+
+        /**
+         * IDB58Decode returns a b58-decoded Peer.
+         */
+        fun idB58Decode(value: String): ID {
+            val multihash = Multihash.fromBase58String(value)
+            return ID(multihash)
+        }
+
+        /**
+         * IDHexDecode returns a hex-decoded Peer
+         */
+        fun idHexDecode(value: String): ID {
+            val multihash = Multihash.fromHexString(value)
+            return ID(multihash)
+        }
+
+        /**
+         * IDFromPublicKey returns the Peer ID corresponding to the provided public key.
+         */
+        fun idFromPublicKey(pubKey: PubKey): ID {
+            val hash = Multihash.encode(pubKey.bytes(), Type.SHA2_256.code)
+            return idFromBytes(hash)
+        }
+
+        /**
+         * Return peer id corresponding to the provided private key.
+         */
+        fun idFromPrivateKey(privKey: PrivKey): ID {
+            return idFromPublicKey(privKey.publicKey())
+        }
     }
 }
 

@@ -1,5 +1,8 @@
 package io.web3j.libp2p.crypto
 
+import com.google.protobuf.ByteString
+import crypto.pb.Crypto.PublicKey as PbPublicKey
+
 enum class KEY_TYPE {
     /**
      * RSA is an enum for the supported RSA key type
@@ -49,7 +52,7 @@ interface PrivKey : Key {
     /**
      * Cryptographically sign the given bytes.
      */
-    fun sign(data: ByteArray) : ByteArray
+    fun sign(data: ByteArray): ByteArray
 
     /**
      * Return a public key paired with this private key.
@@ -65,7 +68,7 @@ interface PubKey : Key {
     /**
      * Verify that 'sig' is the signed hash of 'data'.
      */
-    fun verify(data: ByteArray, signature: ByteArray) : Boolean
+    fun verify(data: ByteArray, signature: ByteArray): Boolean
 }
 
 /**
@@ -126,7 +129,15 @@ fun unmarshalPublicKey(data: ByteArray): PubKey = TODO()
  * MarshalPublicKey converts a public key object into a protobuf serialized
  * public key
  */
-fun marshalPublicKey(pubKey: PubKey): ByteArray = TODO()
+fun marshalPublicKey(pubKey: PubKey): ByteArray {
+
+    val pbmes = PbPublicKey.newBuilder()
+        .setType(pubKey.type())
+        .setData(ByteString.copyFrom(pubKey.raw()))
+
+//    return proto.Marshal(pbmes)
+    return ByteArray(0)
+}
 
 /**
  * UnmarshalPrivateKey converts a protobuf serialized private key into its

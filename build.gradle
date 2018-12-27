@@ -5,6 +5,9 @@ buildscript {
     ext.nettyVersion = '4.1.32.Final'
     ext.protobufVersion = '3.6.1'
     ext.protocVersion = '3.0.0'
+
+    //test dependacies
+    ext.junitVersion = '4.11'
 }
 
 plugins {
@@ -14,7 +17,7 @@ plugins {
 group 'io.web3j'
 version '0.1.0'
 
-allprojects {
+subprojects {
     apply plugin: 'java'
     apply plugin: 'kotlin'
 
@@ -26,6 +29,7 @@ allprojects {
 
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        testCompile "junit:junit:$junitVersion"
     }
 
     compileKotlin {

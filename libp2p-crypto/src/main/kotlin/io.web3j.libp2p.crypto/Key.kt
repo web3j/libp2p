@@ -1,7 +1,5 @@
 package io.web3j.libp2p.crypto
 
-import crypto.pb.Crypto
-
 enum class KEY_TYPE {
     /**
      * RSA is an enum for the supported RSA key type
@@ -51,7 +49,7 @@ interface PrivKey : Key {
     /**
      * Cryptographically sign the given bytes.
      */
-    fun sign(data: ByteArray)
+    fun sign(data: ByteArray) : ByteArray
 
     /**
      * Return a public key paired with this private key.
@@ -67,7 +65,7 @@ interface PubKey : Key {
     /**
      * Verify that 'sig' is the signed hash of 'data'.
      */
-    fun verify(data: ByteArray, signature: ByteArray)
+    fun verify(data: ByteArray, signature: ByteArray) : Boolean
 }
 
 /**
@@ -97,11 +95,25 @@ class BadKeyTypeException : Exception("Invalid or unsupported key type")
 fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
 
     return when (type) {
-        KEY_TYPE.RSA -> generateRsaKeyPair()
+        KEY_TYPE.RSA -> generateRsaKeyPair(bits)
         KEY_TYPE.ED25519 -> generateEd25519KeyPair()
         KEY_TYPE.SECP256K1 -> generateSecp256k1KeyPair()
         KEY_TYPE.ECDSA -> generateEcdsaKeyPair()
     }
+    /*
+    	switch typ {
+	case RSA:
+		return GenerateRSAKeyPair(bits, src)
+	case Ed25519:
+		return GenerateEd25519Key(src)
+	case Secp256k1:
+		return GenerateSecp256k1Key(src)
+	case ECDSA:
+		return GenerateECDSAKeyPair(src)
+	default:
+		return nil, nil, ErrBadKeyType
+	}
+     */
 }
 
 /**
@@ -129,8 +141,5 @@ fun unmarshalPrivateKey(data: ByteArray): PrivKey = TODO()
 fun marshalPrivateKey(privKey: PrivKey): ByteArray = TODO()
 
 
-
-fun generateRsaKeyPair(): Pair<PrivKey, PubKey> = TODO()
-fun generateEd25519KeyPair(): Pair<PrivKey, PubKey> = TODO()
 fun generateSecp256k1KeyPair(): Pair<PrivKey, PubKey> = TODO()
 fun generateEcdsaKeyPair(): Pair<PrivKey, PubKey> = TODO()

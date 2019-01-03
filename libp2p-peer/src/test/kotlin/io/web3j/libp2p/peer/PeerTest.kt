@@ -87,7 +87,7 @@ class PeerTest {
 
         assertEquals(ks.pubKeyHash, p1.toString())
 
-        assertTrue(p1.matchesPublickKey(ks.pubKey))
+        assertTrue(p1.matchesPublicKey(ks.pubKey))
 
         val p2 = ID.idFromPublicKey(ks.pubKey)
 

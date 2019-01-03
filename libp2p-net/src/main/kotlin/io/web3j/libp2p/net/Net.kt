@@ -1,206 +1,330 @@
 package io.web3j.libp2p.net
 
-// MessageSizeMax is a soft (recommended) maximum for network messages.
-// One can write more, as the interface is a stream. But it is useful
-// to bunch it up into multiple read/writes when the whole message is
-// a single, large serialized object.
+import io.ipfs.multiformats.multiaddr.Multiaddr
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
+import kotlin.coroutines.CoroutineContext
+import io.web3j.libp2p.protocol.ID as PROTOCOL_ID
+import io.web3j.libp2p.peer.ID as PEER_ID
+import io.web3j.streammux.Stream as streammux_Stream
+
+/**
+ * MessageSizeMax is a soft (recommended) maximum for network messages.
+ * One can write more, as the interface is a stream. But it is useful
+ * to bunch it up into multiple read/writes when the whole message is
+ * a single, large serialized object.
+ */
 val MESSAGE_SIZE_MAX = 1 shl 22 // 4 MB
 
-/*
-// Stream represents a bidirectional channel between two agents in
-// the IPFS network. "agent" is as granular as desired, potentially
-// being a "request -> reply" pair, or whole protocols.
-// Streams are backed by stream-muxer streams underneath the hood.
-interface Stream {
-    smux.Stream
+/**
+ * Stream represents a bidirectional channel between two agents in
+ * the IPFS network. "agent" is as granular as desired, potentially
+ * being a "request -> reply" pair, or whole protocols.
+ * Streams are backed by stream-muxer streams underneath the hood.
+ */
+interface Stream : streammux_Stream {
 
-    Protocol() protocol.ID
-    SetProtocol(protocol.ID)
+    fun protocol(): PROTOCOL_ID
 
-    // Stat returns metadata pertaining to this stream.
-    Stat() Stat
+    fun setProtocol(id: PROTOCOL_ID)
 
-    // Conn returns the connection this stream is part of.
-    Conn() Conn
+    /**
+     * Stat returns metadata pertaining to this stream.
+     */
+    fun stat(): Stat
+
+    /**
+     * Conn returns the connection this stream is part of.
+     */
+    fun conn(): Conn
 }
 
-// Direction represents which peer in a stream initiated a connection.
-type Direction int
+/**
+ * Direction represents which peer in a stream initiated a connection.
+ */
+enum class Direction(val direction: Int) {
 
-const (
-// DirUnknown is the default direction.
-DirUnknown Direction = iota
-// DirInbound is for when the remote peer initiated a connection.
-DirInbound
-// DirOutbound is for when the local peer initiated a connection.
-DirOutbound
-)
+    /**
+     * DirUnknown is the default direction.
+     */
+    DIR_UNKNOWN(0),
 
-// Stat stores metadata pertaining to a given Stream/Conn.
-type Stat struct {
-    Direction Direction
-            Extra     map[interface{}]interface{}
+    /**
+     * DirInbound is for when the remote peer initiated a connection.
+     */
+    DIR_INBOUND(1),
+
+    /**
+     * DirOutbound is for when the local peer initiated a connection.
+     */
+    DIR_OUTBOUND(2)
 }
 
-// StreamHandler is the type of function used to listen for
-// streams opened by the remote side.
-type StreamHandler func(Stream)
+/**
+ * Stat stores metadata pertaining to a given Stream/Conn
+ */
+data class Stat(val direction: Direction, val extra: Map<Any, Any>)
 
-// ConnSecurity is the interface that one can mix into a connection interface to
-// give it the security methods.
-type ConnSecurity interface {
-    // LocalPeer returns our peer ID
-    LocalPeer() peer.ID
+/**
+ * StreamHandler is the type of function used to listen for
+ * streams opened by the remote side.
+ */
+data class StreamHandler(val stream: Stream)
 
-    // LocalPrivateKey returns our private key
-    LocalPrivateKey() ic.PrivKey
+/**
+ * ConnSecurity is the interface that one can mix into a connection interface to
+ * give it the security methods.
+ */
+interface ConnSecurity {
 
-    // RemotePeer returns the peer ID of the remote peer.
-    RemotePeer() peer.ID
+    /**
+     * LocalPeer returns our peer ID.
+     */
+    fun localPeer(): PEER_ID
 
-    // RemotePublicKey returns the public key of the remote peer.
-    RemotePublicKey() ic.PubKey
+    /**
+     * LocalPrivateKey returns our private key.
+     */
+    fun localPrivateKey(): PrivKey
+
+    /**
+     * RemotePeer returns the peer ID of the remote peer.
+     */
+    fun remotePeer(): PEER_ID
+
+    /**
+     * RemotePublicKey returns the public key of the remote peer.
+     */
+    fun remotePublicKey(): PubKey
 }
 
-// ConnMultiaddrs is an interface mixin for connection types that provide multiaddr
-// addresses for the endpoints.
-type ConnMultiaddrs interface {
-    // LocalMultiaddr returns the local Multiaddr associated
-    // with this connection
-    LocalMultiaddr() ma.Multiaddr
+/**
+ * ConnMultiaddrs is an interface mixin for connection types that provide multiaddr
+ * addresses for the endpoints
+ */
+interface ConnMultiaddrs {
 
-    // RemoteMultiaddr returns the remote Multiaddr associated
-    // with this connection
-    RemoteMultiaddr() ma.Multiaddr
+    /**
+     * LocalMultiaddr returns the local Multiaddr associated
+     * with this connection
+     */
+    fun localMultiaddr(): Multiaddr
+
+    /**
+     * RemoteMultiaddr returns the remote Multiaddr associated
+     * with this connection
+     */
+    fun remoteMultiaddr(): Multiaddr
 }
 
-// Conn is a connection to a remote peer. It multiplexes streams.
-// Usually there is no need to use a Conn directly, but it may
-// be useful to get information about the peer on the other side:
-//  stream.Conn().RemotePeer()
+/**
+ * Conn is a connection to a remote peer. It multiplexes streams.
+ * Usually there is no need to use a Conn directly, but it may
+ * be useful to get information about the peer on the other side:
+ * stream.Conn().RemotePeer()
+ */
+interface Conn : ConnSecurity, ConnMultiaddrs {
 
-type Conn interface {
-    io.Closer
+    /**
+     * NewStreams constructs a new Stream over this connection
+     */
+    fun newStreams(): Stream
 
-    ConnSecurity
-    ConnMultiaddrs
+    /**
+     * GetStreams returns all open streams over this connection
+     */
+    fun getStreams(): Array<Stream>
 
-    // NewStream constructs a new Stream over this conn.
-    NewStream() (Stream, error)
-
-    // GetStreams returns all open streams over this conn.
-    GetStreams() []Stream
-
-    // Stat stores metadata pertaining to this conn.
-    Stat() Stat
+    /**
+     * Stat stores metadata pertaining to this Conn
+     */
+    fun stat(): Stat
 }
 
-// ConnHandler is the type of function used to listen for
-// connections opened by the remote side.
-type ConnHandler func(Conn)
+/**
+ * ConnHandler is the type of function used to listen for
+ * connections opened by the remote side.
+ */
+data class ConnHandler(val conn: Conn)
 
-// Network is the interface used to connect to the outside world.
-// It dials and listens for connections. it uses a Swarm to pool
-// connnections (see swarm pkg, and peerstream.Swarm). Connections
-// are encrypted with a TLS-like protocol.
-type Network interface {
-    Dialer
-    io.Closer
+/**
+ * Network is the interface used to connect to the outside world.
+ * It dials and listens for connections. it uses a Swarm to pool
+ * connnections (see swarm pkg, and peerstream.Swarm). Connections
+ * are encrypted with a TLS-like protocol.
+ */
+interface Network : Dialer {
 
-    // SetStreamHandler sets the handler for new streams opened by the
-    // remote side. This operation is threadsafe.
-    SetStreamHandler(StreamHandler)
+    /**
+     * SetStreamHandler sets the handler for new streams opened by the
+     * remote side. This operation is thread safe
+     */
+    fun setStreamHandler(streamHandler: StreamHandler)
 
-    // SetConnHandler sets the handler for new connections opened by the
-    // remote side. This operation is threadsafe.
-    SetConnHandler(ConnHandler)
+    /**
+     * SetConnHandler sets the handler for new connections opened by the
+     * remote side. This operation is threadsafe.
+     */
+    fun setConnHandler(connHandler: ConnHandler)
 
-    // NewStream returns a new stream to given peer p.
-    // If there is no connection to p, attempts to create one.
-    NewStream(context.Context, peer.ID) (Stream, error)
+    /**
+     * NewStream returns a new stream to given peer p.
+     * If there is no connection to p, attempts to create one.
+     */
+    fun newStream(context: CoroutineContext, id: PEER_ID): Stream
 
-    // Listen tells the network to start listening on given multiaddrs.
-    Listen(...ma.Multiaddr) error
+    /**
+     * Listen tells the network to start listening on given multiaddrs
+     */
+    fun listen(vararg multiaddr: Multiaddr)
 
-    // ListenAddresses returns a list of addresses at which this network listens.
-    ListenAddresses() []ma.Multiaddr
+    /**
+     * ListenAddresses returns a list of addresses at which this network listens.
+     */
+    fun listenAddresses(): Array<Multiaddr>
 
-    // InterfaceListenAddresses returns a list of addresses at which this network
-    // listens. It expands "any interface" addresses (/ip4/0.0.0.0, /ip6/::) to
-    // use the known local interfaces.
-    InterfaceListenAddresses() ([]ma.Multiaddr, error)
+    /**
+     * InterfaceListenAddresses returns a list of addresses at which this network
+     * listens. It expands "any interface" addresses (/ip4/0.0.0.0, /ip6/::) to
+     * use the known local interfaces.
+     */
+    fun interfaceListenAddresses(multiaddrs: Array<Multiaddr>)
 
-    // Process returns the network's Process
-    Process() goprocess.Process
+    /**
+     * Process returns the network's Process
+     */
+    fun process(): Process
 }
 
-// Dialer represents a service that can dial out to peers
-// (this is usually just a Network, but other services may not need the whole
-// stack, and thus it becomes easier to mock)
-type Dialer interface {
+/**
+ * Dialer represents a service that can dial out to peers
+ * (this is usually just a Network, but other services may not need the whole
+ * stack, and thus it becomes easier to mock)
+ */
+interface Dialer {
 
-    // Peerstore returns the internal peerstore
-    // This is useful to tell the dialer about a new address for a peer.
-    // Or use one of the public keys found out over the network.
-    Peerstore() pstore.Peerstore
+    /**
+     * PeerStore returns the internal peerstore
+     * This is useful to tell the dailer about a new address for a peer.
+     * Or use one of the public keys found out over the network.
+     */
+    fun peerstore()
 
-    // LocalPeer returns the local peer associated with this network
-    LocalPeer() peer.ID
+    /**
+     * LocalPeer returns the local peer associated with this network
+     */
+    fun localPeer(): PEER_ID
 
-    // DialPeer establishes a connection to a given peer
-    DialPeer(context.Context, peer.ID) (Conn, error)
+    /**
+     * DialPeer establishes a connection to a given peer
+     */
+    fun dialPeer(context: CoroutineContext, id: PEER_ID): Conn
 
-    // ClosePeer closes the connection to a given peer
-    ClosePeer(peer.ID) error
+    /**
+     * ClosePeer closes the connection to a given peer
+     */
+    fun closePeer(id: PEER_ID)
 
-    // Connectedness returns a state signaling connection capabilities
-    Connectedness(peer.ID) Connectedness
+    /**
+     * Connectedness returns a state signaling connection capabilities
+     */
+    fun connectedness(id: PEER_ID): Connectedness
 
-    // Peers returns the peers connected
-    Peers() []peer.ID
+    /**
+     * Peers returns the peers connected
+     */
+    fun peers(): Array<PEER_ID>
 
-    // Conns returns the connections in this Netowrk
-    Conns() []Conn
+    /**
+     * Conns returns the connections in this Network
+     */
+    fun conns(): Array<Conn>
 
-    // ConnsToPeer returns the connections in this Netowrk for given peer.
-    ConnsToPeer(p peer.ID) []Conn
+    /**
+     * ConnsToPeer returns the connections in this Network for given peer.
+     */
+    fun connsToPeer(peer: PEER_ID): Array<Conn>
 
-    // Notify/StopNotify register and unregister a notifiee for signals
-    Notify(Notifiee)
-    StopNotify(Notifiee)
+    /**
+     * Notify/StopNotify registers and unregisters a notifiee for signals
+     */
+    fun notify(notifiee: Notifiee)
+
+    fun stopNotify(notifiee: Notifiee)
 }
 
-// Connectedness signals the capacity for a connection with a given node.
-// It is used to signal to services and other peers whether a node is reachable.
-type Connectedness int
+/**
+ * Connectedness signals the capacity for a connection with a given node.
+ * It is used to signal to services and other peers whether a node is reachable.
+ */
+enum class Connectedness(val value: Int) {
 
-const (
-// NotConnected means no connection to peer, and no extra information (default)
-NotConnected Connectedness = iota
+    /**
+     * NotConnected means no connection to peer, and no extra information (default)
+     */
+    NOT_CONNECTED(0),
 
-// Connected means has an open, live connection to peer
-Connected
+    /**
+     * Connected means has an open, live connection to peer
+     */
+    CONNECTED(1),
 
-// CanConnect means recently connected to peer, terminated gracefully
-CanConnect
+    /**
+     * CanConnect means recently connected to peer, terminated gracefully
+     */
+    CAN_CONNECT(2),
 
-// CannotConnect means recently attempted connecting but failed to connect.
-// (should signal "made effort, failed")
-CannotConnect
-)
+    /**
+     * CannotConnect means recently attempted connecting but failed to connect.
+     * (should signal "made effort, failed")
+     */
+    CANNOT_CONNECT(3)
+}
 
-// Notifiee is an interface for an object wishing to receive
-// notifications from a Network.
-type Notifiee interface {
-    Listen(Network, ma.Multiaddr)      // called when network starts listening on an addr
-    ListenClose(Network, ma.Multiaddr) // called when network stops listening on an addr
-    Connected(Network, Conn)           // called when a connection opened
-    Disconnected(Network, Conn)        // called when a connection closed
-    OpenedStream(Network, Stream)      // called when a stream opened
-    ClosedStream(Network, Stream)      // called when a stream closed
+/**
+ * Notifiee is an interface for an object wishing to receive
+ * notifications from a Network
+ */
+interface Notifiee {
+
+    /**
+     * Listen called when network starts listening on addr
+     */
+    fun listen(network: Network, multiaddr: Multiaddr)
+
+    /**
+     * ListenClose called when network stops listening on an addr
+     */
+    fun listenClose(network: Network, multiaddr: Multiaddr)
+
+    /**
+     * Connected called when a connection opened
+     */
+    fun connected(network: Network, conn: Conn)
+
+    /**
+     * Disconnected called when a connection closed
+     */
+    fun disconnected(network: Network, conn: Conn)
+
+    /**
+     * OpenedStream called when a stream opened
+     */
+    fun openedStream(network: Network, stream: Stream)
+
+    /**
+     * ClosedStream called when a stream closed
+     */
+    fun closedStream(network: Network, stream: Stream)
 
     // TODO
-    // PeerConnected(Network, peer.ID)    // called when a peer connected
-    // PeerDisconnected(Network, peer.ID) // called when a peer disconnected
+    /**
+     * PeerConnected called when a peer connected
+     * fun peerConnected(network: Network, id: PEER_ID)
+     */
+
+    /**
+     * PeerDisconnected called when a peer disconnected
+     * fun peerDisconnected(network: Network, id: PEER_ID)
+     */
 }
-*/

@@ -59,13 +59,13 @@ data class ID(val id: Multihash) {
      * MatchesPrivateKey tests whether this ID was derived from shared-key
      */
     fun matchesPrivateKey(sharedKey: PrivKey): Boolean {
-        return matchesPublickKey(sharedKey.publicKey())
+        return matchesPublicKey(sharedKey.publicKey())
     }
 
     /**
      * MatchesPublicKey tests whether this ID was derived from pk
      */
-    fun matchesPublickKey(publicKey: PubKey): Boolean {
+    fun matchesPublicKey(publicKey: PubKey): Boolean {
         val otherId = idFromPublicKey(publicKey)
         // TODO: Check no error
         return otherId == this

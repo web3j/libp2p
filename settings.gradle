@@ -5,3 +5,6 @@ include 'libp2p-net'
 include 'libp2p-peer'
 include 'libp2p-tcp'
 include 'libp2p-transport'
+include 'libp2p-protocol'
+include 'stream-muxer'
+

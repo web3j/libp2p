@@ -25,9 +25,10 @@ class NotifieeTest {
         conn = Mockito.mock(Conn::class.java)
         stream = Mockito.mock(Stream::class.java)
         multiaddr = Multiaddr("/ip4/127.0.0.1/udp/1234")
-        notifiee = NotifyBundle(::setCalledToTrue, ::setCalledToTrue,
-                                ::setCalledToTrueConn, ::setCalledToTrueConn,
-                                ::setCalledToTrueStream, ::setCalledToTrueStream
+        notifiee = NotifyBundle(
+            ::setCalledToTrue, ::setCalledToTrue,
+            ::setCalledToTrueConn, ::setCalledToTrueConn,
+            ::setCalledToTrueStream, ::setCalledToTrueStream
         )
     }
 

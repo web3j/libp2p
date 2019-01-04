@@ -131,12 +131,11 @@ fun unmarshalPublicKey(data: ByteArray): PubKey = TODO()
  */
 fun marshalPublicKey(pubKey: PubKey): ByteArray {
 
-    val pbmes = PbPublicKey.newBuilder()
+    return PbPublicKey.newBuilder()
         .setType(pubKey.type())
         .setData(ByteString.copyFrom(pubKey.raw()))
-
-//    return proto.Marshal(pbmes)
-    return ByteArray(0)
+        .build()
+        .toByteArray()
 }
 
 /**

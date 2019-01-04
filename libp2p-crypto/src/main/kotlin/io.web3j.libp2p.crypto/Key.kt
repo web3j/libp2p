@@ -1,7 +1,15 @@
 package io.web3j.libp2p.crypto
 
 import com.google.protobuf.ByteString
+import crypto.pb.Crypto
+import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
+import io.web3j.libp2p.crypto.keys.generateRsaKeyPair
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalRsaPrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalRsaPublicKey
 import crypto.pb.Crypto.PublicKey as PbPublicKey
+import crypto.pb.Crypto.PrivateKey as PbPrivateKey
 
 enum class KEY_TYPE {
     /**
@@ -123,7 +131,19 @@ fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
  * UnmarshalPublicKey converts a protobuf serialized public key into its
  * representative object
  */
-fun unmarshalPublicKey(data: ByteArray): PubKey = TODO()
+fun unmarshalPublicKey(data: ByteArray): PubKey {
+    val pmes = PbPublicKey.parseFrom(data)
+
+    val pmesd = pmes.data.toByteArray()
+
+    return when (pmes.type) {
+        Crypto.KeyType.RSA -> unmarshalRsaPublicKey(pmesd)
+        Crypto.KeyType.Ed25519 -> unmarshalEd25519PublicKey(pmesd)
+        Crypto.KeyType.Secp256k1 -> unmarshalSecpPublicKey(pmesd)
+        Crypto.KeyType.ECDSA -> unmarshalEcdsaPublicKey(pmesd)
+        else -> throw BadKeyTypeException()
+    }
+}
 
 /**
  * MarshalPublicKey converts a public key object into a protobuf serialized
@@ -140,14 +160,37 @@ fun marshalPublicKey(pubKey: PubKey): ByteArray =
  * UnmarshalPrivateKey converts a protobuf serialized private key into its
  * representative object
  */
-fun unmarshalPrivateKey(data: ByteArray): PrivKey = TODO()
+fun unmarshalPrivateKey(data: ByteArray): PrivKey {
+    val pmes = PbPrivateKey.parseFrom(data)
+
+    val pmesd = pmes.data.toByteArray()
+
+    return when (pmes.type) {
+        Crypto.KeyType.RSA -> unmarshalRsaPrivateKey(pmesd)
+        Crypto.KeyType.Ed25519 -> unmarshalEd25519PrivateKey(pmesd)
+        Crypto.KeyType.Secp256k1 -> unmarshalSecpPrivateKey(pmesd)
+        Crypto.KeyType.ECDSA -> unmarshalEcdsaPrivateKey(pmesd)
+        else -> throw BadKeyTypeException()
+    }
+}
+
 
 /**
  * MarshalPrivateKey converts a public key object into a protobuf serialized
  * private key
  */
-fun marshalPrivateKey(privKey: PrivKey): ByteArray = TODO()
-
+fun marshalPrivateKey(privKey: PrivKey): ByteArray =
+    PbPrivateKey.newBuilder()
+        .setType(privKey.type())
+        .setData(ByteString.copyFrom(privKey.raw()))
+        .build()
+        .toByteArray()
 
 fun generateSecp256k1KeyPair(): Pair<PrivKey, PubKey> = TODO()
 fun generateEcdsaKeyPair(): Pair<PrivKey, PubKey> = TODO()
+
+fun unmarshalSecpPrivateKey(data: ByteArray): PrivKey = TODO()
+fun unmarshalEcdsaPrivateKey(data: ByteArray): PrivKey = TODO()
+
+fun unmarshalSecpPublicKey(data: ByteArray): PubKey = TODO()
+fun unmarshalEcdsaPublicKey(data: ByteArray): PubKey = TODO()

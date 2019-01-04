@@ -1,5 +1,9 @@
-package io.web3j.libp2p.crypto
+package io.web3j.libp2p.crypto.keys
 
+import io.web3j.libp2p.crypto.ErrRsaKeyTooSmall
+import io.web3j.libp2p.crypto.Libp2pException
+import io.web3j.libp2p.crypto.unmarshalPrivateKey
+import io.web3j.libp2p.crypto.unmarshalPublicKey
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -41,7 +45,7 @@ class RsaTest {
     fun testRSAMarshalLoop() {
         val keys = generateRsaKeyPair(512)
 
-        val privB = keys.first.bytes();
+        val privB = keys.first.bytes()
         val privNew = unmarshalPrivateKey(privB)
         assertTrue(!keys.first.equals(privNew) || !privNew.equals(keys.first), "keys are not equal")
 

@@ -5,7 +5,7 @@ import io.ipfs.multiformats.multihash.Type
 import io.web3j.libp2p.crypto.KEY_TYPE
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.crypto.generateEd25519KeyPair
+import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
 import io.web3j.libp2p.crypto.generateKeyPair
 import io.web3j.libp2p.crypto.unmarshalPrivateKey
 import org.junit.jupiter.api.Assertions.assertEquals

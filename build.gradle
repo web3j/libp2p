@@ -6,7 +6,10 @@ buildscript {
     ext.nettyVersion = '4.1.32.Final'
     ext.protobufVersion = '3.6.1'
     ext.protocVersion = '3.0.0'
+
+    //test dependencies
     ext.junitVersion = '5.3.2'
+    ext.mockitoKotlinVersion = '1.6.0'
 }
 
 plugins {
@@ -20,15 +23,6 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'kotlin'
 
-    buildscript {
-        repositories {
-            google()
-            mavenLocal()
-            mavenCentral()
-            jcenter()
-        }
-    }
-
     repositories {
         mavenCentral()
         jcenter()
@@ -37,8 +31,10 @@ allprojects {
 
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-        testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-        testCompile "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+        
+        testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion",
+                "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
+                "com.nhaarman:mockito-kotlin:$mockitoKotlinVersion"
     }
 
     compileKotlin {

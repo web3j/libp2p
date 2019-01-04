@@ -1,17 +1,10 @@
-//plugins {
-//    id "com.google.protobuf" version "0.8.7"
-//}
-
 apply plugin: 'com.google.protobuf'
 apply plugin: 'idea'
 
 buildscript {
-//    repositories {
-////        google()
-////        mavenLocal()
-//        mavenCentral()
-//        jcenter()
-//    }
+    repositories {
+        mavenCentral()
+    }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.7'
     }

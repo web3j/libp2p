@@ -31,7 +31,7 @@ allprojects {
 
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-        
+
         testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion",
                 "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
                 "com.nhaarman:mockito-kotlin:$mockitoKotlinVersion"

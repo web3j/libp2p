@@ -129,14 +129,12 @@ fun unmarshalPublicKey(data: ByteArray): PubKey = TODO()
  * MarshalPublicKey converts a public key object into a protobuf serialized
  * public key
  */
-fun marshalPublicKey(pubKey: PubKey): ByteArray {
-
-    return PbPublicKey.newBuilder()
+fun marshalPublicKey(pubKey: PubKey): ByteArray =
+    PbPublicKey.newBuilder()
         .setType(pubKey.type())
         .setData(ByteString.copyFrom(pubKey.raw()))
         .build()
         .toByteArray()
-}
 
 /**
  * UnmarshalPrivateKey converts a protobuf serialized private key into its

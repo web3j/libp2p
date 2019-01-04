@@ -107,7 +107,7 @@ interface Listener {
 /**
  * Network is an interface with methods for managing transports.
  */
-interface Network // TODO:  : inet.Network {
+interface Network { // TODO:  : inet.Network {
 
     /**
      * AddTransport adds a transport to this Network.

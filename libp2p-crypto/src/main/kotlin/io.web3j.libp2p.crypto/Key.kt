@@ -2,12 +2,18 @@ package io.web3j.libp2p.crypto
 
 import com.google.protobuf.ByteString
 import crypto.pb.Crypto
+import io.web3j.libp2p.crypto.keys.generateEcdsaKeyPair
 import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
 import io.web3j.libp2p.crypto.keys.generateRsaKeyPair
+import io.web3j.libp2p.crypto.keys.generateSecp256k1KeyPair
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPublicKey
 import io.web3j.libp2p.crypto.keys.unmarshalEd25519PrivateKey
 import io.web3j.libp2p.crypto.keys.unmarshalEd25519PublicKey
 import io.web3j.libp2p.crypto.keys.unmarshalRsaPrivateKey
 import io.web3j.libp2p.crypto.keys.unmarshalRsaPublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PublicKey
 import crypto.pb.Crypto.PublicKey as PbPublicKey
 import crypto.pb.Crypto.PrivateKey as PbPrivateKey
 
@@ -139,7 +145,7 @@ fun unmarshalPublicKey(data: ByteArray): PubKey {
     return when (pmes.type) {
         Crypto.KeyType.RSA -> unmarshalRsaPublicKey(pmesd)
         Crypto.KeyType.Ed25519 -> unmarshalEd25519PublicKey(pmesd)
-        Crypto.KeyType.Secp256k1 -> unmarshalSecpPublicKey(pmesd)
+        Crypto.KeyType.Secp256k1 -> unmarshalSecp256k1PublicKey(pmesd)
         Crypto.KeyType.ECDSA -> unmarshalEcdsaPublicKey(pmesd)
         else -> throw BadKeyTypeException()
     }
@@ -168,7 +174,7 @@ fun unmarshalPrivateKey(data: ByteArray): PrivKey {
     return when (pmes.type) {
         Crypto.KeyType.RSA -> unmarshalRsaPrivateKey(pmesd)
         Crypto.KeyType.Ed25519 -> unmarshalEd25519PrivateKey(pmesd)
-        Crypto.KeyType.Secp256k1 -> unmarshalSecpPrivateKey(pmesd)
+        Crypto.KeyType.Secp256k1 -> unmarshalSecp256k1PrivateKey(pmesd)
         Crypto.KeyType.ECDSA -> unmarshalEcdsaPrivateKey(pmesd)
         else -> throw BadKeyTypeException()
     }
@@ -185,12 +191,3 @@ fun marshalPrivateKey(privKey: PrivKey): ByteArray =
         .setData(ByteString.copyFrom(privKey.raw()))
         .build()
         .toByteArray()
-
-fun generateSecp256k1KeyPair(): Pair<PrivKey, PubKey> = TODO()
-fun generateEcdsaKeyPair(): Pair<PrivKey, PubKey> = TODO()
-
-fun unmarshalSecpPrivateKey(data: ByteArray): PrivKey = TODO()
-fun unmarshalEcdsaPrivateKey(data: ByteArray): PrivKey = TODO()
-
-fun unmarshalSecpPublicKey(data: ByteArray): PubKey = TODO()
-fun unmarshalEcdsaPublicKey(data: ByteArray): PubKey = TODO()

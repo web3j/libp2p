@@ -1,6 +1,13 @@
-package io.web3j.libp2p.crypto
+package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
+import io.web3j.libp2p.crypto.ErrRsaKeyTooSmall
+import io.web3j.libp2p.crypto.Key
+import io.web3j.libp2p.crypto.Libp2pCrypto
+import io.web3j.libp2p.crypto.Libp2pException
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
+import io.web3j.libp2p.crypto.RSA_ALGORITHM
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.Signature
@@ -101,10 +108,26 @@ fun generateRsaKeyPair(bits: Int): Pair<PrivKey, PubKey> {
     }
 
 
-    val kp: KeyPair = with(KeyPairGenerator.getInstance(RSA_ALGORITHM, Libp2pCrypto.provider)) {
+    val kp: KeyPair = with(KeyPairGenerator.getInstance(
+        RSA_ALGORITHM,
+        Libp2pCrypto.provider
+    )) {
         initialize(bits)
         genKeyPair()
     }
 
-    return Pair(RsaPrivateKey(kp.private, kp.public), RsaPublicKey(kp.public))
+    return Pair(
+        RsaPrivateKey(kp.private, kp.public),
+        RsaPublicKey(kp.public)
+    )
+}
+
+// UnmarshalRsaPrivateKey returns a private key from the input x509 bytes
+fun unmarshalRsaPrivateKey(data: ByteArray): PrivKey {
+    TODO()
+}
+
+// UnmarshalRsaPublicKey returns a public key from the input x509 bytes
+fun unmarshalRsaPublicKey(data: ByteArray): PubKey {
+    TODO()
 }

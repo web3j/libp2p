@@ -1,6 +1,9 @@
-package io.web3j.libp2p.crypto
+package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
+import io.web3j.libp2p.crypto.Key
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
 
 // Ed25519PrivateKey is an ed25519 private key
 class Ed25519PrivateKey() : PrivKey {
@@ -80,3 +83,7 @@ func GenerateEd25519Key(src io.Reader) (PrivKey, PubKey, error) {
 }
      */
 }
+
+fun unmarshalEd25519PrivateKey(data: ByteArray): PrivKey = TODO()
+
+fun unmarshalEd25519PublicKey(data: ByteArray): PubKey = TODO()

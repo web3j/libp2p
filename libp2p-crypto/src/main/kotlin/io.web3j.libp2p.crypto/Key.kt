@@ -38,7 +38,7 @@ interface Key {
     /**
      * Bytes returns a serialized, storeable representation of this key.
      */
-    @Deprecated("Use marshal/unmarshal functions instead")
+    @Deprecated("Use marshal/unmarshal functions instead", level = DeprecationLevel.WARNING)
     fun bytes(): ByteArray
 
     /**

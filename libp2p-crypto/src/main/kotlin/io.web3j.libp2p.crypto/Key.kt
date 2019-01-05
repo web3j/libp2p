@@ -17,7 +17,7 @@ import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PublicKey
 import crypto.pb.Crypto.PublicKey as PbPublicKey
 import crypto.pb.Crypto.PrivateKey as PbPrivateKey
 
-enum class KEY_TYPE {
+enum class KeyType {
     /**
      * RSA is an enum for the supported RSA key type
      */
@@ -50,7 +50,9 @@ interface Key {
     /**
      * Equals checks whether two PubKeys are the same.
      */
-    fun equals(other: Key): Boolean
+    fun equals(other: Key): Boolean {
+        return this == other && this.bytes().contentEquals(other.bytes())
+    }
 
     fun raw(): ByteArray
 
@@ -109,13 +111,13 @@ class BadKeyTypeException : Exception("Invalid or unsupported key type")
 /**
  * Generate a new key pair of the provided type.
  */
-fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
+fun generateKeyPair(type: KeyType, bits: Int): Pair<PrivKey, PubKey> {
 
     return when (type) {
-        KEY_TYPE.RSA -> generateRsaKeyPair(bits)
-        KEY_TYPE.ED25519 -> generateEd25519KeyPair()
-        KEY_TYPE.SECP256K1 -> generateSecp256k1KeyPair()
-        KEY_TYPE.ECDSA -> generateEcdsaKeyPair()
+        KeyType.RSA -> generateRsaKeyPair(bits)
+        KeyType.ED25519 -> generateEd25519KeyPair()
+        KeyType.SECP256K1 -> generateSecp256k1KeyPair()
+        KeyType.ECDSA -> generateEcdsaKeyPair()
     }
     /*
     	switch typ {

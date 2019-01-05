@@ -2,7 +2,7 @@ package io.web3j.libp2p.peer
 
 import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
-import io.web3j.libp2p.crypto.KEY_TYPE
+import io.web3j.libp2p.crypto.KeyType
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kethereum.encodings.encodeToBase58String
+import java.security.SecureRandom
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -75,7 +76,7 @@ class PeerTest {
         assertNull(pk)
 
         // Shouldn't work for, e.g. RSA keys (too large)
-        val keyPair1 = generateKeyPair(KEY_TYPE.RSA, 2048)
+        val keyPair1 = generateKeyPair(KeyType.RSA, 2048)
         val pubKey1 = keyPair1.second
         val rsaId = ID.idFromPublicKey(pubKey1)
         val extractedRsaPub = rsaId.extractPublicKey()
@@ -120,13 +121,7 @@ class PeerTest {
             var generatedPairs = AtomicInteger(0)
 
             fun generate(): Keyset {
-                var seed = System.nanoTime()
-
-                // workaround for low time resolution
-                seed += generatedPairs.incrementAndGet() shl 32
-
-                //TODO use seed in RSA generation
-                val keyPair = generateKeyPair(KEY_TYPE.RSA, 512)
+                val keyPair = generateKeyPair(KeyType.RSA, 512)
 
                 val privKey = keyPair.first
                 val pubKey = keyPair.second

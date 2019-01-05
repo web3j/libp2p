@@ -2,33 +2,33 @@ package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
 import io.web3j.libp2p.crypto.ErrRsaKeyTooSmall
-import io.web3j.libp2p.crypto.Key
 import io.web3j.libp2p.crypto.Libp2pCrypto
 import io.web3j.libp2p.crypto.Libp2pException
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.RSA_ALGORITHM
+import io.web3j.libp2p.crypto.RSA_SIGNATURE_ALGORITHM
+import io.web3j.libp2p.crypto.marshalPrivateKey
+import io.web3j.libp2p.crypto.marshalPublicKey
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.Signature
-import java.security.PrivateKey as javaPrivateKey
-import java.security.PublicKey as javaPublicKey
+import java.security.PrivateKey as JavaPrivateKey
+import java.security.PublicKey as JavaPublicKey
 
 
 // RsaPrivateKey is an rsa private key
-class RsaPrivateKey(private val sk: javaPrivateKey, private val pk: javaPublicKey) : PrivKey {
+class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKey) : PrivKey {
 
     private val rsaPublicKey = RsaPublicKey(pk)
 
     override fun bytes(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun equals(other: Key): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return marshalPrivateKey(this)
     }
 
     override fun raw(): ByteArray {
+        // sk.format == "PKCS#8" - not sure how to convert this
+        // can the format be specified when generating the keypair?
 //        b := x509.MarshalPKCS1PrivateKey(sk.sk)
 //        return b, nil
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -55,7 +55,7 @@ class RsaPrivateKey(private val sk: javaPrivateKey, private val pk: javaPublicKe
     }
 
     override fun sign(data: ByteArray): ByteArray {
-        val signature = Signature.getInstance("SHA256withRSA", Libp2pCrypto.provider)
+        val signature = Signature.getInstance(RSA_SIGNATURE_ALGORITHM, Libp2pCrypto.provider)
         signature.initSign(sk)
         signature.update(data)
         return signature.sign()
@@ -69,19 +69,16 @@ class RsaPrivateKey(private val sk: javaPrivateKey, private val pk: javaPublicKe
 
 
 // RsaPublicKey is an rsa public key
-class RsaPublicKey(private val k: javaPublicKey) : PubKey {
+class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
     override fun bytes(): ByteArray {
-//        return MarshalPublicKey(pk)
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun equals(other: Key): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return marshalPublicKey(this)
     }
 
     override fun raw(): ByteArray {
+        // FIXME - check this
+        // k.format == "x509" not sure if that is equivalent
+        return k.encoded
         // return x509.MarshalPKIXPublicKey(pk.k)
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun type(): Crypto.KeyType {

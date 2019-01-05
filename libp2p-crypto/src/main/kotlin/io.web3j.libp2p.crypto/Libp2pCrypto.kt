@@ -8,10 +8,9 @@ package io.web3j.libp2p.crypto
 const val ErrRsaKeyTooSmall = "rsa keys must be >= 512 bits to be useful"
 
 const val RSA_ALGORITHM = "RSA"
+const val RSA_SIGNATURE_ALGORITHM = "SHA256withRSA"
 
 object Libp2pCrypto {
-
-    val a = "SHA256withRSA"
 
     val provider = org.bouncycastle.jce.provider.BouncyCastleProvider()
 }

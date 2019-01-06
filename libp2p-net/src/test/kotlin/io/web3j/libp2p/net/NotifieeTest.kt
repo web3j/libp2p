@@ -1,7 +1,5 @@
 package io.web3j.libp2p.net
 
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
 import io.ipfs.multiformats.multiaddr.Multiaddr
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -37,7 +35,6 @@ class NotifieeTest {
 
         notifiee.listen(network, multiaddr)
         assertEquals(true, called)
-        verify(notifiee, times(1)).listenNotify(network, multiaddr)
     }
 
     @Test
@@ -46,7 +43,6 @@ class NotifieeTest {
 
         notifiee.listenClose(network, multiaddr)
         assertEquals(true, called)
-        verify(notifiee, times(1)).listenCloseNotify(network, multiaddr)
     }
 
     @Test
@@ -55,7 +51,6 @@ class NotifieeTest {
 
         notifiee.connected(network, conn)
         assertEquals(true, called)
-        verify(notifiee, times(1)).connectedNotify(network, conn)
     }
 
     @Test
@@ -64,7 +59,6 @@ class NotifieeTest {
 
         notifiee.disconnected(network, conn)
         assertEquals(true, called)
-        verify(notifiee, times(1)).disconnectedNotify(network, conn)
     }
 
     @Test
@@ -73,7 +67,6 @@ class NotifieeTest {
 
         notifiee.openedStream(network, stream)
         assertEquals(true, called)
-        verify(notifiee, times(1)).openedStreamNotify(network, stream)
     }
 
     @Test
@@ -82,7 +75,6 @@ class NotifieeTest {
 
         notifiee.closedStream(network, stream)
         assertEquals(true, called)
-        verify(notifiee, times(1)).closedStreamNotify(network, stream)
     }
 
     private fun checkIfCalledIsFalse() {

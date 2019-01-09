@@ -2,20 +2,9 @@ package io.web3j.libp2p.crypto
 
 import com.google.protobuf.ByteString
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.keys.generateEcdsaKeyPair
-import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
-import io.web3j.libp2p.crypto.keys.generateRsaKeyPair
-import io.web3j.libp2p.crypto.keys.generateSecp256k1KeyPair
-import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPrivateKey
-import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPublicKey
-import io.web3j.libp2p.crypto.keys.unmarshalEd25519PrivateKey
-import io.web3j.libp2p.crypto.keys.unmarshalEd25519PublicKey
-import io.web3j.libp2p.crypto.keys.unmarshalRsaPrivateKey
-import io.web3j.libp2p.crypto.keys.unmarshalRsaPublicKey
-import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PrivateKey
-import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PublicKey
-import crypto.pb.Crypto.PublicKey as PbPublicKey
+import io.web3j.libp2p.crypto.keys.*
 import crypto.pb.Crypto.PrivateKey as PbPrivateKey
+import crypto.pb.Crypto.PublicKey as PbPublicKey
 
 enum class KeyType {
     /**
@@ -119,20 +108,6 @@ fun generateKeyPair(type: KeyType, bits: Int): Pair<PrivKey, PubKey> {
         KeyType.SECP256K1 -> generateSecp256k1KeyPair()
         KeyType.ECDSA -> generateEcdsaKeyPair()
     }
-    /*
-    	switch typ {
-	case RSA:
-		return GenerateRSAKeyPair(bits, src)
-	case Ed25519:
-		return GenerateEd25519Key(src)
-	case Secp256k1:
-		return GenerateSecp256k1Key(src)
-	case ECDSA:
-		return GenerateECDSAKeyPair(src)
-	default:
-		return nil, nil, ErrBadKeyType
-	}
-     */
 }
 
 /**

@@ -1,54 +1,49 @@
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.ErrRsaKeyTooSmall
-import io.web3j.libp2p.crypto.Libp2pCrypto
-import io.web3j.libp2p.crypto.Libp2pException
-import io.web3j.libp2p.crypto.PrivKey
-import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.crypto.RSA_ALGORITHM
-import io.web3j.libp2p.crypto.RSA_SIGNATURE_ALGORITHM
-import io.web3j.libp2p.crypto.marshalPrivateKey
-import io.web3j.libp2p.crypto.marshalPublicKey
+import io.web3j.libp2p.crypto.*
+import org.bouncycastle.asn1.ASN1Primitive
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey
+import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters
+import org.bouncycastle.crypto.util.PrivateKeyInfoFactory
+import java.security.KeyFactory
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.Signature
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.RSAPublicKeySpec
+import java.security.spec.X509EncodedKeySpec
 import java.security.PrivateKey as JavaPrivateKey
 import java.security.PublicKey as JavaPublicKey
 
-
-// RsaPrivateKey is an rsa private key
 class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKey) : PrivKey {
 
+    /*
+     * PKCS#8 and PKCS#1 are standards that define how private keys are to be stored; java stores its RSA keys using
+     * the PKCS#8 format and  older libraries use PKCS1.
+     * It is important to note that PKCS#8 includes the data payload in PKCS1 format alongside some additional values.
+     */
+
     private val rsaPublicKey = RsaPublicKey(pk)
+    private val pkcs1PrivateKeyBytes: ByteArray
+
+    init {
+        // Set up private key.
+        val isKeyOfFormat: Boolean = sk.format?.equals(KEY_PKCS8) ?: false
+        if (!isKeyOfFormat) {
+            throw Libp2pException("Private key must be of '$KEY_PKCS8' format")
+        }
+
+        val bcPrivateKeyInfo = PrivateKeyInfo.getInstance(sk.encoded)
+        pkcs1PrivateKeyBytes = bcPrivateKeyInfo.parsePrivateKey().toASN1Primitive().encoded
+    }
 
     override fun bytes(): ByteArray {
         return marshalPrivateKey(this)
     }
 
-    override fun raw(): ByteArray {
-        // sk.format == "PKCS#8" - not sure how to convert this
-        // can the format be specified when generating the keypair?
-//        b := x509.MarshalPKCS1PrivateKey(sk.sk)
-//        return b, nil
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    // http://www.java2s.com/Tutorial/Java/0490__Security/BasicclassforexploringPKCS1V15Signatures.htm
-//        val cipher = Cipher.getInstance("RSA/None/PKCS1Padding", "BC")
-//        cipher.init(Cipher.DECRYPT_MODE, keyPair.getPublic())
-//
-//        val decSig = cipher.doFinal(sigBytes)
-//        val aIn = ASN1InputStream(decSig)
-//        val seq = aIn.readObject() as ASN1Sequence
-//
-//        println(ASN1Dump.dumpAsString(seq))
-//
-//        val hash = MessageDigest.getInstance("SHA-256", "BC")
-//        hash.update(message)
-//
-//        val sigHash = seq.getObjectAt(1) as ASN1OctetString
-//        println(MessageDigest.isEqual(hash.digest(), sigHash.octets))
+    override fun raw(): ByteArray = pkcs1PrivateKeyBytes
 
     override fun type(): Crypto.KeyType {
         return Crypto.KeyType.RSA
@@ -65,6 +60,23 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
         return rsaPublicKey
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as RsaPrivateKey
+        return bytes().contentEquals(other.bytes())
+    }
+
+    override fun hashCode(): Int {
+        var result = sk.hashCode()
+        result = 31 * result + pk.hashCode()
+        result = 31 * result + rsaPublicKey.hashCode()
+        result = 31 * result + pkcs1PrivateKeyBytes.contentHashCode()
+        return result
+    }
+
+
 }
 
 
@@ -75,10 +87,8 @@ class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
     }
 
     override fun raw(): ByteArray {
-        // FIXME - check this
-        // k.format == "x509" not sure if that is equivalent
+        // Java uses x509 for its public keys.
         return k.encoded
-        // return x509.MarshalPKIXPublicKey(pk.k)
     }
 
     override fun type(): Crypto.KeyType {
@@ -92,6 +102,19 @@ class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
         return signature1.verify(signature)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as RsaPublicKey
+
+        return bytes().contentEquals(other.bytes())
+    }
+
+    override fun hashCode(): Int {
+        return k.hashCode()
+    }
+
 }
 
 
@@ -99,16 +122,16 @@ class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
  * GenerateRSAKeyPair generates a new rsa private and public key.
  */
 fun generateRsaKeyPair(bits: Int): Pair<PrivKey, PubKey> {
-
     if (bits < 512) {
         throw Libp2pException(ErrRsaKeyTooSmall)
     }
 
-
-    val kp: KeyPair = with(KeyPairGenerator.getInstance(
-        RSA_ALGORITHM,
-        Libp2pCrypto.provider
-    )) {
+    val kp: KeyPair = with(
+        KeyPairGenerator.getInstance(
+            RSA_ALGORITHM,
+            Libp2pCrypto.provider
+        )
+    ) {
         initialize(bits)
         genKeyPair()
     }
@@ -119,12 +142,39 @@ fun generateRsaKeyPair(bits: Int): Pair<PrivKey, PubKey> {
     )
 }
 
-// UnmarshalRsaPrivateKey returns a private key from the input x509 bytes
-fun unmarshalRsaPrivateKey(data: ByteArray): PrivKey {
-    TODO()
-}
-
 // UnmarshalRsaPublicKey returns a public key from the input x509 bytes
 fun unmarshalRsaPublicKey(data: ByteArray): PubKey {
-    TODO()
+    val pk = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(data))
+    return RsaPublicKey(pk)
+}
+
+/**
+ * Converts the given private key (in PKCS1 format) to a PKCS8 key.
+ */
+fun unmarshalRsaPrivateKey(data: ByteArray): PrivKey {
+    // Input is ASN1 DER encoded PKCS1 private key bytes.
+    val rsaPrivateKey = RSAPrivateKey.getInstance(ASN1Primitive.fromByteArray(data))
+    val privateKeyParameters = RSAPrivateCrtKeyParameters(
+        rsaPrivateKey.modulus,
+        rsaPrivateKey.publicExponent,
+        rsaPrivateKey.privateExponent,
+        rsaPrivateKey.prime1,
+        rsaPrivateKey.prime2,
+        rsaPrivateKey.exponent1,
+        rsaPrivateKey.exponent2,
+        rsaPrivateKey.coefficient
+    )
+
+    // Now convert to a PKSC#8 key.
+    val privateKeyInfo = PrivateKeyInfoFactory.createPrivateKeyInfo(privateKeyParameters)
+    val algorithmId = privateKeyInfo.privateKeyAlgorithm.algorithm.id
+    val spec = PKCS8EncodedKeySpec(privateKeyInfo.encoded)
+    val sk = KeyFactory.getInstance(algorithmId, Libp2pCrypto.provider).generatePrivate(spec)
+
+    // We can extract the public key from the modules and exponent of the private key. Woot!
+    val publicKeySpec = RSAPublicKeySpec(privateKeyParameters.modulus, privateKeyParameters.publicExponent)
+    val keyFactory = KeyFactory.getInstance(RSA_ALGORITHM)
+    val pk = keyFactory.generatePublic(publicKeySpec)
+
+    return RsaPrivateKey(sk, pk)
 }

@@ -3,6 +3,11 @@ description 'libp2p common peer representation in the network'
 
 dependencies {
     compile project(':libp2p-crypto'),
-            "io.ipfs.multiformats:kotlin-multihash:$kotlinMultihashVersion",
-            'com.github.walleth.kethereum:base58:0.66'
+//            "io.ipfs.multiformats:kotlin-multihash:$kotlinMultihashVersion",
+            'com.github.walleth.kethereum:base58:0.66',
+            // FIXME: Remove once multibase 1.0.1 is available
+            "io.ipfs.multiformats:kotlin-multibase:1.0.0"
+    compile("io.ipfs.multiformats:kotlin-multihash:$kotlinMultihashVersion") {
+        exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
+    }
 }

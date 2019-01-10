@@ -5,5 +5,10 @@ dependencies {
             project (':libp2p-peer'),
             project (':libp2p-crypto'),
             project (':stream-muxer'),
-            "io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion"
+//            "io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion"
+            // FIXME: Remove once multibase 1.0.1 is available
+            "io.ipfs.multiformats:kotlin-multibase:1.0.0"
+    compile("io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion") {
+        exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
+    }
 }

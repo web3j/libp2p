@@ -3,9 +3,10 @@ package io.web3j.libp2p.crypto.keys
 import crypto.pb.Crypto
 import io.web3j.libp2p.crypto.*
 import io.web3j.libp2p.crypto.Key
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
+import org.bouncycastle.jce.spec.ECPublicKeySpec
 import java.security.*
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
@@ -20,17 +21,12 @@ private val CURVE: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpe
  */
 class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey {
 
-    val pkcs1PrivateKeyBytes: ByteArray
-
     init {
         // Set up private key.
         val isKeyOfFormat: Boolean = priv.format?.equals(KEY_PKCS8) ?: false
         if (!isKeyOfFormat) {
             throw Libp2pException("Private key must be of '$KEY_PKCS8' format")
         }
-
-        val bcPrivateKeyInfo = PrivateKeyInfo.getInstance(priv.encoded)
-        pkcs1PrivateKeyBytes = bcPrivateKeyInfo.parsePrivateKey().toASN1Primitive().encoded
     }
 
     override fun bytes(): ByteArray = marshalPrivateKey(this)
@@ -60,7 +56,12 @@ class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey {
         }
 
     override fun publicKey(): PubKey {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val keyFactory = KeyFactory.getInstance(ECDSA_ALGORITHM, Libp2pCrypto.provider)
+        priv as BCECPrivateKey
+        val q = priv.parameters.g.multiply((this.priv as org.bouncycastle.jce.interfaces.ECPrivateKey).d)
+        val pubSpec = ECPublicKeySpec(q, priv.parameters)
+        val publicKeyGenerated = keyFactory.generatePublic(pubSpec)
+        return EcdsaPublicKey(publicKeyGenerated)
     }
 
 }

@@ -24,6 +24,21 @@ class EcdsaTest {
     }
 
     @Test
+    fun testECDSABasicSignAndVerifyWithRegeneratedPublicKey() {
+        val (priv, _) = generateEcdsaKeyPair()
+        val data = "hello! and welcome to some awesome crypto primitives".toByteArray()
+        val sig = priv.sign(data)
+
+        val pub = priv.publicKey()
+        Assertions.assertTrue(pub.verify(data, sig), "signature didn't match")
+
+        // change data : data[0] = ^ data [0]
+        data[0] = data[0].xor(data[0])
+
+        Assertions.assertFalse(pub.verify(data, sig), "should have produced a verification error")
+    }
+
+    @Test
     fun testECDSASignZero() {
         val (priv, pub) = generateEcdsaKeyPair()
         val data = ByteArray(0)

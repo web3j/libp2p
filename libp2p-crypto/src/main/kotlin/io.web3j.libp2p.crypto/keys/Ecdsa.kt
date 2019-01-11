@@ -23,8 +23,7 @@ class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey {
 
     init {
         // Set up private key.
-        val isKeyOfFormat: Boolean = priv.format?.equals(KEY_PKCS8) ?: false
-        if (!isKeyOfFormat) {
+        if (!priv.format.equals(KEY_PKCS8)) {
             throw Libp2pException("Private key must be of '$KEY_PKCS8' format")
         }
     }

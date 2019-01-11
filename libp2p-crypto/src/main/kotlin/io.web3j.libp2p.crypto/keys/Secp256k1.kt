@@ -4,6 +4,10 @@ import crypto.pb.Crypto
 import io.web3j.libp2p.crypto.Key
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
+import io.web3j.libp2p.crypto.SHA_ALGORITHM
+import org.bouncycastle.util.encoders.Hex
+import java.security.MessageDigest
+
 
 // Secp256k1PrivateKey is an secp256k1 private key
 class Secp256k1PrivateKey() : PrivKey {
@@ -25,8 +29,24 @@ class Secp256k1PrivateKey() : PrivKey {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun sign(data: ByteArray) : ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun sign(data: ByteArray): ByteArray {
+        val hash = with(MessageDigest.getInstance(SHA_ALGORITHM)) {
+            digest(data) // hash := sha256.Sum256(data)
+        }
+
+        val sha256hex = String(Hex.encode(hash))
+
+
+        /*
+        	hash := sha256.Sum256(data)
+	sig, err := (*btcec.PrivateKey)(k).Sign(hash[:])
+	if err != nil {
+		return nil, err
+	}
+
+	return sig.Serialize(), nil
+         */
+        return ByteArray(0)
     }
 
     override fun publicKey(): PubKey {
@@ -55,7 +75,7 @@ class Secp256k1PublicKey : PubKey {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun verify(data: ByteArray, signature: ByteArray) : Boolean {
+    override fun verify(data: ByteArray, signature: ByteArray): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

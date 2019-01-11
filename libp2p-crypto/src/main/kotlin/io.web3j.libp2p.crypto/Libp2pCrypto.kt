@@ -8,7 +8,15 @@ package io.web3j.libp2p.crypto
 const val ErrRsaKeyTooSmall = "rsa keys must be >= 512 bits to be useful"
 
 const val RSA_ALGORITHM = "RSA"
-const val RSA_SIGNATURE_ALGORITHM = "SHA256withRSA"
+const val SHA_ALGORITHM = "SHA-256"
+
+const val ECDSA_ALGORITHM = "ECDSA"
+
+const val P256_CURVE = "P-256"
+
+const val SHA_256_WITH_RSA = "SHA256withRSA"
+const val SHA_256_WITH_ECDSA = "SHA256withECDSA"
+
 const val KEY_PKCS8 = "PKCS#8"
 
 object Libp2pCrypto {

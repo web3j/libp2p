@@ -39,18 +39,14 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
         pkcs1PrivateKeyBytes = bcPrivateKeyInfo.parsePrivateKey().toASN1Primitive().encoded
     }
 
-    override fun bytes(): ByteArray {
-        return marshalPrivateKey(this)
-    }
+    override fun bytes(): ByteArray = marshalPrivateKey(this)
 
     override fun raw(): ByteArray = pkcs1PrivateKeyBytes
 
-    override fun type(): Crypto.KeyType {
-        return Crypto.KeyType.RSA
-    }
+    override fun type(): Crypto.KeyType = Crypto.KeyType.RSA
 
     override fun sign(data: ByteArray): ByteArray {
-        val signature = Signature.getInstance(RSA_SIGNATURE_ALGORITHM, Libp2pCrypto.provider)
+        val signature = Signature.getInstance(SHA_256_WITH_RSA, Libp2pCrypto.provider)
         signature.initSign(sk)
         signature.update(data)
         return signature.sign()
@@ -82,25 +78,18 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
 
 // RsaPublicKey is an rsa public key
 class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
-    override fun bytes(): ByteArray {
-        return marshalPublicKey(this)
-    }
+    override fun bytes(): ByteArray = marshalPublicKey(this)
 
-    override fun raw(): ByteArray {
-        // Java uses x509 for its public keys.
-        return k.encoded
-    }
+    override fun raw(): ByteArray = k.encoded
 
-    override fun type(): Crypto.KeyType {
-        return Crypto.KeyType.RSA
-    }
+    override fun type(): Crypto.KeyType = Crypto.KeyType.RSA
 
-    override fun verify(data: ByteArray, signature: ByteArray): Boolean {
-        val signature1 = Signature.getInstance("SHA256withRSA", Libp2pCrypto.provider)
-        signature1.initVerify(k)
-        signature1.update(data)
-        return signature1.verify(signature)
-    }
+    override fun verify(data: ByteArray, signature: ByteArray): Boolean =
+        with(Signature.getInstance(SHA_256_WITH_RSA, Libp2pCrypto.provider)) {
+            initVerify(k)
+            update(data)
+            verify(signature)
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -142,11 +131,11 @@ fun generateRsaKeyPair(bits: Int): Pair<PrivKey, PubKey> {
     )
 }
 
-// UnmarshalRsaPublicKey returns a public key from the input x509 bytes
-fun unmarshalRsaPublicKey(data: ByteArray): PubKey {
-    val pk = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(data))
-    return RsaPublicKey(pk)
-}
+/**
+ * UnmarshalRsaPublicKey returns a public key from the input x509 bytes
+ */
+fun unmarshalRsaPublicKey(data: ByteArray): PubKey =
+    RsaPublicKey(KeyFactory.getInstance(RSA_ALGORITHM, Libp2pCrypto.provider).generatePublic(X509EncodedKeySpec(data)))
 
 /**
  * Converts the given private key (in PKCS1 format) to a PKCS8 key.
@@ -171,7 +160,7 @@ fun unmarshalRsaPrivateKey(data: ByteArray): PrivKey {
     val spec = PKCS8EncodedKeySpec(privateKeyInfo.encoded)
     val sk = KeyFactory.getInstance(algorithmId, Libp2pCrypto.provider).generatePrivate(spec)
 
-    // We can extract the public key from the modules and exponent of the private key. Woot!
+    // We can extract the public key from the modulus and exponent of the private key. Woot!
     val publicKeySpec = RSAPublicKeySpec(privateKeyParameters.modulus, privateKeyParameters.publicExponent)
     val keyFactory = KeyFactory.getInstance(RSA_ALGORITHM)
     val pk = keyFactory.generatePublic(publicKeySpec)

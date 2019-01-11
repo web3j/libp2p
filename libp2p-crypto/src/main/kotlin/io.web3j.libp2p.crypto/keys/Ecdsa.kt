@@ -1,33 +1,63 @@
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
+import io.web3j.libp2p.crypto.*
 import io.web3j.libp2p.crypto.Key
-import io.web3j.libp2p.crypto.PrivKey
-import io.web3j.libp2p.crypto.PubKey
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
+import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
+import java.security.*
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
+import java.security.PrivateKey as JavaPrivateKey
+import java.security.interfaces.ECPrivateKey as JavaECPrivateKey
 
-// EcdsaPrivateKey is an implementation of an ecdsa private key
-class EcdsaPrivateKey() : PrivKey {
-    // k ecdsa.PrivateKey
 
-    override fun bytes(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+private val CURVE: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(P256_CURVE)
+
+/**
+ * EcdsaPrivateKey is an implementation of an ecdsa private key
+ */
+class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey {
+
+    val pkcs1PrivateKeyBytes: ByteArray
+
+    init {
+        // Set up private key.
+        val isKeyOfFormat: Boolean = priv.format?.equals(KEY_PKCS8) ?: false
+        if (!isKeyOfFormat) {
+            throw Libp2pException("Private key must be of '$KEY_PKCS8' format")
+        }
+
+        val bcPrivateKeyInfo = PrivateKeyInfo.getInstance(priv.encoded)
+        pkcs1PrivateKeyBytes = bcPrivateKeyInfo.parsePrivateKey().toASN1Primitive().encoded
     }
+
+    override fun bytes(): ByteArray = marshalPrivateKey(this)
 
     override fun equals(other: Key): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as EcdsaPrivateKey
+
+        return bytes().contentEquals(other.bytes())
     }
 
-    override fun raw(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun raw(): ByteArray = priv.encoded
 
-    override fun type(): Crypto.KeyType {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun type(): Crypto.KeyType = Crypto.KeyType.ECDSA
 
-    override fun sign(data: ByteArray): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    /**
+     * Sign returns the signature of the input data.
+     */
+    override fun sign(data: ByteArray): ByteArray =
+        with(Signature.getInstance(SHA_256_WITH_ECDSA, Libp2pCrypto.provider)) {
+            // Signature is made up of r and s numbers.
+            initSign(priv)
+            update(data)
+            sign()
+        }
 
     override fun publicKey(): PubKey {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -36,46 +66,72 @@ class EcdsaPrivateKey() : PrivKey {
 }
 
 // EcdsaPublicKey is an implementation of an ecdsa public key
-class EcdsaPublicKey : PubKey {
-    // 	k ecdsa.PublicKey
+class EcdsaPublicKey(private val pub: PublicKey) : PubKey {
 
-    override fun bytes(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun bytes(): ByteArray = marshalPublicKey(this)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as EcdsaPublicKey
+
+        return bytes().contentEquals(other.bytes())
     }
 
-    override fun equals(other: Key): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun hashCode(): Int = pub.hashCode()
 
-    override fun raw(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun raw(): ByteArray = pub.encoded
 
-    override fun type(): Crypto.KeyType {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun type(): Crypto.KeyType = Crypto.KeyType.ECDSA
 
-    override fun verify(data: ByteArray, signature: ByteArray): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun verify(data: ByteArray, signature: ByteArray): Boolean =
+        with(Signature.getInstance(SHA_256_WITH_ECDSA, Libp2pCrypto.provider)) {
+            initVerify(pub)
+            update(data)
+            verify(signature)
+        }
 
 }
 
-// GenerateEcdsaKey generate a new ecdsa private and public key pair
+/**
+ * GenerateECDSAKeyPairWithCurve generates a new ecdsa private and public key with a specified curve.
+ */
+private fun generateECDSAKeyPairWithCurve(curve: ECNamedCurveParameterSpec): Pair<PrivKey, PubKey> {
+    val keypair: KeyPair = with(KeyPairGenerator.getInstance(ECDSA_ALGORITHM, Libp2pCrypto.provider)) {
+        initialize(curve, SecureRandom())
+        genKeyPair()
+    }
+
+    return Pair(EcdsaPrivateKey(keypair.private as JavaECPrivateKey), EcdsaPublicKey(keypair.public))
+}
+
+/**
+ * GenerateEcdsaKey generate a new ecdsa private and public key pair
+ */
 fun generateEcdsaKeyPair(): Pair<PrivKey, PubKey> {
-    return Pair(EcdsaPrivateKey(), EcdsaPublicKey())
-
-    /*
-
-priv, err := ecdsa.GenerateKey(curve, src)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return &ECDSAPrivateKey{priv}, &ECDSAPublicKey{&priv.PublicKey}, nil
-     */
+    // http://www.bouncycastle.org/wiki/display/JA1/Supported+Curves+%28ECDSA+and+ECGOST%29
+    // and
+    // http://www.bouncycastle.org/wiki/pages/viewpage.action?pageId=362269
+    return generateECDSAKeyPairWithCurve(CURVE)
 }
 
-fun unmarshalEcdsaPrivateKey(data: ByteArray): PrivKey = TODO()
+/**
+ * ECDSAKeyPairFromKey generates a new ecdsa private and public key from an input private key.
+ */
+fun ecdsaKeyPairFromKey(priv: EcdsaPrivateKey): Pair<PrivKey, PubKey> = Pair(priv, priv.publicKey())
 
-fun unmarshalEcdsaPublicKey(data: ByteArray): PubKey = TODO()
+/**
+ * UnmarshalECDSAPrivateKey returns a private key from x509 bytes.
+ */
+fun unmarshalEcdsaPrivateKey(data: ByteArray): PrivKey = EcdsaPrivateKey(
+    KeyFactory.getInstance(ECDSA_ALGORITHM, Libp2pCrypto.provider).generatePrivate(
+        PKCS8EncodedKeySpec(data)
+    )
+)
+
+fun unmarshalEcdsaPublicKey(keyBytes: ByteArray): PubKey {
+    return with(KeyFactory.getInstance(ECDSA_ALGORITHM, Libp2pCrypto.provider)) {
+        EcdsaPublicKey(generatePublic(X509EncodedKeySpec(keyBytes)))
+    }
+}

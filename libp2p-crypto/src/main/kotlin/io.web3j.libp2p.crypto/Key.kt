@@ -30,6 +30,8 @@ enum class KeyType {
 
 interface Key {
 
+    val keyType: crypto.pb.Crypto.KeyType
+
     /**
      * Bytes returns a serialized, storeable representation of this key.
      */
@@ -45,7 +47,6 @@ interface Key {
 
     fun raw(): ByteArray
 
-    fun type(): crypto.pb.Crypto.KeyType
 }
 
 /**
@@ -63,6 +64,15 @@ interface PrivKey : Key {
      * Return a public key paired with this private key.
      */
     fun publicKey(): PubKey
+
+    override fun bytes(): ByteArray = marshalPrivateKey(this)
+
+    override fun equals(other: Key): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return bytes().contentEquals(other.bytes())
+    }
+
 }
 
 /**
@@ -74,6 +84,14 @@ interface PubKey : Key {
      * Verify that 'sig' is the signed hash of 'data'.
      */
     fun verify(data: ByteArray, signature: ByteArray): Boolean
+
+    override fun bytes(): ByteArray = marshalPublicKey(this)
+
+    override fun equals(other: Key): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return bytes().contentEquals(other.bytes())
+    }
 }
 
 /**
@@ -134,7 +152,7 @@ fun unmarshalPublicKey(data: ByteArray): PubKey {
  */
 fun marshalPublicKey(pubKey: PubKey): ByteArray =
     PbPublicKey.newBuilder()
-        .setType(pubKey.type())
+        .setType(pubKey.keyType)
         .setData(ByteString.copyFrom(pubKey.raw()))
         .build()
         .toByteArray()
@@ -164,7 +182,7 @@ fun unmarshalPrivateKey(data: ByteArray): PrivKey {
  */
 fun marshalPrivateKey(privKey: PrivKey): ByteArray =
     PbPrivateKey.newBuilder()
-        .setType(privKey.type())
+        .setType(privKey.keyType)
         .setData(ByteString.copyFrom(privKey.raw()))
         .build()
         .toByteArray()

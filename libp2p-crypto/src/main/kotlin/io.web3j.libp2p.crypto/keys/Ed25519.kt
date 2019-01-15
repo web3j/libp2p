@@ -1,89 +1,58 @@
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.Key
-import io.web3j.libp2p.crypto.PrivKey
-import io.web3j.libp2p.crypto.PubKey
+import io.web3j.libp2p.crypto.*
+import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
+import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
+import org.bouncycastle.crypto.signers.Ed25519Signer
+import java.security.SecureRandom
+
 
 // Ed25519PrivateKey is an ed25519 private key
-class Ed25519PrivateKey() : PrivKey {
+class Ed25519PrivateKey(private val priv: Ed25519PrivateKeyParameters) : PrivKey {
     // k ed25519.PrivateKey
 
-    override fun bytes(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override val keyType = Crypto.KeyType.Ed25519
+
+    override fun raw(): ByteArray = priv.encoded
+
+    override fun sign(data: ByteArray): ByteArray = with(Ed25519Signer()) {
+        init(true, priv)
+        update(data, 0, data.size)
+        generateSignature()
     }
 
-    override fun equals(other: Key): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun raw(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun type(): Crypto.KeyType {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun sign(data: ByteArray) : ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun publicKey(): PubKey {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun publicKey(): PubKey = Ed25519PublicKey(priv.generatePublicKey())
 
 }
 
 // Ed25519PublicKey is an ed25519 public key
-class Ed25519PublicKey : PubKey {
-    // 	k ed25519.PublicKey
+class Ed25519PublicKey(private val pub: Ed25519PublicKeyParameters) : PubKey {
 
-    override fun bytes(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override val keyType = Crypto.KeyType.Ed25519
 
-    override fun equals(other: Key): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun raw(): ByteArray = pub.encoded
 
-    override fun raw(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun type(): Crypto.KeyType {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun verify(data: ByteArray, signature: ByteArray) : Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun verify(data: ByteArray, signature: ByteArray): Boolean {
+        val verifier = Ed25519Signer()
+        verifier.init(false, pub)
+        verifier.update(data, 0, data.size)
+        return verifier.verifySignature(signature)
     }
 
 }
 
 // GenerateEd25519Key generate a new ed25519 private and public key pair
-fun generateEd25519KeyPair(): Pair<PrivKey, PubKey> {
-    return Pair(Ed25519PrivateKey(), Ed25519PublicKey())
-
-    /*
-
-func GenerateEd25519Key(src io.Reader) (PrivKey, PubKey, error) {
-	pub, priv, err := ed25519.GenerateKey(src)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return &Ed25519PrivateKey{
-			k: priv,
-		},
-		&Ed25519PublicKey{
-			k: pub,
-		},
-		nil
-}
-     */
+fun generateEd25519KeyPair(): Pair<PrivKey, PubKey> = with(Ed25519KeyPairGenerator()) {
+    init(Ed25519KeyGenerationParameters(SecureRandom()))
+    val keypair = generateKeyPair()
+    val privateKey = keypair.private as Ed25519PrivateKeyParameters
+    Pair(Ed25519PrivateKey(privateKey), Ed25519PublicKey(keypair.public as Ed25519PublicKeyParameters))
 }
 
-fun unmarshalEd25519PrivateKey(data: ByteArray): PrivKey = TODO()
+fun unmarshalEd25519PrivateKey(data: ByteArray): PrivKey = Ed25519PrivateKey(Ed25519PrivateKeyParameters(data, 0))
 
-fun unmarshalEd25519PublicKey(data: ByteArray): PubKey = TODO()
+
+fun unmarshalEd25519PublicKey(data: ByteArray): PubKey = Ed25519PublicKey(Ed25519PublicKeyParameters(data, 0))

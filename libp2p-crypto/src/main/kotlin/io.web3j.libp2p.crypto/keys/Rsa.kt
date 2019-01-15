@@ -28,6 +28,8 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
     private val rsaPublicKey = RsaPublicKey(pk)
     private val pkcs1PrivateKeyBytes: ByteArray
 
+    override val keyType = Crypto.KeyType.RSA
+
     init {
         // Set up private key.
         val isKeyOfFormat: Boolean = sk.format?.equals(KEY_PKCS8) ?: false
@@ -39,11 +41,7 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
         pkcs1PrivateKeyBytes = bcPrivateKeyInfo.parsePrivateKey().toASN1Primitive().encoded
     }
 
-    override fun bytes(): ByteArray = marshalPrivateKey(this)
-
     override fun raw(): ByteArray = pkcs1PrivateKeyBytes
-
-    override fun type(): Crypto.KeyType = Crypto.KeyType.RSA
 
     override fun sign(data: ByteArray): ByteArray {
         val signature = Signature.getInstance(SHA_256_WITH_RSA, Libp2pCrypto.provider)
@@ -54,14 +52,6 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
 
     override fun publicKey(): PubKey {
         return rsaPublicKey
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as RsaPrivateKey
-        return bytes().contentEquals(other.bytes())
     }
 
     override fun hashCode(): Int {
@@ -78,11 +68,10 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
 
 // RsaPublicKey is an rsa public key
 class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
-    override fun bytes(): ByteArray = marshalPublicKey(this)
+
+    override val keyType = Crypto.KeyType.RSA
 
     override fun raw(): ByteArray = k.encoded
-
-    override fun type(): Crypto.KeyType = Crypto.KeyType.RSA
 
     override fun verify(data: ByteArray, signature: ByteArray): Boolean =
         with(Signature.getInstance(SHA_256_WITH_RSA, Libp2pCrypto.provider)) {
@@ -91,18 +80,6 @@ class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
             verify(signature)
         }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as RsaPublicKey
-
-        return bytes().contentEquals(other.bytes())
-    }
-
-    override fun hashCode(): Int {
-        return k.hashCode()
-    }
 
 }
 

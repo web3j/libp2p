@@ -13,19 +13,9 @@ import java.security.MessageDigest
 class Secp256k1PrivateKey() : PrivKey {
     // k secp256k1.PrivateKey
 
-    override fun bytes(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun equals(other: Key): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override val keyType = Crypto.KeyType.Secp256k1
 
     override fun raw(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun type(): Crypto.KeyType {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -59,6 +49,8 @@ class Secp256k1PrivateKey() : PrivKey {
 class Secp256k1PublicKey : PubKey {
     // 	k secp256k1.PublicKey
 
+    override val keyType = Crypto.KeyType.Secp256k1
+
     override fun bytes(): ByteArray {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -68,10 +60,6 @@ class Secp256k1PublicKey : PubKey {
     }
 
     override fun raw(): ByteArray {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun type(): Crypto.KeyType {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

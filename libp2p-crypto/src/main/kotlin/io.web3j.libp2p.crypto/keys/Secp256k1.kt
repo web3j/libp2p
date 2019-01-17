@@ -1,10 +1,10 @@
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.Libp2pException
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.SECP_256K1_ALGORITHM
+import io.web3j.libp2p.shared.env.Libp2pException
 import org.bouncycastle.asn1.*
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.ec.CustomNamedCurves
@@ -28,11 +28,9 @@ private val CURVE: ECDomainParameters = CURVE_PARAMS.let {
 
 
 // Secp256k1PrivateKey is an secp256k1 private key
-class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : PrivKey() {
+class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : PrivKey(Crypto.KeyType.Secp256k1) {
 
     private val priv = privateKey.d
-
-    override val keyType = Crypto.KeyType.Secp256k1
 
     override fun raw(): ByteArray = priv.toByteArray()
 
@@ -66,9 +64,7 @@ class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : Priv
 }
 
 // Secp256k1PublicKey is an secp256k1 public key
-class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey() {
-
-    override val keyType = Crypto.KeyType.Secp256k1
+class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto.KeyType.Secp256k1) {
 
     override fun raw(): ByteArray = pub.q.getEncoded(true)
 

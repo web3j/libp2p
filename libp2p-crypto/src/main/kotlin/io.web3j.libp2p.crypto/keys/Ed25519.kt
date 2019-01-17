@@ -11,10 +11,7 @@ import java.security.SecureRandom
 
 
 // Ed25519PrivateKey is an ed25519 private key
-class Ed25519PrivateKey(private val priv: Ed25519PrivateKeyParameters) : PrivKey() {
-    // k ed25519.PrivateKey
-
-    override val keyType = Crypto.KeyType.Ed25519
+class Ed25519PrivateKey(private val priv: Ed25519PrivateKeyParameters) : PrivKey(Crypto.KeyType.Ed25519) {
 
     override fun raw(): ByteArray = priv.encoded
 
@@ -30,9 +27,7 @@ class Ed25519PrivateKey(private val priv: Ed25519PrivateKeyParameters) : PrivKey
 }
 
 // Ed25519PublicKey is an ed25519 public key
-class Ed25519PublicKey(private val pub: Ed25519PublicKeyParameters) : PubKey() {
-
-    override val keyType = Crypto.KeyType.Ed25519
+class Ed25519PublicKey(private val pub: Ed25519PublicKeyParameters) : PubKey(Crypto.KeyType.Ed25519) {
 
     override fun raw(): ByteArray = pub.encoded
 

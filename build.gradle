@@ -1,6 +1,4 @@
 buildscript {
-    ext.bouncycastleVersion = '161b20'
-
     /*
     This is a temporary work-around until BC-1.60 is taken out of beta and published.
     Step 1: Download the jar file locally: https://downloads.bouncycastle.org/betas/bcprov-jdk15on-161b20.jar
@@ -8,6 +6,7 @@ buildscript {
         mvn install:install-file -DgroupId=org.bouncycastle -DartifactId=bcprov-jdk15on -Dversion=161b20 -Dfile=/Users/sam/Downloads/bcprov-jdk15on-161b21.jar -Dtype=jar -Dpackaging=jar
         Don't forget to change the "file" argument to point to your download
      */
+    ext.bouncycastleVersion = '161b20'
 
     ext.kotlin_version = '1.3.10'
     ext.kotlinMultiaddrVersion = '1.0.0'

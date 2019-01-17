@@ -1,4 +1,4 @@
-package io.web3j.libp2p.crypto
+package io.web3j.libp2p.shared.env
 
 class Libp2pException : RuntimeException {
 

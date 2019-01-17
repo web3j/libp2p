@@ -6,7 +6,8 @@ import io.web3j.libp2p.crypto.keys.*
 import crypto.pb.Crypto.PrivateKey as PbPrivateKey
 import crypto.pb.Crypto.PublicKey as PbPublicKey
 
-enum class KeyType {
+enum class KEY_TYPE {
+
     /**
      * RSA is an enum for the supported RSA key type
      */
@@ -46,7 +47,7 @@ interface Key {
  * PrivKey represents a private key that can be used to generate a public key,
  * sign data, and decrypt data that was encrypted with a public key.
  */
-abstract class PrivKey : Key {
+abstract class PrivKey(override val keyType: Crypto.KeyType) : Key {
 
     /**
      * Cryptographically sign the given bytes.
@@ -71,7 +72,7 @@ abstract class PrivKey : Key {
 /**
  * PubKey is a public key.
  */
-abstract class PubKey : Key {
+abstract class PubKey(override val keyType: Crypto.KeyType) : Key {
 
     /**
      * Verify that 'sig' is the signed hash of 'data'.
@@ -112,13 +113,13 @@ class BadKeyTypeException : Exception("Invalid or unsupported key type")
 /**
  * Generate a new key pair of the provided type.
  */
-fun generateKeyPair(type: KeyType, bits: Int): Pair<PrivKey, PubKey> {
+fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
 
     return when (type) {
-        KeyType.RSA -> generateRsaKeyPair(bits)
-        KeyType.ED25519 -> generateEd25519KeyPair()
-        KeyType.SECP256K1 -> generateSecp256k1KeyPair()
-        KeyType.ECDSA -> generateEcdsaKeyPair()
+        KEY_TYPE.RSA -> generateRsaKeyPair(bits)
+        KEY_TYPE.ED25519 -> generateEd25519KeyPair()
+        KEY_TYPE.SECP256K1 -> generateSecp256k1KeyPair()
+        KEY_TYPE.ECDSA -> generateEcdsaKeyPair()
     }
 }
 

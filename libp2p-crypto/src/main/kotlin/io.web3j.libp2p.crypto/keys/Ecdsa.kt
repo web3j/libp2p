@@ -2,6 +2,7 @@ package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
 import io.web3j.libp2p.crypto.*
+import io.web3j.libp2p.shared.env.Libp2pException
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
@@ -18,9 +19,8 @@ private val CURVE: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpe
 /**
  * EcdsaPrivateKey is an implementation of an ecdsa private key
  */
-class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey() {
+class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey(Crypto.KeyType.ECDSA) {
 
-    override val keyType = Crypto.KeyType.ECDSA
 
     init {
         // Set up private key.
@@ -56,9 +56,7 @@ class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey() {
 }
 
 // EcdsaPublicKey is an implementation of an ecdsa public key
-class EcdsaPublicKey(private val pub: PublicKey) : PubKey() {
-
-    override val keyType = Crypto.KeyType.ECDSA
+class EcdsaPublicKey(private val pub: PublicKey) : PubKey(Crypto.KeyType.ECDSA) {
 
     override fun raw(): ByteArray = pub.encoded
 

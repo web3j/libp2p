@@ -43,25 +43,16 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
 
     override fun raw(): ByteArray = pkcs1PrivateKeyBytes
 
-    override fun sign(data: ByteArray): ByteArray {
-        val signature = Signature.getInstance(SHA_256_WITH_RSA, Libp2pCrypto.provider)
-        signature.initSign(sk)
-        signature.update(data)
-        return signature.sign()
-    }
+    override fun sign(data: ByteArray): ByteArray =
+        with(Signature.getInstance(SHA_256_WITH_RSA, Libp2pCrypto.provider)) {
+            initSign(sk)
+            update(data)
+            sign()
+        }
 
-    override fun publicKey(): PubKey {
-        return rsaPublicKey
-    }
+    override fun publicKey(): PubKey = rsaPublicKey
 
-    override fun hashCode(): Int {
-        var result = sk.hashCode()
-        result = 31 * result + pk.hashCode()
-        result = 31 * result + rsaPublicKey.hashCode()
-        result = 31 * result + pkcs1PrivateKeyBytes.contentHashCode()
-        return result
-    }
-
+    override fun hashCode(): Int = pk.hashCode()
 
 }
 

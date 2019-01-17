@@ -69,17 +69,17 @@ class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto
     override fun raw(): ByteArray = pub.q.getEncoded(true)
 
     override fun verify(data: ByteArray, signature: ByteArray): Boolean {
-        val signer = ECDSASigner()
-        val params = SECNamedCurves.getByName(SECP_256K1_ALGORITHM)
-        val ecParams = ECDomainParameters(params.curve, params.g, params.n, params.h)
-        signer.init(false, pub)
+        val signer = ECDSASigner().also {
+            it.init(false, pub)
+        }
 
         val asn1: ASN1Primitive =
             ByteArrayInputStream(signature).use { inStream -> ASN1InputStream(inStream).use { asnInputStream -> asnInputStream.readObject() } }
 
-        val asn1Encodables = (asn1 as ASN1Sequence).toArray()
-        if (asn1Encodables.size != 2) {
-            throw Libp2pException("Invalid signature: expected 2 values for 'r' and 's' but got ${asn1Encodables.size}")
+        val asn1Encodables = (asn1 as ASN1Sequence).toArray().also {
+            if (it.size != 2) {
+                throw Libp2pException("Invalid signature: expected 2 values for 'r' and 's' but got ${it.size}")
+            }
         }
 
         val r = (asn1Encodables[0].toASN1Primitive() as ASN1Integer).value

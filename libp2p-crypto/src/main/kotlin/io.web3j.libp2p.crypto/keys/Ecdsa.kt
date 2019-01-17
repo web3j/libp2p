@@ -43,12 +43,14 @@ class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey(Crypto.KeyType
         }
 
     override fun publicKey(): PubKey {
-        val keyFactory = KeyFactory.getInstance(ECDSA_ALGORITHM, Libp2pCrypto.provider)
-        priv as BCECPrivateKey
-        val q = priv.parameters.g.multiply((this.priv as org.bouncycastle.jce.interfaces.ECPrivateKey).d)
-        val pubSpec = ECPublicKeySpec(q, priv.parameters)
-        val publicKeyGenerated = keyFactory.generatePublic(pubSpec)
-        return EcdsaPublicKey(publicKeyGenerated)
+        val pubSpec: ECPublicKeySpec = (priv as BCECPrivateKey).run {
+            val q = parameters.g.multiply((this as org.bouncycastle.jce.interfaces.ECPrivateKey).d)
+            ECPublicKeySpec(q, parameters)
+        }
+
+        return with(KeyFactory.getInstance(ECDSA_ALGORITHM, Libp2pCrypto.provider)) {
+            EcdsaPublicKey(generatePublic(pubSpec))
+        }
     }
 
     override fun hashCode(): Int = priv.hashCode()

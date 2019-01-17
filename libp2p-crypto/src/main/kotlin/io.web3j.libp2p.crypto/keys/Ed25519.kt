@@ -1,7 +1,8 @@
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.*
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
 import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
 import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
@@ -31,12 +32,12 @@ class Ed25519PublicKey(private val pub: Ed25519PublicKeyParameters) : PubKey(Cry
 
     override fun raw(): ByteArray = pub.encoded
 
-    override fun verify(data: ByteArray, signature: ByteArray): Boolean {
-        val verifier = Ed25519Signer()
-        verifier.init(false, pub)
-        verifier.update(data, 0, data.size)
-        return verifier.verifySignature(signature)
+    override fun verify(data: ByteArray, signature: ByteArray): Boolean = with(Ed25519Signer()) {
+        init(false, pub)
+        update(data, 0, data.size)
+        verifySignature(signature)
     }
+
 
     override fun hashCode(): Int = pub.hashCode()
 

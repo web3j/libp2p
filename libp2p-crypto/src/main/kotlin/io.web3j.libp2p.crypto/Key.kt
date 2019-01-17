@@ -38,13 +38,6 @@ interface Key {
     @Deprecated("Use marshal/unmarshal functions instead", level = DeprecationLevel.WARNING)
     fun bytes(): ByteArray
 
-    /**
-     * Equals checks whether two PubKeys are the same.
-     */
-    fun equals(other: Key): Boolean {
-        return this == other && this.bytes().contentEquals(other.bytes())
-    }
-
     fun raw(): ByteArray
 
 }
@@ -53,24 +46,24 @@ interface Key {
  * PrivKey represents a private key that can be used to generate a public key,
  * sign data, and decrypt data that was encrypted with a public key.
  */
-interface PrivKey : Key {
+abstract class PrivKey : Key {
 
     /**
      * Cryptographically sign the given bytes.
      */
-    fun sign(data: ByteArray): ByteArray
+    abstract fun sign(data: ByteArray): ByteArray
 
     /**
      * Return a public key paired with this private key.
      */
-    fun publicKey(): PubKey
+    abstract fun publicKey(): PubKey
 
     override fun bytes(): ByteArray = marshalPrivateKey(this)
 
-    override fun equals(other: Key): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        return bytes().contentEquals(other.bytes())
+        return bytes().contentEquals((other as PrivKey).bytes())
     }
 
 }
@@ -78,20 +71,21 @@ interface PrivKey : Key {
 /**
  * PubKey is a public key.
  */
-interface PubKey : Key {
+abstract class PubKey : Key {
 
     /**
      * Verify that 'sig' is the signed hash of 'data'.
      */
-    fun verify(data: ByteArray, signature: ByteArray): Boolean
+    abstract fun verify(data: ByteArray, signature: ByteArray): Boolean
 
     override fun bytes(): ByteArray = marshalPublicKey(this)
 
-    override fun equals(other: Key): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        return bytes().contentEquals(other.bytes())
+        return bytes().contentEquals((other as PubKey).bytes())
     }
+
 }
 
 /**

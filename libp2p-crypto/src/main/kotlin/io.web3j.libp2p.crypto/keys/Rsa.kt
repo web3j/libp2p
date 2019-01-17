@@ -17,7 +17,7 @@ import java.security.spec.X509EncodedKeySpec
 import java.security.PrivateKey as JavaPrivateKey
 import java.security.PublicKey as JavaPublicKey
 
-class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKey) : PrivKey {
+class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKey) : PrivKey() {
 
     /*
      * PKCS#8 and PKCS#1 are standards that define how private keys are to be stored; java stores its RSA keys using
@@ -29,6 +29,7 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
     private val pkcs1PrivateKeyBytes: ByteArray
 
     override val keyType = Crypto.KeyType.RSA
+
 
     init {
         // Set up private key.
@@ -67,7 +68,7 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
 
 
 // RsaPublicKey is an rsa public key
-class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
+class RsaPublicKey(private val k: JavaPublicKey) : PubKey() {
 
     override val keyType = Crypto.KeyType.RSA
 
@@ -80,7 +81,7 @@ class RsaPublicKey(private val k: JavaPublicKey) : PubKey {
             verify(signature)
         }
 
-
+    override fun hashCode(): Int = k.hashCode()
 }
 
 

@@ -35,14 +35,37 @@ class Secp256k1Test {
     }
 
     @Test
+    fun testSecp256k1SignNonZero() {
+        val (priv, pub) = generateSecp256k1KeyPair()
+        val data = "Hello there!".toByteArray()
+        val sig = priv.sign(data)
+        Assertions.assertTrue(pub.verify(data, sig), "signature didn't match")
+    }
+
+    @Test
+    fun testKeyCycle() {
+        val (priv, pub) = generateSecp256k1KeyPair()
+        val privBytes = priv.bytes()
+        val reconstructedPrivateKey = unmarshalPrivateKey(privBytes)
+        Assertions.assertEquals(priv, reconstructedPrivateKey, "Incorrect private key marshalling/unmarshalling")
+
+        val pubRegenerated = priv.publicKey()
+        Assertions.assertTrue(pub.equals(pubRegenerated) || pubRegenerated.equals(pub), "keys are not equal")
+
+        val pubBytes = pub.bytes()
+        val reconstructedPublicKey = unmarshalPublicKey(pubBytes)
+        Assertions.assertEquals(pub, reconstructedPublicKey, "Incorrect public key marshalling/unmarshalling")
+    }
+
+    @Test
     fun testSecp256k1MarshalLoop() {
         val (priv, pub) = generateSecp256k1KeyPair()
         val privB = priv.bytes()
         val privNew = unmarshalPrivateKey(privB)
         Assertions.assertTrue(priv.equals(privNew) || privNew.equals(priv), "keys are not equal")
 
-        val pubB = pub.bytes()
-        val pubNew = unmarshalPublicKey(pubB)
+        val pubBytes = pub.bytes()
+        val pubNew = unmarshalPublicKey(pubBytes)
         Assertions.assertTrue(pub.equals(pubNew) || pubNew.equals(pub), "keys are not equal")
     }
 

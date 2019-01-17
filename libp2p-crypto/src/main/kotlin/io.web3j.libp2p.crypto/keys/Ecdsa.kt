@@ -18,7 +18,7 @@ private val CURVE: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpe
 /**
  * EcdsaPrivateKey is an implementation of an ecdsa private key
  */
-class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey {
+class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey() {
 
     override val keyType = Crypto.KeyType.ECDSA
 
@@ -51,10 +51,12 @@ class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey {
         return EcdsaPublicKey(publicKeyGenerated)
     }
 
+    override fun hashCode(): Int = priv.hashCode()
+
 }
 
 // EcdsaPublicKey is an implementation of an ecdsa public key
-class EcdsaPublicKey(private val pub: PublicKey) : PubKey {
+class EcdsaPublicKey(private val pub: PublicKey) : PubKey() {
 
     override val keyType = Crypto.KeyType.ECDSA
 
@@ -67,6 +69,7 @@ class EcdsaPublicKey(private val pub: PublicKey) : PubKey {
             verify(signature)
         }
 
+    override fun hashCode(): Int = pub.hashCode()
 }
 
 /**

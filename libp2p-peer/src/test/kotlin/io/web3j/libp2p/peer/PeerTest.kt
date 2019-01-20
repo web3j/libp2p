@@ -5,15 +5,15 @@ import io.ipfs.multiformats.multihash.Type
 import io.web3j.libp2p.crypto.KEY_TYPE
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.crypto.generateEd25519KeyPair
+import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
 import io.web3j.libp2p.crypto.generateKeyPair
 import io.web3j.libp2p.crypto.unmarshalPrivateKey
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.kethereum.encodings.encodeToBase58String
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -39,7 +39,7 @@ class PeerTest {
     private lateinit var gen2: Keyset //generated
     private lateinit var man: Keyset //manual
 
-    @Before
+    @BeforeEach
     fun init() {
         gen1 = Keyset.generate()
         gen2 = Keyset.generate()
@@ -61,7 +61,7 @@ class PeerTest {
     }
 
     // https://github.com/libp2p/go-libp2p-crypto/issues/51
-    @Ignore("disabled until libp2p/go-libp2p-crypto#51 is fixed")
+    @Disabled("disabled until libp2p/go-libp2p-crypto#51 is fixed")
     @Test
     fun testPublicKeyExtraction() {
         val keyPair = generateEd25519KeyPair()
@@ -120,12 +120,6 @@ class PeerTest {
             var generatedPairs = AtomicInteger(0)
 
             fun generate(): Keyset {
-                var seed = System.nanoTime()
-
-                // workaround for low time resolution
-                seed += generatedPairs.incrementAndGet() shl 32
-
-                //TODO use seed in RSA generation
                 val keyPair = generateKeyPair(KEY_TYPE.RSA, 512)
 
                 val privKey = keyPair.first

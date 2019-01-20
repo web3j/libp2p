@@ -1,0 +1,3 @@
+apply plugin: 'idea'
+
+description 'libp2p shared'

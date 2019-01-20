@@ -1,8 +1,13 @@
 package io.web3j.libp2p.crypto
 
+import com.google.protobuf.ByteString
 import crypto.pb.Crypto
+import io.web3j.libp2p.crypto.keys.*
+import crypto.pb.Crypto.PrivateKey as PbPrivateKey
+import crypto.pb.Crypto.PublicKey as PbPublicKey
 
 enum class KEY_TYPE {
+
     /**
      * RSA is an enum for the supported RSA key type
      */
@@ -26,48 +31,62 @@ enum class KEY_TYPE {
 
 interface Key {
 
+    val keyType: crypto.pb.Crypto.KeyType
+
     /**
      * Bytes returns a serialized, storeable representation of this key.
      */
-    @Deprecated("Use marshal/unmarshal functions instead")
+    @Deprecated("Use marshal/unmarshal functions instead", level = DeprecationLevel.WARNING)
     fun bytes(): ByteArray
-
-    /**
-     * Equals checks whether two PubKeys are the same.
-     */
-    fun equals(other: Key): Boolean
 
     fun raw(): ByteArray
 
-    fun type(): crypto.pb.Crypto.KeyType
 }
 
 /**
  * PrivKey represents a private key that can be used to generate a public key,
  * sign data, and decrypt data that was encrypted with a public key.
  */
-interface PrivKey : Key {
+abstract class PrivKey(override val keyType: Crypto.KeyType) : Key {
 
     /**
      * Cryptographically sign the given bytes.
      */
-    fun sign(data: ByteArray)
+    abstract fun sign(data: ByteArray): ByteArray
 
     /**
      * Return a public key paired with this private key.
      */
-    fun publicKey(): PubKey
+    abstract fun publicKey(): PubKey
+
+    override fun bytes(): ByteArray = marshalPrivateKey(this)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return bytes().contentEquals((other as PrivKey).bytes())
+    }
+
 }
 
 /**
  * PubKey is a public key.
  */
-interface PubKey : Key {
+abstract class PubKey(override val keyType: Crypto.KeyType) : Key {
 
     /**
      * Verify that 'sig' is the signed hash of 'data'.
      */
-    fun verify(data: ByteArray, signature: ByteArray)
+    abstract fun verify(data: ByteArray, signature: ByteArray): Boolean
+
+    override fun bytes(): ByteArray = marshalPublicKey(this)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return bytes().contentEquals((other as PubKey).bytes())
+    }
+
 }
 
 /**
@@ -97,7 +116,7 @@ class BadKeyTypeException : Exception("Invalid or unsupported key type")
 fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
 
     return when (type) {
-        KEY_TYPE.RSA -> generateRsaKeyPair()
+        KEY_TYPE.RSA -> generateRsaKeyPair(bits)
         KEY_TYPE.ED25519 -> generateEd25519KeyPair()
         KEY_TYPE.SECP256K1 -> generateSecp256k1KeyPair()
         KEY_TYPE.ECDSA -> generateEcdsaKeyPair()
@@ -108,29 +127,57 @@ fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
  * UnmarshalPublicKey converts a protobuf serialized public key into its
  * representative object
  */
-fun unmarshalPublicKey(data: ByteArray): PubKey = TODO()
+fun unmarshalPublicKey(data: ByteArray): PubKey {
+    val pmes = PbPublicKey.parseFrom(data)
+
+    val pmesd = pmes.data.toByteArray()
+
+    return when (pmes.type) {
+        Crypto.KeyType.RSA -> unmarshalRsaPublicKey(pmesd)
+        Crypto.KeyType.Ed25519 -> unmarshalEd25519PublicKey(pmesd)
+        Crypto.KeyType.Secp256k1 -> unmarshalSecp256k1PublicKey(pmesd)
+        Crypto.KeyType.ECDSA -> unmarshalEcdsaPublicKey(pmesd)
+        else -> throw BadKeyTypeException()
+    }
+}
 
 /**
  * MarshalPublicKey converts a public key object into a protobuf serialized
  * public key
  */
-fun marshalPublicKey(pubKey: PubKey): ByteArray = TODO()
+fun marshalPublicKey(pubKey: PubKey): ByteArray =
+    PbPublicKey.newBuilder()
+        .setType(pubKey.keyType)
+        .setData(ByteString.copyFrom(pubKey.raw()))
+        .build()
+        .toByteArray()
 
 /**
  * UnmarshalPrivateKey converts a protobuf serialized private key into its
  * representative object
  */
-fun unmarshalPrivateKey(data: ByteArray): PrivKey = TODO()
+fun unmarshalPrivateKey(data: ByteArray): PrivKey {
+    val pmes = PbPrivateKey.parseFrom(data)
+
+    val pmesd = pmes.data.toByteArray()
+
+    return when (pmes.type) {
+        Crypto.KeyType.RSA -> unmarshalRsaPrivateKey(pmesd)
+        Crypto.KeyType.Ed25519 -> unmarshalEd25519PrivateKey(pmesd)
+        Crypto.KeyType.Secp256k1 -> unmarshalSecp256k1PrivateKey(pmesd)
+        Crypto.KeyType.ECDSA -> unmarshalEcdsaPrivateKey(pmesd)
+        else -> throw BadKeyTypeException()
+    }
+}
+
 
 /**
  * MarshalPrivateKey converts a public key object into a protobuf serialized
  * private key
  */
-fun marshalPrivateKey(privKey: PrivKey): ByteArray = TODO()
-
-
-
-fun generateRsaKeyPair(): Pair<PrivKey, PubKey> = TODO()
-fun generateEd25519KeyPair(): Pair<PrivKey, PubKey> = TODO()
-fun generateSecp256k1KeyPair(): Pair<PrivKey, PubKey> = TODO()
-fun generateEcdsaKeyPair(): Pair<PrivKey, PubKey> = TODO()
+fun marshalPrivateKey(privKey: PrivKey): ByteArray =
+    PbPrivateKey.newBuilder()
+        .setType(privKey.keyType)
+        .setData(ByteString.copyFrom(privKey.raw()))
+        .build()
+        .toByteArray()

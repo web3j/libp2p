@@ -109,18 +109,17 @@ interface Listener {
  */
 interface Network // TODO:  : inet.Network {
 
-    /**
-     * AddTransport adds a transport to this Network.
-     *
-     * When dialing, this Network will iterate over the protocols in the
-     * remote multiaddr and pick the first protocol registered with a proxy
-     * transport, if any. Otherwise, it'll pick the transport registered to
-     * handle the last protocol in the multiaddr.
-     *
-     * When listening, this Network will iterate over the protocols in the
-     * local multiaddr and pick the *last* protocol registered with a proxy
-     * transport, if any. Otherwise, it'll pick the transport registered to
-     * handle the last protocol in the multiaddr.
-     */
-    fun addTransport(transport: Transport)
-}
+/**
+ * AddTransport adds a transport to this Network.
+ *
+ * When dialing, this Network will iterate over the protocols in the
+ * remote multiaddr and pick the first protocol registered with a proxy
+ * transport, if any. Otherwise, it'll pick the transport registered to
+ * handle the last protocol in the multiaddr.
+ *
+ * When listening, this Network will iterate over the protocols in the
+ * local multiaddr and pick the *last* protocol registered with a proxy
+ * transport, if any. Otherwise, it'll pick the transport registered to
+ * handle the last protocol in the multiaddr.
+ */
+fun addTransport(transport: Transport) {}

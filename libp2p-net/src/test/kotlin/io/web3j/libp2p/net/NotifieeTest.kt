@@ -1,9 +1,9 @@
 package io.web3j.libp2p.net
 
 import io.ipfs.multiformats.multiaddr.Multiaddr
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.lang.RuntimeException
 
@@ -17,15 +17,16 @@ class NotifieeTest {
 
     private var called = false
 
-    @Before
+    @BeforeEach
     fun init() {
         network = Mockito.mock(Network::class.java)
         conn = Mockito.mock(Conn::class.java)
         stream = Mockito.mock(Stream::class.java)
         multiaddr = Multiaddr("/ip4/127.0.0.1/udp/1234")
-        notifiee = NotifyBundle(::setCalledToTrue, ::setCalledToTrue,
-                                ::setCalledToTrueConn, ::setCalledToTrueConn,
-                                ::setCalledToTrueStream, ::setCalledToTrueStream
+        notifiee = NotifyBundle(
+            ::setCalledToTrue, ::setCalledToTrue,
+            ::setCalledToTrueConn, ::setCalledToTrueConn,
+            ::setCalledToTrueStream, ::setCalledToTrueStream
         )
     }
 

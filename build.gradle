@@ -1,77 +1,75 @@
 buildscript {
-    /*
-    This is a temporary work-around until BC-1.60 is taken out of beta and published.
-    Step 1: Download the jar file locally: https://downloads.bouncycastle.org/betas/bcprov-jdk15on-161b20.jar
-    Step 2: install it into your local maven repo with:
-        mvn install:install-file -DgroupId=org.bouncycastle -DartifactId=bcprov-jdk15on -Dversion=161b20 -Dfile=/Users/sam/Downloads/bcprov-jdk15on-161b21.jar -Dtype=jar -Dpackaging=jar
-        Don't forget to change the "file" argument to point to your download
-     */
-    ext.bouncycastleVersion = '161b20'
+	/*
+	 This is a temporary work-around until BC-1.60 is taken out of beta and published.
+	 Step 1: Download the jar file locally: https://downloads.bouncycastle.org/betas/bcprov-jdk15on-161b20.jar
+	 Step 2: install it into your local maven repo with:
+	 mvn install:install-file -DgroupId=org.bouncycastle -DartifactId=bcprov-jdk15on -Dversion=161b20 -Dfile=/Users/sam/Downloads/bcprov-jdk15on-161b21.jar -Dtype=jar -Dpackaging=jar
+	 Don't forget to change the "file" argument to point to your download
+	 */
+	ext.bouncycastleVersion = '161b20'
 
-    ext.kotlin_version = '1.3.10'
-    ext.kotlinMultiaddrVersion = '1.0.0'
-    ext.kotlinMultihashVersion = '1.1.0'
-    ext.nettyVersion = '4.1.32.Final'
-    ext.protobufVersion = '3.6.1'
-    ext.protocVersion = '3.0.0'
+	ext.kotlin_version = '1.3.10'
+	ext.kotlinMultiaddrVersion = '1.0.0'
+	ext.kotlinMultihashVersion = '1.1.0'
+	ext.nettyVersion = '4.1.32.Final'
+	ext.protobufVersion = '3.6.1'
+	ext.protocVersion = '3.0.0'
 
-    //test dependencies
-    ext.junitVersion = '5.3.2'
-    ext.mockitoKotlinVersion = '1.6.0'
+	//test dependencies
+	ext.junitVersion = '5.3.2'
+	ext.mockitoKotlinVersion = '1.6.0'
 }
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.10'
-    id "com.diffplug.gradle.spotless" version "3.16.0"
+	id 'org.jetbrains.kotlin.jvm' version '1.3.10'
+	id "com.diffplug.gradle.spotless" version "3.16.0"
 }
 
 group 'io.web3j'
 version '0.1.0'
 
 allprojects {
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
+	apply plugin: 'java'
+	apply plugin: 'kotlin'
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-    }
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+		maven { url 'https://jitpack.io' }
+	}
 
-    dependencies {
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+	dependencies {
+		compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-        testCompile "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
-                "com.nhaarman:mockito-kotlin:$mockitoKotlinVersion"
-    }
+		testCompile "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
+				"com.nhaarman:mockito-kotlin:$mockitoKotlinVersion"
+	}
 
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    
-    apply plugin: 'com.diffplug.gradle.spotless'
-    // see https://github.com/diffplug/spotless/tree/master/plugin-gradle
-    spotless {
-        kotlin {
-            // This path needs to be relative to each project
-            target fileTree('.') {
-                include '**/*.kt'
-                exclude '**/.gradle/**'
-            }
-            ktlint()
+	compileKotlin { kotlinOptions.jvmTarget = "1.8" }
+	compileTestKotlin { kotlinOptions.jvmTarget = "1.8" }
 
-//            licenseHeader '/* Licensed under Apache-2.0 */'	// License header
-//            licenseHeaderFile "${rootDir}/gradle/spotless.java.license"		// License header file
-        }
+	apply plugin: 'com.diffplug.gradle.spotless'
+	// see https://github.com/diffplug/spotless/tree/master/plugin-gradle
+	spotless {
+		kotlin {
+			// This path needs to be relative to each project
+			target fileTree('.') {
+				include '**/*.kt'
+				exclude '**/.gradle/**'
+			}
+			ktlint()
 
-        groovyGradle {
-            target '*.gradle'
-//            greclipse().configFile(rootProject.file('gradle/formatter.properties'))
-            endWithNewline()
-        }
-    }
+			// To clean up if team does not want license in every file
+			// licenseHeader '/* Licensed under Apache-2.0 */'  // License header
+			// licenseHeaderFile "${rootDir}/gradle/spotless.java.license"  // License header file
+		}
+
+		groovyGradle {
+			target '*.gradle'
+			greclipse().configFile(rootProject.file('gradle/formatter.properties'))
+			endWithNewline()
+			paddedCell() // recommended hack to keep gradle files tidy
+		}
+	}
 }

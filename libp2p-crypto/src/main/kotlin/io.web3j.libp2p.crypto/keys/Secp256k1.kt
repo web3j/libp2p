@@ -79,7 +79,11 @@ class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto
         }
 
         val asn1: ASN1Primitive =
-            ByteArrayInputStream(signature).use { inStream -> ASN1InputStream(inStream).use { asnInputStream -> asnInputStream.readObject() } }
+            ByteArrayInputStream(signature)
+                .use { inStream -> ASN1InputStream(inStream)
+                    .use { asnInputStream -> asnInputStream.readObject()
+                    }
+                }
 
         val asn1Encodables = (asn1 as ASN1Sequence).toArray().also {
             if (it.size != 2) {

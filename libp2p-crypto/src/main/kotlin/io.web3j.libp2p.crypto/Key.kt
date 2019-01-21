@@ -2,7 +2,18 @@ package io.web3j.libp2p.crypto
 
 import com.google.protobuf.ByteString
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.keys.*
+import io.web3j.libp2p.crypto.keys.generateEcdsaKeyPair
+import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
+import io.web3j.libp2p.crypto.keys.generateRsaKeyPair
+import io.web3j.libp2p.crypto.keys.generateSecp256k1KeyPair
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalRsaPrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalRsaPublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PublicKey
 import crypto.pb.Crypto.PrivateKey as PbPrivateKey
 import crypto.pb.Crypto.PublicKey as PbPublicKey
 
@@ -40,7 +51,6 @@ interface Key {
     fun bytes(): ByteArray
 
     fun raw(): ByteArray
-
 }
 
 /**
@@ -66,7 +76,6 @@ abstract class PrivKey(override val keyType: Crypto.KeyType) : Key {
         if (javaClass != other?.javaClass) return false
         return bytes().contentEquals((other as PrivKey).bytes())
     }
-
 }
 
 /**
@@ -86,7 +95,6 @@ abstract class PubKey(override val keyType: Crypto.KeyType) : Key {
         if (javaClass != other?.javaClass) return false
         return bytes().contentEquals((other as PubKey).bytes())
     }
-
 }
 
 /**
@@ -169,7 +177,6 @@ fun unmarshalPrivateKey(data: ByteArray): PrivKey {
         else -> throw BadKeyTypeException()
     }
 }
-
 
 /**
  * MarshalPrivateKey converts a public key object into a protobuf serialized

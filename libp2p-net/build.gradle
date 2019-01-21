@@ -1,9 +1,9 @@
 description 'libp2p network API'
 
 dependencies {
-    compile project(':libp2p-protocol'),
-            project(':libp2p-peer'),
-            project(':libp2p-crypto'),
-            project(':stream-muxer'),
-            "io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion"
+	compile project(':libp2p-protocol'),
+			project(':libp2p-peer'),
+			project(':libp2p-crypto'),
+			project(':stream-muxer'),
+			"io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion"
 }

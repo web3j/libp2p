@@ -8,4 +8,3 @@ include 'libp2p-tcp'
 include 'libp2p-transport'
 include 'libp2p-protocol'
 include 'stream-muxer'
-

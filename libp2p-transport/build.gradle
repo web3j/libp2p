@@ -1,6 +1,6 @@
 description 'libp2p common interface for network transports'
 
 dependencies {
-    compile project(':libp2p-peer'),
-            "io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion"
+	compile project(':libp2p-peer'),
+			"io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion"
 }

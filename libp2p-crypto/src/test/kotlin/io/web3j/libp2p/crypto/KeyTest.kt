@@ -11,7 +11,5 @@ class KeyTest {
         print("Starting test")
 
         assertEquals(1, 0 + 1, "incorrect result")
-
     }
-
 }

@@ -5,11 +5,19 @@ import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.SECP_256K1_ALGORITHM
 import io.web3j.libp2p.shared.env.Libp2pException
-import org.bouncycastle.asn1.*
+import org.bouncycastle.asn1.ASN1InputStream
+import org.bouncycastle.asn1.ASN1Integer
+import org.bouncycastle.asn1.ASN1Primitive
+import org.bouncycastle.asn1.ASN1Sequence
+import org.bouncycastle.asn1.DERSequenceGenerator
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.ec.CustomNamedCurves
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator
-import org.bouncycastle.crypto.params.*
+import org.bouncycastle.crypto.params.ECDomainParameters
+import org.bouncycastle.crypto.params.ECKeyGenerationParameters
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters
+import org.bouncycastle.crypto.params.ECPublicKeyParameters
+import org.bouncycastle.crypto.params.ParametersWithRandom
 import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.math.ec.FixedPointCombMultiplier
 import org.bouncycastle.math.ec.FixedPointUtil
@@ -26,7 +34,6 @@ private val CURVE: ECDomainParameters = CURVE_PARAMS.let {
     ECDomainParameters(CURVE_PARAMS.curve, CURVE_PARAMS.g, CURVE_PARAMS.n, CURVE_PARAMS.h)
 }
 
-
 // Secp256k1PrivateKey is an secp256k1 private key
 class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : PrivKey(Crypto.KeyType.Secp256k1) {
 
@@ -41,7 +48,6 @@ class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : Priv
                 Pair(it[0], it[1])
             }
         }
-
 
         return with(ByteArrayOutputStream()) {
             DERSequenceGenerator(this).run {
@@ -60,7 +66,6 @@ class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : Priv
     }
 
     override fun hashCode(): Int = priv.hashCode()
-
 }
 
 // Secp256k1PublicKey is an secp256k1 public key
@@ -88,7 +93,6 @@ class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto
     }
 
     override fun hashCode(): Int = pub.hashCode()
-
 }
 
 // GenerateSecp256k1Key generate a new secp256k1 private and public key pair

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kethereum.encodings.encodeToBase58String
-import java.util.*
+import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
 
 class PeerTest {

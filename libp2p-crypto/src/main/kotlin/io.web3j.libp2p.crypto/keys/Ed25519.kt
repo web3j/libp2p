@@ -10,7 +10,6 @@ import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
 import org.bouncycastle.crypto.signers.Ed25519Signer
 import java.security.SecureRandom
 
-
 // Ed25519PrivateKey is an ed25519 private key
 class Ed25519PrivateKey(private val priv: Ed25519PrivateKeyParameters) : PrivKey(Crypto.KeyType.Ed25519) {
 
@@ -38,9 +37,7 @@ class Ed25519PublicKey(private val pub: Ed25519PublicKeyParameters) : PubKey(Cry
         verifySignature(signature)
     }
 
-
     override fun hashCode(): Int = pub.hashCode()
-
 }
 
 // GenerateEd25519Key generate a new ed25519 private and public key pair
@@ -52,6 +49,5 @@ fun generateEd25519KeyPair(): Pair<PrivKey, PubKey> = with(Ed25519KeyPairGenerat
 }
 
 fun unmarshalEd25519PrivateKey(data: ByteArray): PrivKey = Ed25519PrivateKey(Ed25519PrivateKeyParameters(data, 0))
-
 
 fun unmarshalEd25519PublicKey(data: ByteArray): PubKey = Ed25519PublicKey(Ed25519PublicKeyParameters(data, 0))

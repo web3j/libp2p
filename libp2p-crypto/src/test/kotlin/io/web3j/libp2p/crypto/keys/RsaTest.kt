@@ -6,7 +6,10 @@ import io.web3j.libp2p.crypto.unmarshalPrivateKey
 import io.web3j.libp2p.crypto.unmarshalPublicKey
 import io.web3j.libp2p.shared.env.Libp2pException
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.experimental.xor
 
@@ -81,5 +84,4 @@ class RsaTest {
         val pubRegenerated = priv.publicKey()
         Assertions.assertTrue(pub.equals(pubRegenerated) || pubRegenerated.equals(pub), "keys are not equal")
     }
-
 }

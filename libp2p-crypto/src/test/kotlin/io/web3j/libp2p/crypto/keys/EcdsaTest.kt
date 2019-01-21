@@ -72,6 +72,4 @@ class EcdsaTest {
         val pubRegenerated = priv.publicKey()
         Assertions.assertTrue(pub.equals(pubRegenerated) || pubRegenerated.equals(pub), "keys are not equal")
     }
-
-
 }

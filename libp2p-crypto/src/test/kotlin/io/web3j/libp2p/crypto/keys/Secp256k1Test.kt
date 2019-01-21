@@ -68,5 +68,4 @@ class Secp256k1Test {
         val pubNew = unmarshalPublicKey(pubBytes)
         Assertions.assertTrue(pub.equals(pubNew) || pubNew.equals(pub), "keys are not equal")
     }
-
 }

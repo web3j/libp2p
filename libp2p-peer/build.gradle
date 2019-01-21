@@ -1,7 +1,7 @@
 description 'libp2p common peer representation in the network'
 
 dependencies {
-    compile project(':libp2p-crypto'),
-            "io.ipfs.multiformats:kotlin-multihash:$kotlinMultihashVersion",
-            'com.github.walleth.kethereum:base58:0.66'
+	compile project(':libp2p-crypto'),
+			"io.ipfs.multiformats:kotlin-multihash:$kotlinMultihashVersion",
+			'com.github.walleth.kethereum:base58:0.66'
 }

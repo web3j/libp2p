@@ -8,7 +8,6 @@ import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.unmarshalPublicKey
 
-
 /**
  * Empty peer ID exception.
  */

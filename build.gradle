@@ -22,6 +22,7 @@ buildscript {
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.10'
+    id "com.diffplug.gradle.spotless" version "3.16.0"
 }
 
 group 'io.web3j'
@@ -50,5 +51,27 @@ allprojects {
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
+    }
+    
+    apply plugin: 'com.diffplug.gradle.spotless'
+    // see https://github.com/diffplug/spotless/tree/master/plugin-gradle
+    spotless {
+        kotlin {
+            // This path needs to be relative to each project
+            target fileTree('.') {
+                include '**/*.kt'
+                exclude '**/.gradle/**'
+            }
+            ktlint()
+
+//            licenseHeader '/* Licensed under Apache-2.0 */'	// License header
+//            licenseHeaderFile "${rootDir}/gradle/spotless.java.license"		// License header file
+        }
+
+        groovyGradle {
+            target '*.gradle'
+//            greclipse().configFile(rootProject.file('gradle/formatter.properties'))
+            endWithNewline()
+        }
     }
 }

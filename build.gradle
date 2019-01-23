@@ -60,10 +60,7 @@ allprojects {
 			}
 			// see https://github.com/shyiko/ktlint#standard-rules
 			ktlint().userData(['max_line_length': '120'])
-
-			// To clean up if team does not want license in every file
-			// licenseHeader '/* Licensed under Apache-2.0 */'  // License header
-			// licenseHeaderFile "${rootDir}/gradle/spotless.java.license"  // License header file
+			licenseHeaderFile "${rootDir}/gradle/spotless.java.license"  // License header file
 		}
 
 		groovyGradle {

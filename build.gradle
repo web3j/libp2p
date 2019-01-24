@@ -59,7 +59,7 @@ allprojects {
                 exclude '**/.gradle/**'
             }
             // see https://github.com/shyiko/ktlint#standard-rules
-            ktlint().userData(['max_line_length': '120'])
+            ktlint().userData(['max_line_length': '120', 'insert_final_newline': 'true'])
             licenseHeaderFile "${rootDir}/gradle/spotless.java.license"  // License header file
         }
 

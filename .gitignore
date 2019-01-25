@@ -6,6 +6,8 @@
 
 # Package Files #
 *.jar
+# Temporary exclusion until dependencies are published to a public maven repo.
+!lib/*.jar
 *.war
 *.ear
 

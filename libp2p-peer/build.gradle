@@ -10,4 +10,3 @@ dependencies {
 
     compile "com.github.walleth.kethereum:base58:$kethereumBase58Version"
 }
-

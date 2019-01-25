@@ -1,8 +1,31 @@
+/*
+ * Copyright 2019 BLK Technologies Limited. (web3labs.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package io.web3j.libp2p.crypto
 
 import com.google.protobuf.ByteString
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.keys.*
+import io.web3j.libp2p.crypto.keys.generateEcdsaKeyPair
+import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
+import io.web3j.libp2p.crypto.keys.generateRsaKeyPair
+import io.web3j.libp2p.crypto.keys.generateSecp256k1KeyPair
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalRsaPrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalRsaPublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PublicKey
 import crypto.pb.Crypto.PrivateKey as PbPrivateKey
 import crypto.pb.Crypto.PublicKey as PbPublicKey
 
@@ -40,7 +63,6 @@ interface Key {
     fun bytes(): ByteArray
 
     fun raw(): ByteArray
-
 }
 
 /**
@@ -66,7 +88,6 @@ abstract class PrivKey(override val keyType: Crypto.KeyType) : Key {
         if (javaClass != other?.javaClass) return false
         return bytes().contentEquals((other as PrivKey).bytes())
     }
-
 }
 
 /**
@@ -86,7 +107,6 @@ abstract class PubKey(override val keyType: Crypto.KeyType) : Key {
         if (javaClass != other?.javaClass) return false
         return bytes().contentEquals((other as PubKey).bytes())
     }
-
 }
 
 /**
@@ -169,7 +189,6 @@ fun unmarshalPrivateKey(data: ByteArray): PrivKey {
         else -> throw BadKeyTypeException()
     }
 }
-
 
 /**
  * MarshalPrivateKey converts a public key object into a protobuf serialized

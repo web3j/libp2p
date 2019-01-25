@@ -1,18 +1,40 @@
+/*
+ * Copyright 2019 BLK Technologies Limited. (web3labs.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.*
+import io.web3j.libp2p.crypto.ECDSA_ALGORITHM
+import io.web3j.libp2p.crypto.KEY_PKCS8
+import io.web3j.libp2p.crypto.Libp2pCrypto
+import io.web3j.libp2p.crypto.P256_CURVE
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
+import io.web3j.libp2p.crypto.SHA_256_WITH_ECDSA
 import io.web3j.libp2p.shared.env.Libp2pException
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
 import org.bouncycastle.jce.spec.ECPublicKeySpec
-import java.security.*
+import java.security.KeyFactory
+import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.PublicKey
+import java.security.SecureRandom
+import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.security.PrivateKey as JavaPrivateKey
 import java.security.interfaces.ECPrivateKey as JavaECPrivateKey
-
 
 private val CURVE: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(P256_CURVE)
 
@@ -20,7 +42,6 @@ private val CURVE: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpe
  * EcdsaPrivateKey is an implementation of an ecdsa private key
  */
 class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey(Crypto.KeyType.ECDSA) {
-
 
     init {
         // Set up private key.
@@ -54,7 +75,6 @@ class EcdsaPrivateKey(private val priv: JavaPrivateKey) : PrivKey(Crypto.KeyType
     }
 
     override fun hashCode(): Int = priv.hashCode()
-
 }
 
 // EcdsaPublicKey is an implementation of an ecdsa public key

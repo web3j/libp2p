@@ -1,3 +1,15 @@
+/*
+ * Copyright 2019 BLK Technologies Limited. (web3labs.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
@@ -9,7 +21,6 @@ import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
 import org.bouncycastle.crypto.signers.Ed25519Signer
 import java.security.SecureRandom
-
 
 // Ed25519PrivateKey is an ed25519 private key
 class Ed25519PrivateKey(private val priv: Ed25519PrivateKeyParameters) : PrivKey(Crypto.KeyType.Ed25519) {
@@ -38,9 +49,7 @@ class Ed25519PublicKey(private val pub: Ed25519PublicKeyParameters) : PubKey(Cry
         verifySignature(signature)
     }
 
-
     override fun hashCode(): Int = pub.hashCode()
-
 }
 
 // GenerateEd25519Key generate a new ed25519 private and public key pair
@@ -52,6 +61,5 @@ fun generateEd25519KeyPair(): Pair<PrivKey, PubKey> = with(Ed25519KeyPairGenerat
 }
 
 fun unmarshalEd25519PrivateKey(data: ByteArray): PrivKey = Ed25519PrivateKey(Ed25519PrivateKeyParameters(data, 0))
-
 
 fun unmarshalEd25519PublicKey(data: ByteArray): PubKey = Ed25519PublicKey(Ed25519PublicKeyParameters(data, 0))

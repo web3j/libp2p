@@ -11,8 +11,8 @@ description 'libp2p crypto'
 
 dependencies {
     compile project(':libp2p-shared')
+    compile files('../lib/bcprov-jdk15on-161b20.jar')
     compile "com.google.protobuf:protobuf-java:$protobufVersion"
-    compile "org.bouncycastle:bcprov-jdk15on:$bouncycastleVersion"
 }
 
 sourceSets {

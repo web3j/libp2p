@@ -1,6 +1,5 @@
 package io.web3j.libp2p.peer
 
-import io.ipfs.multiformats.multihash.DecodedMultihash
 import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
 import io.web3j.libp2p.crypto.*
@@ -11,8 +10,11 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kethereum.encodings.decodeBase58
 import org.kethereum.encodings.encodeToBase58String
+import java.security.MessageDigest
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import io.ipfs.multihash.Multihash as JMultihash
+
 
 class PeerTest {
 
@@ -60,6 +62,13 @@ class PeerTest {
     }
 
     @Test
+    fun testLoadPrivateKeyAndGeneratePublicKeyUsingKotlinMultihashLibrary() {
+        val keyset = Keyset.load(manualPubKeyHashBase58, manualPrivKeyBytes)
+        throw UnsupportedOperationException("We can load the private key! Now implement the rest of the test!")
+    }
+
+
+    @Test
     fun testIDMatchesPublicKey() {
         idMatchesPublicKey(gen1)
         idMatchesPublicKey(gen2)
@@ -98,8 +107,8 @@ class PeerTest {
     private fun idMatchesPublicKey(ks: Keyset) {
         val p1: ID = ID.idB58Decode(ks.hpkp) // p1, err := IDB58Decode(ks.hpkp)
         assertTrue(ks.hpk.raw.contentEquals(p1.id.raw)) //  ks.hpk == string(p1)
-        assertTrue(p1.matchesPublicKey(ks.pk)) // p1.MatchesPublicKey(ks.pk)
-        val p2: ID = ID.idFromPublicKey(ks.pk) // p2, err := IDFromPublicKey(ks.pk)
+        assertTrue(p1.matchesPublicKey(ks.pubKey)) // p1.MatchesPublicKey(ks.pk)
+        val p2: ID = ID.idFromPublicKey(ks.pubKey) // p2, err := IDFromPublicKey(ks.pk)
         assertEquals(p1, p2) //  p1 == p2
         assertEquals(ks.hpkp, p2.pretty(), "hpkp and p2.Pretty differ") // p2.Pretty() == ks.hpkp
     }
@@ -122,10 +131,6 @@ class PeerTest {
         val hpk: Multihash,
         val hpkp: String
     ) {
-        val sk: PrivKey = privKey
-        val pk: PubKey = pubKey
-//        val hpk: Multihash = Multihash.cast(pubKeyHashBytes) //pubKeyHash // TODO: review! string(hash(pk.bytes()))
-//        val hpkp: String = pubKeyHashBase58 // ks.hpkp = b58.Encode([]byte(ks.hpk))
 
         companion object {
 
@@ -144,22 +149,37 @@ class PeerTest {
 
             fun load(manPubKeyHashBase58: String, manPrivKeyBytes: String): Keyset {
 
-                val reconstructedMultihash: Multihash = with(Base64.getDecoder().decode(manPrivKeyBytes)) {
+                val (kReconstructedMultihash, jReconstructedMultihash) = with(Base64.getDecoder().decode(manPrivKeyBytes)) {
                     val privKey = unmarshalPrivateKey(this)
                     val pubKey = privKey.publicKey()
                     val pubKeyBytes = pubKey.bytes()
                     val pubKeyHash: ByteArray = Multihash.encodeByName(pubKeyBytes, Type.SHA2_256.named) // hash(bpk)
-                    Multihash.cast(pubKeyHash)
+
+                    // Try with java-multihash.
+                    val javaLibValue = with(MessageDigest.getInstance("SHA-256")) {
+                        update(pubKeyBytes)
+                        JMultihash(JMultihash.Type.sha2_256, digest())
+                    }
+
+                    Pair(Multihash.cast(pubKeyHash), javaLibValue)
                 }
 
+                val jInputValue: JMultihash = JMultihash.fromBase58(manPubKeyHashBase58)
+                assertEquals(
+                    jInputValue.toBase58(),
+                    jReconstructedMultihash.toBase58(),
+                    "Java-library multi-hash values differ"
+                )
 
-                val aa: ByteArray = manPubKeyHashBase58.decodeBase58()
-                val bb: Multihash = Multihash.cast(aa)
-                val cc: DecodedMultihash = Multihash.decode(aa)
-//                val dd: Multihash = Multihash.cast(cc.digest)
+                val kInputValue = Multihash.fromBase58String(manPubKeyHashBase58)
+                assertEquals(
+                    kInputValue.toBase58String(),
+                    kReconstructedMultihash.toBase58String(),
+                    "Kotlin-library multi-hash values differ"
+                )
 
 
-                val reconstructedMultihashBase58: String = reconstructedMultihash.toBase58String()
+                val reconstructedMultihashBase58: String = kReconstructedMultihash.toBase58String()
 
 
 //                val pubKeyHash = Multihash.encodeByName(pubKeyBytes, Type.SHA2_256.named)
@@ -169,10 +189,6 @@ class PeerTest {
 //                val inputMultihash = Multihash.fromBase58String(pubKeyHashBase58)
 
                 val inputMultihash = Multihash.cast(manPubKeyHashBase58.decodeBase58())
-
-//                if (reconstructedMultihash.raw.contentEquals(inputMultihash.raw)) {
-
-                // ID.idB58Decode(ks.hpkp)
 
                 if (reconstructedMultihashBase58 != manPubKeyHashBase58) {
                     throw RuntimeException(

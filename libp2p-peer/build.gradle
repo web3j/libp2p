@@ -9,5 +9,10 @@ dependencies {
     }
 
     compile "com.github.walleth.kethereum:base58:$kethereumBase58Version"
+
+    compile group: 'com.github.multiformats', name: 'java-multihash', version: 'v1.2.1'
+    runtime group: 'commons-codec', name: 'commons-codec', version: '1.11'
+
+
 }
 

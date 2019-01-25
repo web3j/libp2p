@@ -1,10 +1,10 @@
 buildscript {
     /*
-    This is a temporary work-around until BC-1.60 is taken out of beta and published.
-    Step 1: Download the jar file locally: https://downloads.bouncycastle.org/betas/bcprov-jdk15on-161b20.jar
-    Step 2: install it into your local maven repo with:
-        mvn install:install-file -DgroupId=org.bouncycastle -DartifactId=bcprov-jdk15on -Dversion=161b20 -Dfile=/Users/sam/Downloads/bcprov-jdk15on-161b21.jar -Dtype=jar -Dpackaging=jar
-        Don't forget to change the "file" argument to point to your download
+     This is a temporary work-around until BC-1.60 is taken out of beta and published.
+     Step 1: Download the jar file locally: https://downloads.bouncycastle.org/betas/bcprov-jdk15on-161b20.jar
+     Step 2: install it into your local maven repo with:
+     mvn install:install-file -DgroupId=org.bouncycastle -DartifactId=bcprov-jdk15on -Dversion=161b20 -Dfile=/Users/sam/Downloads/bcprov-jdk15on-161b21.jar -Dtype=jar -Dpackaging=jar
+     Don't forget to change the "file" argument to point to your download
      */
     ext.bouncycastleVersion = '161b20'
 
@@ -23,6 +23,7 @@ buildscript {
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.10'
+    id "com.diffplug.gradle.spotless" version "3.16.0"
 }
 
 group 'io.web3j'
@@ -46,10 +47,28 @@ allprojects {
                 "com.nhaarman:mockito-kotlin:$mockitoKotlinVersion"
     }
 
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+    compileKotlin { kotlinOptions.jvmTarget = "1.8" }
+    compileTestKotlin { kotlinOptions.jvmTarget = "1.8" }
+
+    apply plugin: 'com.diffplug.gradle.spotless'
+    // see https://github.com/diffplug/spotless/tree/master/plugin-gradle
+    spotless {
+        kotlin {
+            // This path needs to be relative to each project
+            target fileTree('.') {
+                include '**/*.kt'
+                exclude '**/.gradle/**'
+            }
+            // see https://github.com/shyiko/ktlint#standard-rules
+            ktlint().userData(['max_line_length': '120', 'insert_final_newline': 'true'])
+            licenseHeaderFile "${rootDir}/gradle/spotless.java.license"  // License header file
+        }
+
+        groovyGradle {
+            target '*.gradle'
+            greclipse().configFile(rootProject.file('gradle/formatter.properties'))
+            endWithNewline()
+            paddedCell() // recommended hack to keep gradle files tidy
+        }
     }
 }

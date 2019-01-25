@@ -1,7 +1,25 @@
+/*
+ * Copyright 2019 BLK Technologies Limited. (web3labs.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
-import io.web3j.libp2p.crypto.*
+import io.web3j.libp2p.crypto.ErrRsaKeyTooSmall
+import io.web3j.libp2p.crypto.KEY_PKCS8
+import io.web3j.libp2p.crypto.Libp2pCrypto
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
+import io.web3j.libp2p.crypto.RSA_ALGORITHM
+import io.web3j.libp2p.crypto.SHA_256_WITH_RSA
 import io.web3j.libp2p.shared.env.Libp2pException
 import org.bouncycastle.asn1.ASN1Primitive
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
@@ -29,7 +47,6 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
     private val rsaPublicKey = RsaPublicKey(pk)
     private val pkcs1PrivateKeyBytes: ByteArray
 
-
     init {
         // Set up private key.
         val isKeyOfFormat: Boolean = sk.format?.equals(KEY_PKCS8) ?: false
@@ -53,9 +70,7 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
     override fun publicKey(): PubKey = rsaPublicKey
 
     override fun hashCode(): Int = pk.hashCode()
-
 }
-
 
 // RsaPublicKey is an rsa public key
 class RsaPublicKey(private val k: JavaPublicKey) : PubKey(Crypto.KeyType.RSA) {
@@ -71,7 +86,6 @@ class RsaPublicKey(private val k: JavaPublicKey) : PubKey(Crypto.KeyType.RSA) {
 
     override fun hashCode(): Int = k.hashCode()
 }
-
 
 /**
  * GenerateRSAKeyPair generates a new rsa private and public key.

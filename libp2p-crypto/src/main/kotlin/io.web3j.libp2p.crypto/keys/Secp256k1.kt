@@ -1,3 +1,15 @@
+/*
+ * Copyright 2019 BLK Technologies Limited. (web3labs.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package io.web3j.libp2p.crypto.keys
 
 import crypto.pb.Crypto
@@ -5,11 +17,19 @@ import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.SECP_256K1_ALGORITHM
 import io.web3j.libp2p.shared.env.Libp2pException
-import org.bouncycastle.asn1.*
+import org.bouncycastle.asn1.ASN1InputStream
+import org.bouncycastle.asn1.ASN1Integer
+import org.bouncycastle.asn1.ASN1Primitive
+import org.bouncycastle.asn1.ASN1Sequence
+import org.bouncycastle.asn1.DERSequenceGenerator
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.ec.CustomNamedCurves
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator
-import org.bouncycastle.crypto.params.*
+import org.bouncycastle.crypto.params.ECDomainParameters
+import org.bouncycastle.crypto.params.ECKeyGenerationParameters
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters
+import org.bouncycastle.crypto.params.ECPublicKeyParameters
+import org.bouncycastle.crypto.params.ParametersWithRandom
 import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.math.ec.FixedPointCombMultiplier
 import org.bouncycastle.math.ec.FixedPointUtil
@@ -26,7 +46,6 @@ private val CURVE: ECDomainParameters = CURVE_PARAMS.let {
     ECDomainParameters(CURVE_PARAMS.curve, CURVE_PARAMS.g, CURVE_PARAMS.n, CURVE_PARAMS.h)
 }
 
-
 // Secp256k1PrivateKey is an secp256k1 private key
 class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : PrivKey(Crypto.KeyType.Secp256k1) {
 
@@ -41,7 +60,6 @@ class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : Priv
                 Pair(it[0], it[1])
             }
         }
-
 
         return with(ByteArrayOutputStream()) {
             DERSequenceGenerator(this).run {
@@ -60,7 +78,6 @@ class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : Priv
     }
 
     override fun hashCode(): Int = priv.hashCode()
-
 }
 
 // Secp256k1PublicKey is an secp256k1 public key
@@ -74,7 +91,11 @@ class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto
         }
 
         val asn1: ASN1Primitive =
-            ByteArrayInputStream(signature).use { inStream -> ASN1InputStream(inStream).use { asnInputStream -> asnInputStream.readObject() } }
+            ByteArrayInputStream(signature)
+                .use { inStream -> ASN1InputStream(inStream)
+                    .use { asnInputStream -> asnInputStream.readObject()
+                    }
+                }
 
         val asn1Encodables = (asn1 as ASN1Sequence).toArray().also {
             if (it.size != 2) {
@@ -88,7 +109,6 @@ class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto
     }
 
     override fun hashCode(): Int = pub.hashCode()
-
 }
 
 // GenerateSecp256k1Key generate a new secp256k1 private and public key pair

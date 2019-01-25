@@ -2,12 +2,8 @@ apply plugin: 'com.google.protobuf'
 apply plugin: 'idea'
 
 buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.7'
-    }
+    repositories { mavenCentral() }
+    dependencies { classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.7' }
 }
 
 description 'libp2p crypto'
@@ -21,17 +17,11 @@ dependencies {
 
 sourceSets {
 
-    main {
-        proto {
-            srcDir 'src/main/proto'
-        }
-    }
+    main { proto { srcDir 'src/main/proto' } }
 }
 
 protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:$protocVersion"
-    }
+    protoc { artifact = "com.google.protobuf:protoc:$protocVersion" }
 
     clean { delete protobuf.generatedFilesBaseDir }
 

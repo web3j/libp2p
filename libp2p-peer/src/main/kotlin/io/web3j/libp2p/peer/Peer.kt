@@ -2,8 +2,6 @@ package io.web3j.libp2p.peer
 
 import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
-import java.lang.Exception
-
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.unmarshalPublicKey
@@ -55,6 +53,12 @@ data class ID(val id: Multihash) {
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return this.id.raw.contentEquals((other as ID).id.raw)
+    }
+
     /**
      * MatchesPrivateKey tests whether this ID was derived from shared-key
      */
@@ -66,9 +70,9 @@ data class ID(val id: Multihash) {
      * MatchesPublicKey tests whether this ID was derived from pk
      */
     fun matchesPublicKey(publicKey: PubKey): Boolean {
-        val otherId = idFromPublicKey(publicKey)
+        val otherId: ID = idFromPublicKey(publicKey)
         // TODO: Check no error
-        return otherId == this
+        return otherId.toString() == this.toString()
     }
 
     /**
@@ -123,10 +127,7 @@ data class ID(val id: Multihash) {
         /**
          * IDB58Decode returns a b58-decoded Peer.
          */
-        fun idB58Decode(value: String): ID {
-            val multihash = Multihash.fromBase58String(value)
-            return ID(multihash)
-        }
+        fun idB58Decode(value: String): ID = ID(Multihash.fromBase58String(value))
 
         /**
          * IDHexDecode returns a hex-decoded Peer

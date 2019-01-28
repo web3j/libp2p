@@ -23,7 +23,8 @@ Its goal is to provide a single implementation that meets the needs of Java, And
 written in Kotlin which was designed with Java and Android interop in mind.
 
 The project was created by [Web3 Labs](https://www.web3labs.com) with the support of the 
-[Ethereum Community Fund](https://ecf.network) and blessing from the [libp2p](https://libp2p.io) team.
+[Ethereum Community Fund](https://ecf.network) and advisory from members of the libp2p team at 
+[Protocol Labs](https://protocol.ai). 
 
 
 ## Getting started
@@ -45,26 +46,26 @@ We welcome contributions from everyone.
 We are currently prioritising implementation of the libp2p modules that are required for eth2.0's Serenity release. As it currently stands
 they are (taken from the following [issue](https://github.com/ethresearch/p2p/issues/4#issuecomment-436702674)):
 
-| Library             | Module                                        | Available          |
-|---------------------|-----------------------------------------------|--------------------|
-| Multiformat         | Multiaddr                                     | :white_check_mark: |
-|                     | Multihash                                     | :white_check_mark: |
-| General Purpose     | Net                                           | :white_check_mark: |
-|                     | Peer                                          | :white_check_mark: |
-|                     | Crypto                                        | :white_check_mark: |
-| Protocol Muxer      | Multistream(-select)                          |                    |
-| Stream Muxer        | Multiplex                                     |                    |
-| Crypto Channels     | SecIO                                         |                    |
-| Transport           | TCP                                           |                    |
-| Network Abstraction | Switch/Swarm                                  |                    |
-| Peerstore           | Local database backend (KV store or SQLite    |                    |
-| Protocols           | Ping                                          |                    |
-|                     | Identify                                      |                    |
-| Host Abstraction    |                                               | :white_check_mark: |
-| NAT traversal       |                                               |                    |
-| Others              | Floodsub/Gossipsub (w/signed message records) |                    |
-| Peer Routing        | kad-dht                                       |                    |
-| Discovery           | Find_node (or whatever is chosen)             |                    |
+| Library             | Module                                        | Available                |
+|---------------------|-----------------------------------------------|--------------------------|
+| Multiformat         | Multiaddr                                     | :white_check_mark:       |
+|                     | Multihash                                     | :white_check_mark:       |
+| General Purpose     | Net                                           | :white_check_mark:       |
+|                     | Peer                                          | :white_check_mark:       |
+|                     | Crypto                                        | :white_check_mark:       |
+| Protocol Muxer      | Multistream(-select)                          |                          |
+| Stream Muxer        | Multiplex                                     |                          |
+| Crypto Channels     | SecIO                                         |                          |
+| Transport           | TCP                                           | :hourglass_flowing_sand: |
+| Network Abstraction | Switch/Swarm                                  |                          |
+| Peerstore           | Local database backend (KV store or SQLite)   |                          |
+| Protocols           | Ping                                          |                          |
+|                     | Identify                                      |                          |
+| Host Abstraction    |                                               | :white_check_mark:       |
+| NAT traversal       |                                               |                          |
+| Others              | Floodsub/Gossipsub (w/signed message records) |                          |
+| Peer Routing        | kad-dht                                       |                          |
+| Discovery           | Find_node (or whatever is chosen)             |                          |
 
 
 We recommend before starting work on a contribution that you communicate with the libp2p JVM community on the 
@@ -78,6 +79,8 @@ you can get started with!
 
 ## Build instructions
 
+```bash
 git clone https://github.com/web3j/libp2p.git
 cd libp2p
 ./gradlew build publishToMavenLocal
+```

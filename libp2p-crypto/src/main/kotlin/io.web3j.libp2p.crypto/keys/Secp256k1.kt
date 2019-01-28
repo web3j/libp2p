@@ -46,7 +46,9 @@ private val CURVE: ECDomainParameters = CURVE_PARAMS.let {
     ECDomainParameters(CURVE_PARAMS.curve, CURVE_PARAMS.g, CURVE_PARAMS.n, CURVE_PARAMS.h)
 }
 
-// Secp256k1PrivateKey is an secp256k1 private key
+/**
+ * @param privateKey the private key backing this instance.
+ */
 class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : PrivKey(Crypto.KeyType.Secp256k1) {
 
     private val priv = privateKey.d
@@ -80,7 +82,9 @@ class Secp256k1PrivateKey(private val privateKey: ECPrivateKeyParameters) : Priv
     override fun hashCode(): Int = priv.hashCode()
 }
 
-// Secp256k1PublicKey is an secp256k1 public key
+/**
+ * @param pub the public key backing this instance.
+ */
 class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto.KeyType.Secp256k1) {
 
     override fun raw(): ByteArray = pub.q.getEncoded(true)
@@ -92,9 +96,11 @@ class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto
 
         val asn1: ASN1Primitive =
             ByteArrayInputStream(signature)
-                .use { inStream -> ASN1InputStream(inStream)
-                    .use { asnInputStream -> asnInputStream.readObject()
-                    }
+                .use { inStream ->
+                    ASN1InputStream(inStream)
+                        .use { asnInputStream ->
+                            asnInputStream.readObject()
+                        }
                 }
 
         val asn1Encodables = (asn1 as ASN1Sequence).toArray().also {
@@ -111,7 +117,10 @@ class Secp256k1PublicKey(private val pub: ECPublicKeyParameters) : PubKey(Crypto
     override fun hashCode(): Int = pub.hashCode()
 }
 
-// GenerateSecp256k1Key generate a new secp256k1 private and public key pair
+/**
+ * Generates a new SECP256K1 private and public key.
+ * @return a pair of the private and public keys.
+ */
 fun generateSecp256k1KeyPair(): Pair<PrivKey, PubKey> = with(ECKeyPairGenerator()) {
     val domain = SECNamedCurves.getByName(SECP_256K1_ALGORITHM).let {
         ECDomainParameters(it.curve, it.g, it.n, it.h)
@@ -123,8 +132,18 @@ fun generateSecp256k1KeyPair(): Pair<PrivKey, PubKey> = with(ECKeyPairGenerator(
     return Pair(Secp256k1PrivateKey(privateKey), Secp256k1PublicKey(keypair.public as ECPublicKeyParameters))
 }
 
+/**
+ * Unmarshals the given key bytes into a SECP256K1 private key instance.
+ * @param keyBytes the key bytes.
+ * @return a private key instance.
+ */
 fun unmarshalSecp256k1PrivateKey(data: ByteArray): PrivKey =
     Secp256k1PrivateKey(ECPrivateKeyParameters(BigInteger(1, data), CURVE))
 
+/**
+ * Unmarshals the given key bytes into a SECP256K1 public key instance.
+ * @param keyBytes the key bytes.
+ * @return a public key instance.
+ */
 fun unmarshalSecp256k1PublicKey(data: ByteArray): PubKey =
     Secp256k1PublicKey(ECPublicKeyParameters(CURVE.curve.decodePoint(data), CURVE))

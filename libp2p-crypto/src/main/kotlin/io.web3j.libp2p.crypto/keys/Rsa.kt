@@ -36,13 +36,11 @@ import java.security.spec.X509EncodedKeySpec
 import java.security.PrivateKey as JavaPrivateKey
 import java.security.PublicKey as JavaPublicKey
 
+/**
+ * @param sk the private key backing this instance.
+ * @param pk the public key backing this instance.
+ */
 class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKey) : PrivKey(Crypto.KeyType.RSA) {
-
-    /*
-     * PKCS#8 and PKCS#1 are standards that define how private keys are to be stored; java stores its RSA keys using
-     * the PKCS#8 format and  older libraries use PKCS1.
-     * It is important to note that PKCS#8 includes the data payload in PKCS1 format alongside some additional values.
-     */
 
     private val rsaPublicKey = RsaPublicKey(pk)
     private val pkcs1PrivateKeyBytes: ByteArray
@@ -72,7 +70,9 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
     override fun hashCode(): Int = pk.hashCode()
 }
 
-// RsaPublicKey is an rsa public key
+/**
+ * @param k the public key backing this instance.
+ */
 class RsaPublicKey(private val k: JavaPublicKey) : PubKey(Crypto.KeyType.RSA) {
 
     override fun raw(): ByteArray = k.encoded
@@ -88,7 +88,9 @@ class RsaPublicKey(private val k: JavaPublicKey) : PubKey(Crypto.KeyType.RSA) {
 }
 
 /**
- * GenerateRSAKeyPair generates a new rsa private and public key.
+ * Generates a new rsa private and public key.
+ * @param bits the number of bits required in the key.
+ * @return a pair of the private and public keys.
  */
 fun generateRsaKeyPair(bits: Int): Pair<PrivKey, PubKey> {
     if (bits < 512) {
@@ -112,17 +114,26 @@ fun generateRsaKeyPair(bits: Int): Pair<PrivKey, PubKey> {
 }
 
 /**
- * UnmarshalRsaPublicKey returns a public key from the input x509 bytes
+ * Unmarshals the given key bytes into an RSA public key instance.
+ * @param keyBytes the key bytes.
+ * @return a private key.
  */
-fun unmarshalRsaPublicKey(data: ByteArray): PubKey =
-    RsaPublicKey(KeyFactory.getInstance(RSA_ALGORITHM, Libp2pCrypto.provider).generatePublic(X509EncodedKeySpec(data)))
+fun unmarshalRsaPublicKey(keyBytes: ByteArray): PubKey =
+    RsaPublicKey(
+        KeyFactory.getInstance(
+            RSA_ALGORITHM,
+            Libp2pCrypto.provider
+        ).generatePublic(X509EncodedKeySpec(keyBytes))
+    )
 
 /**
- * Converts the given private key (in PKCS1 format) to a PKCS8 key.
+ * Unmarshals the given key bytes (in PKCS1 format) into an RSA PKCS8 private key instance.
+ * @param keyBytes the key bytes.
+ * @return a private key instance.
  */
-fun unmarshalRsaPrivateKey(data: ByteArray): PrivKey {
+fun unmarshalRsaPrivateKey(keyBytes: ByteArray): PrivKey {
     // Input is ASN1 DER encoded PKCS1 private key bytes.
-    val rsaPrivateKey = RSAPrivateKey.getInstance(ASN1Primitive.fromByteArray(data))
+    val rsaPrivateKey = RSAPrivateKey.getInstance(ASN1Primitive.fromByteArray(keyBytes))
     val privateKeyParameters = RSAPrivateCrtKeyParameters(
         rsaPrivateKey.modulus,
         rsaPrivateKey.publicExponent,

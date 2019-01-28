@@ -30,6 +30,7 @@ import org.kethereum.encodings.encodeToBase58String
 import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
 
+@Disabled("Awaiting a resolution to: https://github.com/changjiashuai/kotlin-multihash/issues/3")
 class PeerTest {
 
     val manualPubKeyHashBase58 = "QmRK3JgmVEGiewxWbhpXLJyjWuGuLeSTMTndA1coMHEy5o"

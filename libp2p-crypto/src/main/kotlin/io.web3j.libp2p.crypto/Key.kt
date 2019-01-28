@@ -131,7 +131,9 @@ interface GenSharedKey : (ByteArray) -> ByteArray
 class BadKeyTypeException : Exception("Invalid or unsupported key type")
 
 /**
- * Generate a new key pair of the provided type.
+ * Generates a new key pair of the provided type.
+ * @param type the type key to be generated.
+ * @param bits the number of bits desired for the key (only applicable for RSA).
  */
 fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
 
@@ -144,8 +146,9 @@ fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
 }
 
 /**
- * UnmarshalPublicKey converts a protobuf serialized public key into its
- * representative object
+ * Converts the protobuf serialized public key into its representative object.
+ * @param data the byte array of the protobuf public key.
+ * @return the equivalent public key.
  */
 fun unmarshalPublicKey(data: ByteArray): PubKey {
     val pmes = PbPublicKey.parseFrom(data)
@@ -162,8 +165,9 @@ fun unmarshalPublicKey(data: ByteArray): PubKey {
 }
 
 /**
- * MarshalPublicKey converts a public key object into a protobuf serialized
- * public key
+ * Converts a public key object into a protobuf serialized public key.
+ * @param pubKey the public key instance.
+ * @return the protobuf bytes.
  */
 fun marshalPublicKey(pubKey: PubKey): ByteArray =
     PbPublicKey.newBuilder()
@@ -173,8 +177,9 @@ fun marshalPublicKey(pubKey: PubKey): ByteArray =
         .toByteArray()
 
 /**
- * UnmarshalPrivateKey converts a protobuf serialized private key into its
- * representative object
+ * Converts a protobuf serialized private key into its representative object.
+ * @param data the byte array of hte protobuf private key.
+ * @return the equivalent private key.
  */
 fun unmarshalPrivateKey(data: ByteArray): PrivKey {
     val pmes = PbPrivateKey.parseFrom(data)
@@ -191,8 +196,9 @@ fun unmarshalPrivateKey(data: ByteArray): PrivKey {
 }
 
 /**
- * MarshalPrivateKey converts a public key object into a protobuf serialized
- * private key
+ * Converts a public key object into a protobuf serialized private key.
+ * @param privKey the private key.
+ * @return the protobuf bytes.
  */
 fun marshalPrivateKey(privKey: PrivKey): ByteArray =
     PbPrivateKey.newBuilder()

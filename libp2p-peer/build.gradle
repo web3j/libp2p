@@ -15,6 +15,5 @@ dependencies {
 
 
     compile "com.github.multiformats:java-multihash:$javaMultihashLibVerison"
-    runtime "commons-codec:commons-codec$commonsCodecVersion"
-
+    runtime "commons-codec:commons-codec:$commonsCodecVersion"
 }

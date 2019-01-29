@@ -9,11 +9,5 @@ dependencies {
     }
 
     compile "com.github.walleth.kethereum:base58:$kethereumBase58Version"
-
-    ext.javaMultihashLibVerison = 'v1.2.1'
-    ext.commonsCodecVersion = '1.11'
-
-
-    compile "com.github.multiformats:java-multihash:$javaMultihashLibVerison"
     runtime "commons-codec:commons-codec:$commonsCodecVersion"
 }

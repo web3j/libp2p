@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.org/web3j/libp2p"<img src="https://travis-ci.org/web3j/libp2p.svg?branch=master" /></a>
+  <a href="https://travis-ci.org/web3j/libp2p"><img src="https://travis-ci.org/web3j/libp2p.svg?branch=master" /></a>
   <br>
 </p>
 

@@ -140,15 +140,9 @@ data class ID(val id: Multihash) {
          * @param pubKey the public key.
          * @return the Peer ID corresponding to the provided public key.
          */
-        fun idFromPublicKey(pubKey: PubKey): ID {
-
-            val sha256Bytes: ByteArray = with(MessageDigest.getInstance("SHA-256")) {
-                update(pubKey.bytes())
-                digest()
-            }
-
-            val hash = Multihash.encode(sha256Bytes, Type.SHA2_256.code)
-            return idFromBytes(hash)
+        fun idFromPublicKey(pubKey: PubKey): ID = with(MessageDigest.getInstance("SHA-256")) {
+            update(pubKey.bytes())
+            idFromBytes(Multihash.encode(digest(), Type.SHA2_256.code))
         }
 
         /**

@@ -104,11 +104,11 @@ const (
         // Get/Put is a simple registry for other peer-related key/value pairs.
         // if we find something we use often, it should become its own set of
         // methods. this is a last resort.
-        fun get(eerId: PeerID, key: String):
+        fun get(eerId: PeerID, key: String): Any
 
-        interface {}
-
-        fun put(eerId: PeerID, key: String, val interface {})
+//        interface {}
+//
+//        fun put(eerId: PeerID, key: String, val interface {})
     }
 
 
@@ -139,10 +139,10 @@ const (
         // Addresses returns all known (and valid) addresses for a given peer
         fun addrs(peerId: PeerID): Array<Multiaddr>
 
-        // AddrStream returns a channel that gets all addresses for a given
-        // peer sent on it. If new addresses are added after the call is made
-        // they will be sent along through the channel as well.
-        fun addrStream(context: context.Context, peerId: PeerID) <-chan ma.Multiaddr
+//        // AddrStream returns a channel that gets all addresses for a given
+//        // peer sent on it. If new addresses are added after the call is made
+//        // they will be sent along through the channel as well.
+//        fun addrStream(context: context.Context, peerId: PeerID) <-chan ma.Multiaddr
 
         // ClearAddresses removes all previously stored addresses
         fun clearAddrs(peerId: PeerID)

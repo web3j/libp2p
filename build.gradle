@@ -16,6 +16,7 @@ buildscript {
     ext.protocVersion = '3.0.0'
     ext.kethereumBase58Version='0.66'
     ext.commonsCodecVersion = '1.11'
+    ext.jacksonVersion = '2.9.8'
 
     //test dependencies
     ext.junitVersion = '5.3.2'

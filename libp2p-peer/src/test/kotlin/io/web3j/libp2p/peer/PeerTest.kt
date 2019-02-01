@@ -167,7 +167,6 @@ class PeerTest {
                     "Multi-hash values differ for the public key"
                 )
 
-
                 val pubKeyHashBase58 = pubKeyHash.toBase58String()
 
                 return Keyset(privKey, pubKey, pubKeyHash.toString(), pubKeyHashBase58)

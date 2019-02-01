@@ -41,7 +41,7 @@ data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
     }
 
     fun infoToP2pAddrs(): Array<Multiaddr> {
-        var addrs = mutableListOf<Multiaddr>()//[]ma.Multiaddr
+        var addrs = mutableListOf<Multiaddr>()
         var tpl = "/${Protocol.IPFS.named}/"
         addrs.forEach { m ->
             val p2addr = Multiaddr(tpl + peerID.idB58Encode())

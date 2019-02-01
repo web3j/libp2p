@@ -17,6 +17,7 @@ import io.ipfs.multiformats.multihash.Type
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.unmarshalPublicKey
+import java.security.MessageDigest
 
 /**
  * Empty peer ID exception.
@@ -36,15 +37,19 @@ data class ID(val id: Multihash) {
     /**
      * @return a base 58-encoded string of the ID.
      */
-    fun pretty(): String {
-        return idB58Encode()
-    }
+    fun pretty(): String = idB58Encode()
 
     /**
      * @return a pretty peerID string in loggable JSON format.
      */
     fun loggable(): Map<String, String> {
         return mapOf("peerID" to pretty())
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return this.id.raw.contentEquals((other as ID).id.raw)
     }
 
     /**
@@ -69,20 +74,14 @@ data class ID(val id: Multihash) {
      * @param sharedKey the private key.
      * @return true if it was derived.
      */
-    fun matchesPrivateKey(sharedKey: PrivKey): Boolean {
-        return matchesPublicKey(sharedKey.publicKey())
-    }
+    fun matchesPrivateKey(sharedKey: PrivKey): Boolean = matchesPublicKey(sharedKey.publicKey())
 
     /**
      * Tests whether this ID was derived from the public key.
      * @param publicKey the public key.
      * @return true if it was derived.
      */
-    fun matchesPublicKey(publicKey: PubKey): Boolean {
-        val otherId = idFromPublicKey(publicKey)
-        // TODO: Check no error
-        return otherId == this
-    }
+    fun matchesPublicKey(publicKey: PubKey): Boolean = idFromPublicKey(publicKey) == this
 
     /**
      * ExtractPublicKey attempts to extract the public key from an ID
@@ -102,16 +101,12 @@ data class ID(val id: Multihash) {
     /**
      * @return base 58-encoded string.
      */
-    fun idB58Encode(): String {
-        return id.toBase58String()
-    }
+    fun idB58Encode(): String = id.toBase58String()
 
     /**
      * @return a hex-encoded string.
      */
-    fun idHexEncode(): String {
-        return id.toHexString()
-    }
+    fun idHexEncode(): String = id.toHexString()
 
     companion object {
 
@@ -120,55 +115,41 @@ data class ID(val id: Multihash) {
          * @param value the string value.
          * @return the ID.
          */
-        fun idFromString(value: String): ID {
-            val multihash = Multihash.fromHexString(value)
-            return ID(multihash)
-        }
+        fun idFromString(value: String): ID = ID(Multihash.fromHexString(value))
 
         /**
          * Casts a byte array to ID type, and validates the id to make sure it is a multihash.
          * @param value the byte array.
          * @return the ID.
          */
-        fun idFromBytes(value: ByteArray): ID {
-            val multihash = Multihash.cast(value)
-            return ID(multihash)
-        }
+        fun idFromBytes(value: ByteArray): ID = ID(Multihash.cast(value))
 
         /**
          * @param value the string value.
          * @return a base 58-decoded Peer.
          */
-        fun idB58Decode(value: String): ID {
-            val multihash = Multihash.fromBase58String(value)
-            return ID(multihash)
-        }
+        fun idB58Decode(value: String): ID = ID(Multihash.fromBase58String(value))
 
         /**
          * @param value the string value.
          * @return a hex-decoded Peer
          */
-        fun idHexDecode(value: String): ID {
-            val multihash = Multihash.fromHexString(value)
-            return ID(multihash)
-        }
+        fun idHexDecode(value: String): ID = ID(Multihash.fromHexString(value))
 
         /**
          * @param pubKey the public key.
          * @return the Peer ID corresponding to the provided public key.
          */
-        fun idFromPublicKey(pubKey: PubKey): ID {
-            val hash = Multihash.encode(pubKey.bytes(), Type.SHA2_256.code)
-            return idFromBytes(hash)
+        fun idFromPublicKey(pubKey: PubKey): ID = with(MessageDigest.getInstance("SHA-256")) {
+            update(pubKey.bytes())
+            idFromBytes(Multihash.encode(digest(), Type.SHA2_256.code))
         }
 
         /**
          * @param privKey the private key.
          * @return the peer id corresponding to the provided private key.
          */
-        fun idFromPrivateKey(privKey: PrivKey): ID {
-            return idFromPublicKey(privKey.publicKey())
-        }
+        fun idFromPrivateKey(privKey: PrivKey): ID = idFromPublicKey(privKey.publicKey())
     }
 }
 

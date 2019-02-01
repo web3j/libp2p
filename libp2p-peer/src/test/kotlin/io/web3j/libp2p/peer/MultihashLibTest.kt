@@ -12,15 +12,13 @@
  */
 package io.web3j.libp2p.peer
 
+import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
 import io.web3j.libp2p.crypto.unmarshalPrivateKey
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.security.MessageDigest
 import java.util.Base64
-import io.ipfs.multiformats.multihash.Multihash as KMultihash
-import io.ipfs.multihash.Multihash as JMultihash
 
 /*
  * Copyright 2019 BLK Technologies Limited (web3labs.com).
@@ -53,41 +51,24 @@ class MultihashLibTest {
     """.trimIndent().replace("\n", "")
 
     @Test
-    fun loadUsingJavaLibrary() {
-        val reconstructedPkMultihash: JMultihash = with(Base64.getDecoder().decode(privateKeyBase64)) {
-            val privKey = unmarshalPrivateKey(this)
-            val pubKey = privKey.publicKey()
-            val pubKeyBytes = pubKey.bytes()
-
-            // Try with java-multihash.
-            with(MessageDigest.getInstance("SHA-256")) {
-                update(pubKeyBytes)
-                JMultihash(JMultihash.Type.sha2_256, digest())
-            }
-        }
-
-        val inputPkMultihash: JMultihash = JMultihash.fromBase58(pubKeyHashBase58)
-        Assertions.assertEquals(
-            inputPkMultihash.toBase58(),
-            reconstructedPkMultihash.toBase58(),
-            "Java-library multi-hash values differ for the public key"
-        )
-    }
-
-    @Disabled("Awaiting a resolution to: https://github.com/changjiashuai/kotlin-multihash/issues/3")
-    @Test
     fun loadUsingKotlinLibrary() {
-        val reconstructedPkMultihash: KMultihash = with(Base64.getDecoder().decode(privateKeyBase64)) {
+        val reconstructedPkMultihash: Multihash = with(Base64.getDecoder().decode(privateKeyBase64)) {
             val privKey = unmarshalPrivateKey(this)
             val pubKey = privKey.publicKey()
             val pubKeyBytes = pubKey.bytes()
-            val pubKeyHash: ByteArray = KMultihash.encodeByName(pubKeyBytes, Type.SHA2_256.named) // hash(bpk)
-            KMultihash.cast(pubKeyHash)
+
+            val sha256Bytes: ByteArray = with(MessageDigest.getInstance("SHA-256")) {
+                update(pubKeyBytes)
+                digest()
+            }
+
+            val kBytes: ByteArray = Multihash.encodeByName(sha256Bytes, Type.SHA2_256.named)
+            Multihash.cast(kBytes)
         }
 
-        val inputPkMultihash: KMultihash = KMultihash.fromBase58String(pubKeyHashBase58)
+        val kInputPkMultihash: Multihash = Multihash.fromBase58String(pubKeyHashBase58)
         Assertions.assertEquals(
-            inputPkMultihash.toBase58String(),
+            kInputPkMultihash.toBase58String(),
             reconstructedPkMultihash.toBase58String(),
             "Kotlin-library multi-hash values differ for the public key"
         )

@@ -17,20 +17,19 @@ import io.ipfs.multiformats.multihash.Type
 import io.web3j.libp2p.crypto.KEY_TYPE
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
 import io.web3j.libp2p.crypto.generateKeyPair
+import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
 import io.web3j.libp2p.crypto.unmarshalPrivateKey
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.kethereum.encodings.encodeToBase58String
 import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
 
-@Disabled("Awaiting a resolution to: https://github.com/changjiashuai/kotlin-multihash/issues/3")
 class PeerTest {
 
     val manualPubKeyHashBase58 = "QmRK3JgmVEGiewxWbhpXLJyjWuGuLeSTMTndA1coMHEy5o"
@@ -77,10 +76,9 @@ class PeerTest {
     @Disabled("disabled until libp2p/go-libp2p-crypto#51 is fixed")
     @Test
     fun testPublicKeyExtraction() {
-        val keyPair = generateEd25519KeyPair()
-        val pubKey = keyPair.second
-        val id = ID.idFromPublicKey(pubKey)
-        val extractedPub = id.extractPublicKey()
+        val (_, pubKey) = generateEd25519KeyPair()
+        val id: ID = ID.idFromPublicKey(pubKey)
+        val extractedPub: PubKey = id.extractPublicKey()
         assertEquals(pubKey, extractedPub)
 
         // Test invalid multihash (invariant of the type of public key)
@@ -96,23 +94,18 @@ class PeerTest {
     }
 
     private fun idMatchesPublicKey(ks: Keyset) {
-        val p1 = ID.idB58Decode(ks.pubKeyHashBase58)
-
-        assertEquals(ks.pubKeyHash, p1.toString())
-
+        val p1: ID = ID.idB58Decode(ks.pubKeyHashBase58)
+        assertEquals(ks.pubKeyHash, p1.id.toHexString())
         assertTrue(p1.matchesPublicKey(ks.pubKey))
 
         val p2 = ID.idFromPublicKey(ks.pubKey)
-
         assertEquals(p1, p2)
-
         assertEquals(ks.pubKeyHashBase58, p2.pretty())
     }
 
     private fun idMatchesPrivateKey(ks: Keyset) {
-        val p1 = ID.idB58Decode(ks.pubKeyHashBase58)
-
-        assertEquals(ks.pubKeyHash, p1.toString())
+        val p1: ID = ID.idB58Decode(ks.pubKeyHashBase58)
+        assertEquals(ks.pubKeyHash, p1.id.toHexString())
 
         assertTrue(p1.matchesPrivateKey(ks.privKey))
 
@@ -138,26 +131,43 @@ class PeerTest {
                 val privKey = keyPair.first
                 val pubKey = keyPair.second
                 val pubKeyBytes = pubKey.bytes()
-                val pubKeyHash = Multihash.encodeByName(pubKeyBytes, Type.SHA2_256.name)
-                val pubKeyHashBase58 = pubKeyHash.encodeToBase58String()
+
+                val sha256PkBytes: ByteArray = with(java.security.MessageDigest.getInstance("SHA-256")) {
+                    update(pubKeyBytes)
+                    digest()
+                }
+
+                val kBytes: ByteArray = Multihash.encodeByName(sha256PkBytes, Type.SHA2_256.named)
+                val pubKeyHash: Multihash = Multihash.cast(kBytes)
+
+                val pubKeyHashBase58 = pubKeyHash.toBase58String()
 
                 return Keyset(privKey, pubKey, pubKeyHash.toString(), pubKeyHashBase58)
             }
 
             fun load(manPubKeyHashBase58: String, manPrivKeyBytes: String): Keyset {
+
                 val decodedPrivKeyBytes = Base64.getDecoder().decode(manPrivKeyBytes)
                 val privKey = unmarshalPrivateKey(decodedPrivKeyBytes)
                 val pubKey = privKey.publicKey()
                 val pubKeyBytes = pubKey.bytes()
-                val pubKeyHash = Multihash.encodeByName(pubKeyBytes, Type.SHA2_256.name)
-                val pubKeyHashBase58 = pubKeyHash.encodeToBase58String()
 
-                if (pubKeyHashBase58 != manPubKeyHashBase58) {
-                    throw RuntimeException(
-                        "pubKeyHashBase58 does " +
-                                "not match manPubKeyHashBase58. $pubKeyHashBase58"
-                    )
+                val sha256PkBytes: ByteArray = with(java.security.MessageDigest.getInstance("SHA-256")) {
+                    update(pubKeyBytes)
+                    digest()
                 }
+
+                val kBytes: ByteArray = Multihash.encodeByName(sha256PkBytes, Type.SHA2_256.named)
+                val pubKeyHash: Multihash = Multihash.cast(kBytes)
+
+                val kInputPkMultihash: Multihash = Multihash.fromBase58String(manPubKeyHashBase58)
+                Assertions.assertEquals(
+                    kInputPkMultihash.toBase58String(),
+                    pubKeyHash.toBase58String(),
+                    "Multi-hash values differ for the public key"
+                )
+
+                val pubKeyHashBase58 = pubKeyHash.toBase58String()
 
                 return Keyset(privKey, pubKey, pubKeyHash.toString(), pubKeyHashBase58)
             }

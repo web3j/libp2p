@@ -25,7 +25,7 @@ import io.web3j.libp2p.peer.ID as PeerID
  * a complete view of the system, but rather to model updates to
  * the peerstore. It is used by things like the routing system.
  */
-data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
+data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr> = emptyArray()) {
 
     // TODO: review whether "Any" is the best type for this.
     fun loggable(): Map<String, Any> = mapOf(
@@ -41,16 +41,12 @@ data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
     }
 
     fun infoToP2pAddrs(): Array<Multiaddr> {
-        var addrs = mutableListOf<Multiaddr>()
-        var tpl = "/${Protocol.IPFS.named}/"
-        addrs.forEach { m ->
-            val p2addr = Multiaddr(tpl + peerID.idB58Encode())
-            addrs.add(m.encapsulate(p2addr))
-        }
+        val tpl = "/${Protocol.IPFS.named}/"
+        val p2addr = Multiaddr(tpl + peerID.idB58Encode())
 
-        return addrs.toTypedArray()
+        val b = this.addrs.map { it.encapsulate(p2addr) }.toTypedArray()
+        return b
     }
-
 
     companion object {
 
@@ -71,9 +67,18 @@ data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
                 throw invalidAddrEx
             }
 
-            val ipfspart =
-                parts.findLast { part -> part.getProtocols().firstOrNull() { it.code == Protocol.IPFS.code } != null }
-                    ?: throw invalidAddrEx
+            val partsByProtocol: Map<Boolean, List<Multiaddr>> = parts.groupBy { ma ->
+                ma.getProtocols().contains(Protocol.IPFS)
+            }
+
+            val ipfsParts = partsByProtocol[true]
+            val nonIpfsParts = partsByProtocol[false]
+
+            if (ipfsParts.isNullOrEmpty()) {
+                throw invalidAddrEx
+            }
+
+            val ipfspart = ipfsParts.first()
 
             // make sure the /ipfs value parses as a peer.ID
             val peerIdParts = ipfspart.toString().split("/")
@@ -82,26 +87,12 @@ data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
 
             // we might have received just an /ipfs part, which means there's no addr.
             var addrs = mutableListOf<Multiaddr>()
-            if (parts.size > 1) {
-                // TODO: check if this is correct.
+            if (!nonIpfsParts.isNullOrEmpty()) {
                 // addrs = append(addrs, ma.Join(parts[:len( parts) - 1]...))
-                addrs.add(Multiaddr.join(*parts.dropLast(1).toTypedArray()))
+                addrs.add(Multiaddr.join(*nonIpfsParts.toTypedArray()))
             }
 
             return PeerInfo(id, addrs.toTypedArray())
-
-            /*
-	// we might have received just an /ipfs part, which means there's no addr.
-	var addrs []ma.Multiaddr
-	if len(parts) > 1 {
-		addrs = append(addrs, ma.Join(parts[:len(parts)-1]...)) // drop the last item
-	}
-
-	return &PeerInfo{
-		ID:    id,
-		Addrs: addrs,
-	}, nil
-             */
         }
 
 

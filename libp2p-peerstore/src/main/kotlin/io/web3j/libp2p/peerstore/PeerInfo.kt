@@ -60,7 +60,7 @@ data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
         fun unmarshalJSON(b: ByteArray): PeerInfo {
             val data: Map<String, Any> = ObjectMapper().readValue(b, Map::class.java) as Map<String, Any>
             val pid = PeerID.idB58Decode(data["ID"] as String)
-            val addrs = (data["Addrs"] as Array<String>).map { Multiaddr(it) }.toTypedArray()
+            val addrs = (data["Addrs"] as List<String>).map { Multiaddr(it) }.toTypedArray()
             return PeerInfo(pid, addrs)
         }
 
@@ -71,14 +71,9 @@ data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
                 throw invalidAddrEx
             }
 
-            // TODO(lgierth): we shouldn't assume /ipfs is the last part
-            val ipfspart = parts.last()
-
-            ipfspart.getProtocols().firstOrNull()?.let {
-                if (it.code != Protocol.IPFS.code) {
-                    throw invalidAddrEx
-                }
-            }
+            val ipfspart =
+                parts.findLast { part -> part.getProtocols().firstOrNull() { it.code == Protocol.IPFS.code } != null }
+                    ?: throw invalidAddrEx
 
             // make sure the /ipfs value parses as a peer.ID
             val peerIdParts = ipfspart.toString().split("/")
@@ -89,10 +84,24 @@ data class PeerInfo(val peerID: PeerID, val addrs: Array<Multiaddr>) {
             var addrs = mutableListOf<Multiaddr>()
             if (parts.size > 1) {
                 // TODO: check if this is correct.
-                addrs.add(Multiaddr.join(parts.last())) // addrs = append(addrs, ma.Join(parts[:len( parts) - 1]...))
+                // addrs = append(addrs, ma.Join(parts[:len( parts) - 1]...))
+                addrs.add(Multiaddr.join(*parts.dropLast(1).toTypedArray()))
             }
 
             return PeerInfo(id, addrs.toTypedArray())
+
+            /*
+	// we might have received just an /ipfs part, which means there's no addr.
+	var addrs []ma.Multiaddr
+	if len(parts) > 1 {
+		addrs = append(addrs, ma.Join(parts[:len(parts)-1]...)) // drop the last item
+	}
+
+	return &PeerInfo{
+		ID:    id,
+		Addrs: addrs,
+	}, nil
+             */
         }
 
 

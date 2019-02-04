@@ -14,21 +14,14 @@ package io.web3j.libp2p.peer
 
 import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
-import io.web3j.libp2p.crypto.KEY_TYPE
-import io.web3j.libp2p.crypto.PrivKey
-import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.crypto.generateKeyPair
+import io.web3j.libp2p.crypto.*
 import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
-import io.web3j.libp2p.crypto.unmarshalPrivateKey
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.util.Base64
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.*
 
 class PeerTest {
 
@@ -122,8 +115,6 @@ class PeerTest {
     ) {
 
         companion object {
-
-            var generatedPairs = AtomicInteger(0)
 
             fun generate(): Keyset {
                 val keyPair = generateKeyPair(KEY_TYPE.RSA, 512)

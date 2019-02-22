@@ -1,8 +1,0 @@
-description 'libp2p common interface for network transports'
-
-dependencies {
-    compile project(':libp2p-peer')
-    compile("io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion") {
-        exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
-    }
-}

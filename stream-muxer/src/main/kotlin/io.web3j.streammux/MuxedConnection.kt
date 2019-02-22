@@ -27,12 +27,12 @@ interface MuxedConnection {
      * @param peerId the ID of the peer that the stream is to connect to.
      * @param multiaddr the address that the stream is to connect to.
      */
-    fun openStream(protocol: Protocol, streamId: Long, peerId: Any, multiaddr: Multiaddr): Stream
+    fun openStream(protocol: Protocol, streamId: Long, peerId: Any, multiaddr: Multiaddr): MuxedStream
 
     /**
      * Accepts a muxed stream opened by the other side.
      */
-    fun acceptStream(): Stream
+    fun acceptStream(): MuxedStream
 
     /**
      * @return whether a connection is fully closed, so it can be garbage collected.

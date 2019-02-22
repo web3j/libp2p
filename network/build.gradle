@@ -1,0 +1,14 @@
+description 'libp2p network API'
+
+dependencies {
+    compile project(':protocol'),
+            project(':peer'),
+            project(':crypto'),
+            project(':stream-muxer')
+
+    compile("io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion") {
+        exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
+    }
+
+    compile files('../lib/kotlin-multibase-1.0.1.jar')
+}

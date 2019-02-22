@@ -1,0 +1,5 @@
+description 'libp2p TCP connection'
+
+dependencies {
+    compile project(':connection')
+}

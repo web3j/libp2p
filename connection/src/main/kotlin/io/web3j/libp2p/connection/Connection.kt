@@ -25,5 +25,5 @@ interface Connection {
      */
     fun getObservedAddrs(): Multiaddr
 
-    fun getPeerInfo(): Any = TODO("Not implemented")
+    fun getPeerInfo(): Any = TODO("define return type")
 }

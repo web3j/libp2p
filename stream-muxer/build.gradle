@@ -1,3 +1,5 @@
 description 'A common interface for stream muxers, with common tests.'
 
-dependencies { compile project(":connection") }
+dependencies {
+    compile project(":connection")
+}

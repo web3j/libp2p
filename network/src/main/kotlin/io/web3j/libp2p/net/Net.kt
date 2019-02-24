@@ -46,13 +46,13 @@ interface Stream : streammux_Stream {
     fun stat(): Stat
 
     /**
-     * Conn returns the connection this stream is part of.
+     * Conn returns the transport this stream is part of.
      */
     fun conn(): Conn
 }
 
 /**
- * Direction represents which peer in a stream initiated a connection.
+ * Direction represents which peer in a stream initiated a transport.
  */
 enum class Direction(val direction: Int) {
 
@@ -62,12 +62,12 @@ enum class Direction(val direction: Int) {
     DIR_UNKNOWN(0),
 
     /**
-     * DirInbound is for when the remote peer initiated a connection.
+     * DirInbound is for when the remote peer initiated a transport.
      */
     DIR_INBOUND(1),
 
     /**
-     * DirOutbound is for when the local peer initiated a connection.
+     * DirOutbound is for when the local peer initiated a transport.
      */
     DIR_OUTBOUND(2)
 }
@@ -84,7 +84,7 @@ data class Stat(val direction: Direction, val extra: Map<Any, Any>)
 data class StreamHandler(val stream: Stream)
 
 /**
- * ConnSecurity is the interface that one can mix into a connection interface to
+ * ConnSecurity is the interface that one can mix into a transport interface to
  * give it the security methods.
  */
 interface ConnSecurity {
@@ -111,26 +111,26 @@ interface ConnSecurity {
 }
 
 /**
- * ConnMultiaddrs is an interface mixin for connection types that provide multiaddr
+ * ConnMultiaddrs is an interface mixin for transport types that provide multiaddr
  * addresses for the endpoints
  */
 interface ConnMultiaddrs {
 
     /**
      * LocalMultiaddr returns the local Multiaddr associated
-     * with this connection
+     * with this transport
      */
     fun localMultiaddr(): Multiaddr
 
     /**
      * RemoteMultiaddr returns the remote Multiaddr associated
-     * with this connection
+     * with this transport
      */
     fun remoteMultiaddr(): Multiaddr
 }
 
 /**
- * Conn is a connection to a remote peer. It multiplexes streams.
+ * Conn is a transport to a remote peer. It multiplexes streams.
  * Usually there is no need to use a Conn directly, but it may
  * be useful to get information about the peer on the other side:
  * stream.Conn().RemotePeer()
@@ -138,12 +138,12 @@ interface ConnMultiaddrs {
 interface Conn : ConnSecurity, ConnMultiaddrs {
 
     /**
-     * NewStreams constructs a new Stream over this connection
+     * NewStreams constructs a new Stream over this transport
      */
     fun newStreams(): Stream
 
     /**
-     * GetStreams returns all open streams over this connection
+     * GetStreams returns all open streams over this transport
      */
     fun getStreams(): Array<Stream>
 
@@ -181,7 +181,7 @@ interface Network : Dialer {
 
     /**
      * NewStream returns a new stream to given peer p.
-     * If there is no connection to p, attempts to create one.
+     * If there is no transport to p, attempts to create one.
      */
     fun newStream(context: CoroutineContext, id: PEER_ID): Stream
 
@@ -228,17 +228,17 @@ interface Dialer {
     fun localPeer(): PEER_ID
 
     /**
-     * DialPeer establishes a connection to a given peer
+     * DialPeer establishes a transport to a given peer
      */
     fun dialPeer(context: CoroutineContext, id: PEER_ID): Conn
 
     /**
-     * ClosePeer closes the connection to a given peer
+     * ClosePeer closes the transport to a given peer
      */
     fun closePeer(id: PEER_ID)
 
     /**
-     * Connectedness returns a state signaling connection capabilities
+     * Connectedness returns a state signaling transport capabilities
      */
     fun connectedness(id: PEER_ID): Connectedness
 
@@ -266,18 +266,18 @@ interface Dialer {
 }
 
 /**
- * Connectedness signals the capacity for a connection with a given node.
+ * Connectedness signals the capacity for a transport with a given node.
  * It is used to signal to services and other peers whether a node is reachable.
  */
 enum class Connectedness(val value: Int) {
 
     /**
-     * NotConnected means no connection to peer, and no extra information (default)
+     * NotConnected means no transport to peer, and no extra information (default)
      */
     NOT_CONNECTED(0),
 
     /**
-     * Connected means has an open, live connection to peer
+     * Connected means has an open, live transport to peer
      */
     CONNECTED(1),
 
@@ -310,12 +310,12 @@ interface Notifiee {
     fun listenClose(network: Network, multiaddr: Multiaddr)
 
     /**
-     * Connected called when a connection opened
+     * Connected called when a transport opened
      */
     fun connected(network: Network, conn: Conn)
 
     /**
-     * Disconnected called when a connection closed
+     * Disconnected called when a transport closed
      */
     fun disconnected(network: Network, conn: Conn)
 

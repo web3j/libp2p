@@ -10,20 +10,11 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.connection
-
-import io.ipfs.multiformats.multiaddr.Multiaddr
+package io.web3j.libp2p.transport
 
 /**
- * Represents a generic connection instance across any type of connection.
+ * Distinct interface to separate the RawConnection from one that
+ * provides access to security and network attributes.
  */
-interface Connection {
-
-    /**
-     * TODO: document!
-     * list of multiaddrs
-     */
-    fun getObservedAddrs(): Multiaddr
-
-    fun getPeerInfo(): Any = TODO("define return type")
+interface UpgradedConnection : ConnectionSecurity, ConnectionMultiaddr {
 }

@@ -20,22 +20,22 @@ import io.web3j.libp2p.crypto.unmarshalPublicKey
 import java.security.MessageDigest
 
 /**
- * Empty peer ID exception.
+ * Empty peer PeerID exception.
  */
-class EmptyPeerIdException : Exception("empty peer ID")
+class EmptyPeerIdException : Exception("empty peer PeerID")
 
 /**
  * Exception for peer IDs that don't embed public keys.
  */
-class NoPublicKeyException : Exception("public key is not embedded in peer ID")
+class NoPublicKeyException : Exception("public key is not embedded in peer PeerID")
 
 /**
- * ID is a libp2p peer identity.
+ * PeerID is a libp2p peer identity.
  */
-data class ID(val id: Multihash) {
+data class PeerID(val id: Multihash) {
 
     /**
-     * @return a base 58-encoded string of the ID.
+     * @return a base 58-encoded string of the PeerID.
      */
     fun pretty(): String = idB58Encode()
 
@@ -49,44 +49,44 @@ data class ID(val id: Multihash) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        return this.id.raw.contentEquals((other as ID).id.raw)
+        return this.id.raw.contentEquals((other as PeerID).id.raw)
     }
 
     /**
      * String prints out the peer.
      *
-     * TODO(brian): ensure correctness at ID generation and
+     * TODO(brian): ensure correctness at PeerID generation and
      * enforce this by only exposing functions that generate
-     * IDs safely. Then any peer.ID type found in the
+     * IDs safely. Then any peer.PeerID type found in the
      * codebase is known to be correct.
      */
     override fun toString(): String {
         val pid = pretty()
         return if (pid.length <= 10) {
-            "<peer.ID $pid>"
+            "<peer.PeerID $pid>"
         } else {
-            "<peer.ID ${pid.subSequence(0, 2)}*${pid.subSequence(pid.length - 6, pid.length)}"
+            "<peer.PeerID ${pid.subSequence(0, 2)}*${pid.subSequence(pid.length - 6, pid.length)}"
         }
     }
 
     /**
-     * Tests whether this ID was derived from shared-key.
+     * Tests whether this PeerID was derived from shared-key.
      * @param sharedKey the private key.
      * @return true if it was derived.
      */
     fun matchesPrivateKey(sharedKey: PrivKey): Boolean = matchesPublicKey(sharedKey.publicKey())
 
     /**
-     * Tests whether this ID was derived from the public key.
+     * Tests whether this PeerID was derived from the public key.
      * @param publicKey the public key.
      * @return true if it was derived.
      */
     fun matchesPublicKey(publicKey: PubKey): Boolean = idFromPublicKey(publicKey) == this
 
     /**
-     * ExtractPublicKey attempts to extract the public key from an ID
+     * ExtractPublicKey attempts to extract the public key from an PeerID
      *
-     * This method returns ErrNoPublicKey if the peer ID looks valid but it can't extract
+     * This method returns ErrNoPublicKey if the peer PeerID looks valid but it can't extract
      * the public key.
      */
     fun extractPublicKey(): PubKey {
@@ -111,36 +111,36 @@ data class ID(val id: Multihash) {
     companion object {
 
         /**
-         * Casts a string to ID type, and validates the id to make sure it is a multihash.
+         * Casts a string to PeerID type, and validates the id to make sure it is a multihash.
          * @param value the string value.
-         * @return the ID.
+         * @return the PeerID.
          */
-        fun idFromString(value: String): ID = ID(Multihash.fromHexString(value))
+        fun idFromString(value: String): PeerID = PeerID(Multihash.fromHexString(value))
 
         /**
-         * Casts a byte array to ID type, and validates the id to make sure it is a multihash.
+         * Casts a byte array to PeerID type, and validates the id to make sure it is a multihash.
          * @param value the byte array.
-         * @return the ID.
+         * @return the PeerID.
          */
-        fun idFromBytes(value: ByteArray): ID = ID(Multihash.cast(value))
+        fun idFromBytes(value: ByteArray): PeerID = PeerID(Multihash.cast(value))
 
         /**
          * @param value the string value.
          * @return a base 58-decoded Peer.
          */
-        fun idB58Decode(value: String): ID = ID(Multihash.fromBase58String(value))
+        fun idB58Decode(value: String): PeerID = PeerID(Multihash.fromBase58String(value))
 
         /**
          * @param value the string value.
          * @return a hex-decoded Peer
          */
-        fun idHexDecode(value: String): ID = ID(Multihash.fromHexString(value))
+        fun idHexDecode(value: String): PeerID = PeerID(Multihash.fromHexString(value))
 
         /**
          * @param pubKey the public key.
-         * @return the Peer ID corresponding to the provided public key.
+         * @return the Peer PeerID corresponding to the provided public key.
          */
-        fun idFromPublicKey(pubKey: PubKey): ID = with(MessageDigest.getInstance("SHA-256")) {
+        fun idFromPublicKey(pubKey: PubKey): PeerID = with(MessageDigest.getInstance("SHA-256")) {
             update(pubKey.bytes())
             idFromBytes(Multihash.encode(digest(), Type.SHA2_256.code))
         }
@@ -149,21 +149,21 @@ data class ID(val id: Multihash) {
          * @param privKey the private key.
          * @return the peer id corresponding to the provided private key.
          */
-        fun idFromPrivateKey(privKey: PrivKey): ID = idFromPublicKey(privKey.publicKey())
+        fun idFromPrivateKey(privKey: PrivKey): PeerID = idFromPublicKey(privKey.publicKey())
     }
 }
 
 /**
  * IDSlice for sorting peers
  */
-class IDSlice(val ids: MutableList<ID>) {
-    fun len(): Int = ids.size
+class IDSlice(val peerIds: MutableList<PeerID>) {
+    fun len(): Int = peerIds.size
 
     fun swap(i: Int, j: Int) {
-        val tmp = ids[i]
-        ids[i] = ids[j]
-        ids[j] = tmp
+        val tmp = peerIds[i]
+        peerIds[i] = peerIds[j]
+        peerIds[j] = tmp
     }
 
-    fun less(i: Int, j: Int): Boolean = ids[i].id.toHexString() < ids[j].id.toHexString()
+    fun less(i: Int, j: Int): Boolean = peerIds[i].id.toHexString() < peerIds[j].id.toHexString()
 }

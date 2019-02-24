@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.connection
+package io.web3j.libp2p.transport
 
 import io.ipfs.multiformats.multiaddr.Multiaddr
 
@@ -19,7 +19,7 @@ import io.ipfs.multiformats.multiaddr.Multiaddr
  * <ul>
  *      <li>listening</li>
  *      <li>close</li>
- *      <li>connection</li>
+ *      <li>transport</li>
  *      <li>error</li>
  * </ul>
  */
@@ -29,7 +29,7 @@ interface TransportListener {
      * This method starts the listener and puts it in listening mode, waiting for incoming connections.
      *
      * @param multiaddr the address where the listener should bind to.
-     * @return true if a connection was established.
+     * @return true if a transport was established.
      */
     fun listen(multiaddr: Multiaddr): Boolean
 
@@ -42,19 +42,19 @@ interface TransportListener {
     fun getAddrs(): Multiaddr
 
     /**
-     * Closes the listener so that no more connections can be open on this connection instance.
+     * Closes the listener so that no more connections can be open on this transport instance.
      * @param blocking whether to block until the listener has closed.
      * @param options optional settings for closing the listener
      */
     fun close(blocking: Boolean = false, options: TransportCloseOptions? = null): Boolean
 
     /**
-     * Contains the options for closing a TransportListener connection.
+     * Contains the options for closing a TransportListener transport.
      */
     interface TransportCloseOptions {
 
         /**
-         * The timeout (in milliseconds) that fires and destroys all the connections on this connection if the connection
+         * The timeout (in milliseconds) that fires and destroys all the connections on this transport if the transport
          * is not able to close graciously. (e.g { timeout: 1000 })
          */
         val timeoutMillis: Long

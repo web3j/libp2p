@@ -77,39 +77,39 @@ class PeerTest {
     @Test
     fun testPublicKeyExtraction() {
         val (_, pubKey) = generateEd25519KeyPair()
-        val id: ID = ID.idFromPublicKey(pubKey)
-        val extractedPub: PubKey = id.extractPublicKey()
+        val peerId: PeerID = PeerID.idFromPublicKey(pubKey)
+        val extractedPub: PubKey = peerId.extractPublicKey()
         assertEquals(pubKey, extractedPub)
 
         // Test invalid multihash (invariant of the type of public key)
-        val pk = ID(Multihash(byteArrayOf())).extractPublicKey()
+        val pk = PeerID(Multihash(byteArrayOf())).extractPublicKey()
         assertNull(pk)
 
         // Shouldn't work for, e.g. RSA keys (too large)
         val keyPair1 = generateKeyPair(KEY_TYPE.RSA, 2048)
         val pubKey1 = keyPair1.second
-        val rsaId = ID.idFromPublicKey(pubKey1)
+        val rsaId = PeerID.idFromPublicKey(pubKey1)
         val extractedRsaPub = rsaId.extractPublicKey()
         assertNull(extractedRsaPub)
     }
 
     private fun idMatchesPublicKey(ks: Keyset) {
-        val p1: ID = ID.idB58Decode(ks.pubKeyHashBase58)
+        val p1: PeerID = PeerID.idB58Decode(ks.pubKeyHashBase58)
         assertEquals(ks.pubKeyHash, p1.id.toHexString())
         assertTrue(p1.matchesPublicKey(ks.pubKey))
 
-        val p2 = ID.idFromPublicKey(ks.pubKey)
+        val p2 = PeerID.idFromPublicKey(ks.pubKey)
         assertEquals(p1, p2)
         assertEquals(ks.pubKeyHashBase58, p2.pretty())
     }
 
     private fun idMatchesPrivateKey(ks: Keyset) {
-        val p1: ID = ID.idB58Decode(ks.pubKeyHashBase58)
+        val p1: PeerID = PeerID.idB58Decode(ks.pubKeyHashBase58)
         assertEquals(ks.pubKeyHash, p1.id.toHexString())
 
         assertTrue(p1.matchesPrivateKey(ks.privKey))
 
-        val p2 = ID.idFromPrivateKey(ks.privKey)
+        val p2 = PeerID.idFromPrivateKey(ks.privKey)
 
         assertEquals(p1, p2)
     }

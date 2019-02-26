@@ -10,34 +10,35 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.transport
+package io.web3j.libp2p.net
 
-import io.web3j.libp2p.crypto.PrivKey
-import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.peer.PeerID
+import io.ipfs.multiformats.multiaddr.Protocol
 
 /**
- * Provides access to security-related aspects of a Connection.
+ * A bi-directional channel between two nodes in the network.
  */
-interface ConnectionSecurity {
+interface NetworkStream {
 
     /**
-     * @return this user's peer ID.
+     * The protocol that this stream runs on.
      */
-    fun getLocalPeerID(): PeerID
+    val protocol: Protocol
 
     /**
-     * @return this user's private key.
+     * @return the bytes from the underlying transport.
      */
-    fun getLocalPrivateKey(): PrivKey
+    fun read(): ByteArray
 
     /**
-     * @return the remote peer's public key.
+     * Writes the given bytes to the underlying transport.
+     * @param byteArray the byte array to be written out.
+     * @return the number of bytes written.
      */
-    fun getRemotePublicKey(): PubKey
+    fun write(byteArray: ByteArray): Long
 
     /**
-     * @return this remote peer's peer ID.
+     * Closes the underlying transport.
+     * @return true if the transport was successfully closed.
      */
-    fun getRemotePeerID(): PeerID
+    fun close(): Boolean
 }

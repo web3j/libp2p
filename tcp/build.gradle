@@ -1,5 +1,0 @@
-description 'libp2p TCP transport'
-
-dependencies {
-    compile project(':transport')
-}

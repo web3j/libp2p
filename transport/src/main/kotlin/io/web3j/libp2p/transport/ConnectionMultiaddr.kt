@@ -28,5 +28,4 @@ interface ConnectionMultiaddr {
      * @return the remote peer's multiaddr associated with this connection.
      */
     fun getRemoteMultiaddr(): Multiaddr
-
 }

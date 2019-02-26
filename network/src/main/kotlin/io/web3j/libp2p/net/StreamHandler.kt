@@ -10,17 +10,16 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.transport
+package io.web3j.libp2p.net
 
 /**
- * Provides an interface to convert a raw connection between peers to one that can handle streams, authentication, etc.
+ * Provides a callback facility to handle events relating to [NetworkStream].
  */
-interface TransportUpgrader {
+interface StreamHandler {
 
     /**
-     * Upgrades the given raw connection to a muxed connection.
-     * @param connection the connection to be upgraded.
-     * @return the upgraded (muxed) connection.
+     * Callback function that gets invoked when a new stream has been established from a remote peer.
+     * @param stream the newly established stream.
      */
-    fun upgrade(connection: RawConnection): UpgradedConnection
+    fun onNewStream(stream: NetworkStream): Unit
 }

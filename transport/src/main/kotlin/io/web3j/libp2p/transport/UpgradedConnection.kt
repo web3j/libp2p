@@ -13,8 +13,10 @@
 package io.web3j.libp2p.transport
 
 /**
- * Distinct interface to separate the RawConnection from one that
- * provides access to security and network attributes.
+ * Distinct interface to separate a [RawConnection] from one that
+ * has been upgraded/decorated to provide additional features and services. <br />
+ * Such additional traits of an [UpgradedConnection] include muxing and security.
  */
-interface UpgradedConnection : ConnectionSecurity, ConnectionMultiaddr {
+interface UpgradedConnection : RawConnection, ConnectionMultiaddr, ConnectionSecurity {
+    // The counterpart to this in the Python implemented is: MuxedConnection.
 }

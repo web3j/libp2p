@@ -15,21 +15,17 @@ package io.web3j.libp2p.net
 import io.ipfs.multiformats.multiaddr.Multiaddr
 
 /**
- * A callback interface providing access to network-related events.
+ * Provides access to multiaddr addresses for endpoints.
  */
-interface NetworkListener {
+interface ConnectionMultiaddr {
 
     /**
-     * Called when the network commences listening on the given address.
-     * @param network the network instance that the event occurred on.
-     * @param multiaddr the address that listening commenced on.
+     * @return the local multiaddr associated with this connection.
      */
-    fun onListeningStarted(network: Network, multiaddr: Multiaddr): Unit
+    fun getLocalMultiaddr(): Multiaddr
 
     /**
-     * Called when the network stops listening on the given address.
-     * @param network the network instance that the event occurred on.
-     * @param multiaddr the address that listening ceased for.
+     * @return the remote peer's multiaddr associated with this connection.
      */
-    fun onListeningStopped(network: Network, multiaddr: Multiaddr): Unit
+    fun getRemoteMultiaddr(): Multiaddr
 }

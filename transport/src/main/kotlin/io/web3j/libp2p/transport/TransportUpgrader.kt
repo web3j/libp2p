@@ -22,5 +22,5 @@ interface TransportUpgrader {
      * @param connection the connection to be upgraded.
      * @return the upgraded (muxed) connection.
      */
-    fun upgrade(connection: RawConnection): UpgradedConnection
+    fun upgrade(connection: TransportConnection): UpgradedConnection
 }

@@ -10,22 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.transport
-
-import io.ipfs.multiformats.multiaddr.Multiaddr
+package io.web3j.libp2p.peer
 
 /**
- * Provides access to multiaddr addresses for endpoints.
+ * Defines the common informational traits of a peer on the network.
+ *
+ * @param ID the peer ID.
+ * @param data the data associated with the peer.
  */
-interface ConnectionMultiaddr {
-
-    /**
-     * @return the local multiaddr associated with this connection.
-     */
-    fun getLocalMultiaddr(): Multiaddr
-
-    /**
-     * @return the remote peer's multiaddr associated with this connection.
-     */
-    fun getRemoteMultiaddr(): Multiaddr
-}
+data class PeerInfo(val ID: PeerID, val data: PeerData)

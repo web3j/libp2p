@@ -30,13 +30,11 @@ interface MuxedConnection {
     fun openStream(protocol: Protocol, multiaddr: Multiaddr): MuxedStream
 
     /**
-     * TODO[Raul]: How does Peer#1 know when to call this? Is this triggered by a listener to
-     * some other event?
-     *
-     * Accepts a stream opened by the other peer.
-     * @return the stream that was opened.
+     * Registers an event handler that receives notifications of relevant
+     * connection events.
+     * @param eventHandler the event handler.
      */
-    fun acceptStream(): MuxedStream
+    fun registerEventHandler(eventHandler: MuxedConnectionEventHandler): Unit
 
     /**
      * @return whether a transport is fully closed, so it can be garbage collected.

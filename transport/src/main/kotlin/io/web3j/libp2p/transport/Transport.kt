@@ -18,7 +18,7 @@ import io.ipfs.multiformats.multiaddr.Protocol
 /**
  * The Transport interface can be viewed as a factory that creates connections.
  *
- * @link {https://github.com/libp2p/interface-transport}
+ * @link [https://github.com/libp2p/interface-transport]
  *
  */
 interface Transport {
@@ -29,7 +29,7 @@ interface Transport {
      * @param options the dial options.
      * @return the established transport.
      */
-    fun dial(multiaddr: Multiaddr, options: TransportDialOptions? = null): RawConnection
+    fun dial(multiaddr: Multiaddr, options: TransportDialOptions? = null): TransportConnection
 
     /**
      * Checks whether the given address can be dialed with this transport implementation. <br />
@@ -40,15 +40,10 @@ interface Transport {
     fun canDial(multiaddr: Multiaddr): Boolean
 
     /**
-     * Creates a listener on the transport instance.
-     * @param options contains properties that the listener must have.
-     * @param newConnectionListener a callback interface that is notified when a new transport is received.
-     * @return the listener.
+     * Registers a listener on the transport instance.
+     * @param listener a callback interface that is notified when a new transport is received.
      */
-    fun createListener(
-        options: TransportListenerOptions? = null,
-        newConnectionListener: TransportConnectionListener? = null
-    ): TransportListener
+    fun registerListener(listener: TransportConnectionListener): Unit
 
     /**
      * @return the set of protocols handled by this transport instance.
@@ -56,24 +51,7 @@ interface Transport {
     fun getProtocols(): Array<Protocol>
 
     /**
-     * Contains the options for a listener instance.
-     */
-    interface TransportListenerOptions
-
-    /**
      * Contains the options to dial to a peer using the selected transport.
      */
     interface TransportDialOptions
-
-    /**
-     * Provides access to newly established connections in the transport layer.
-     */
-    interface TransportConnectionListener {
-
-        /**
-         * Fired when a new transport is received on the transport layer.
-         * @param connection the transport that was established.
-         */
-        fun onNewConnection(connection: RawConnection): Unit
-    }
 }

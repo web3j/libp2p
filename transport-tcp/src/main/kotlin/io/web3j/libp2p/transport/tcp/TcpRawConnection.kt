@@ -12,27 +12,7 @@
  */
 package io.web3j.libp2p.transport.tcp
 
-import io.ipfs.multiformats.multiaddr.Multiaddr
-import io.web3j.libp2p.transport.RawConnection
-import io.web3j.libp2p.transport.Transport
-
 /**
- * Provides a RawConnection instance using the TCP protocol.
+ * Provides a TransportConnection instance using the TCP protocol.
  */
-class TcpRawConnection : RawConnection {
-
-    /**
-     * Returns the multiaddrs for the peers in this connection.
-     * @return the addresses for the peers.
-     */
-    override fun getObservedAddrs(): List<Multiaddr> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    /**
-     * @return the Transport instance that this connection belongs to.
-     */
-    override fun getTransport(): Transport {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-}
+class TcpRawConnection

@@ -10,15 +10,34 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.transport
+package io.web3j.libp2p.net
 
-import io.web3j.libp2p.net.ConnectionMultiaddr
-import io.web3j.libp2p.net.ConnectionSecurity
-import io.web3j.streammux.MuxedConnection
+import io.web3j.libp2p.crypto.PrivKey
+import io.web3j.libp2p.crypto.PubKey
+import io.web3j.libp2p.peer.PeerID
 
 /**
- * Distinct interface to separate a [TransportConnection] from one that
- * has been upgraded/decorated to provide additional features and services. <br />
- * Such additional traits of an [UpgradedConnection] include muxing and security.
+ * Provides access to security-related aspects of a Connection.
  */
-interface UpgradedConnection : ConnectionMultiaddr, ConnectionSecurity, MuxedConnection
+interface ConnectionSecurity {
+
+    /**
+     * @return this user's peer ID.
+     */
+    fun getLocalPeerID(): PeerID
+
+    /**
+     * @return this user's private key.
+     */
+    fun getLocalPrivateKey(): PrivKey
+
+    /**
+     * @return the remote peer's public key.
+     */
+    fun getRemotePublicKey(): PubKey
+
+    /**
+     * @return this remote peer's peer ID.
+     */
+    fun getRemotePeerID(): PeerID
+}

@@ -14,11 +14,20 @@ package io.web3j.libp2p.transport
 
 import io.web3j.libp2p.net.ConnectionMultiaddr
 import io.web3j.libp2p.net.ConnectionSecurity
-import io.web3j.streammux.MuxedConnection
+import io.web3j.libp2p.peer.PeerInfo
 
 /**
- * Distinct interface to separate a [TransportConnection] from one that
- * has been upgraded/decorated to provide additional features and services. <br />
- * Such additional traits of an [UpgradedConnection] include muxing and security.
+ * Represents a generic transport instance across any type of transport.
  */
-interface UpgradedConnection : ConnectionMultiaddr, ConnectionSecurity, MuxedConnection
+interface TransportConnection : ConnectionSecurity, ConnectionMultiaddr {
+
+    /**
+     * @return the Transport instance that this connection belongs to.
+     */
+    fun getTransport(): Transport
+
+    /**
+     * @return information about the other peer on this connection.
+     */
+    fun getPeerInfo(): PeerInfo
+}

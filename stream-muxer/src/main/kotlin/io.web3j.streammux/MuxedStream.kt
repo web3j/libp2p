@@ -12,36 +12,12 @@
  */
 package io.web3j.streammux
 
-import io.ipfs.multiformats.multiaddr.Protocol
 import java.time.Duration
 
 /**
  * A muxed stream represents a line of communication over a RawConnection, using a specific protocol.
  */
-interface MuxedStream {
-
-    /**
-     * @return the protocol that this muxed stream is associated with.
-     */
-    fun getProtocol(): Protocol
-
-    /**
-     * @return the bytes from the underlying muxed transport.
-     */
-    fun read(): ByteArray
-
-    /**
-     * Writes the given bytes to the underlying muxed transport.
-     * @param byteArray the byte array to be written out.
-     * @return the number of bytes written.
-     */
-    fun write(byteArray: ByteArray): Long
-
-    /**
-     * Closes the underlying muxed transport.
-     * @return true if the transport was successfully closed.
-     */
-    fun close(): Boolean
+interface MuxedStream : BasicStream {
 
     /**
      * Reset closes both ends of the stream. Use this to tell the remote

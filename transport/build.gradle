@@ -3,7 +3,6 @@ description 'libp2p common interface for network transports'
 dependencies {
     compile project(':network')
     compile project(':peer')
-    compile project(':stream-muxer')
     compile("io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion") {
         exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
     }

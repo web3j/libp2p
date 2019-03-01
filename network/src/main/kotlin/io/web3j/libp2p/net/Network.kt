@@ -19,15 +19,6 @@ import io.web3j.streammux.MuxedConnection
 
 /**
  * The IPFS Network package handles all of the peer-to-peer networking. It connects to other hosts, it encrypts communications, it muxes messages between the network's client services and target hosts. It has multiple subcomponents:
-
-Conn - a connection to a single Peer
-MultiConn - a set of connections to a single Peer
-SecureConn - an encrypted (tls-like) connection
-Swarm - holds connections to Peers, multiplexes from/to each MultiConn
-Muxer - multiplexes between Services and Swarm. Handles Request/Reply.
-Service - connects between an outside client service and Network.
-Handler - the client service part that handles requests
-It looks a bit like this:
  */
 interface Network {
 
@@ -65,4 +56,10 @@ interface Network {
      * @param streamHandler the handler instance.
      */
     fun setStreamHandler(protocol: Protocol, streamHandler: StreamHandler): Unit
+
+    /**
+     * Registers a listener to receive network events.
+     * @param networkListener the network listener.
+     */
+    fun setNetworkListener(networkListener: NetworkListener): Unit
 }

@@ -18,8 +18,16 @@ package io.web3j.libp2p.net
 interface StreamHandler {
 
     /**
-     * Callback function that gets invoked when a new stream has been established from a remote peer.
-     * @param stream the newly established stream.
+     * Called when a stream is opened.
+     * @param network the network instance that the event occurred on.
+     * @param stream the stream involved in the event.
      */
-    fun onNewStream(stream: NetworkStream): Unit
+    fun onStreamOpened(network: Network, stream: NetworkStream): Unit
+
+    /**
+     * Called when a stream is closed.
+     * @param network the network instance that the event occurred on.
+     * @param stream the stream involved in the event.
+     */
+    fun onStreamClosed(network: Network, stream: NetworkStream): Unit
 }

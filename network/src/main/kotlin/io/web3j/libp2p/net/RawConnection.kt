@@ -12,7 +12,18 @@
  */
 package io.web3j.libp2p.net
 
-/**
- * Indicates an issue/error with the networking library of libp2p.
- */
-class NetworkException(cause: String) : Exception(cause)
+interface RawConnection {
+
+    // TODO: consider how we are going to provide a reader and writer.
+
+    /**
+     * Creates a new stream over this connection.
+     * @return the new stream.
+     */
+    fun newStream(): NetworkStream
+
+    /**
+     * @return all the open streams over this connection.
+     */
+    fun getStreams(): Array<NetworkStream>
+}

@@ -10,34 +10,16 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.transport
-
-import io.web3j.libp2p.crypto.PrivKey
-import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.peer.PeerID
+package io.web3j.streammux
 
 /**
- * Provides access to security-related aspects of a Connection.
+ * Provides a facility to receive events on a [MuxedConnection]
  */
-interface ConnectionSecurity {
+interface MuxedConnectionEventHandler {
 
     /**
-     * @return this user's peer ID.
+     * Fired when a new stream has been accepted by the connection.
+     * @param acceptedStream the new stream that was accepted.
      */
-    fun getLocalPeerID(): PeerID
-
-    /**
-     * @return this user's private key.
-     */
-    fun getLocalPrivateKey(): PrivKey
-
-    /**
-     * @return the remote peer's public key.
-     */
-    fun getRemotePublicKey(): PubKey
-
-    /**
-     * @return this remote peer's peer ID.
-     */
-    fun getRemotePeerID(): PeerID
+    fun onStreamAccepted(acceptedStream: MuxedStream): Unit
 }

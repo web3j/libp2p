@@ -13,32 +13,17 @@
 package io.web3j.libp2p.net
 
 import io.ipfs.multiformats.multiaddr.Protocol
+import io.web3j.streammux.BasicStream
 
 /**
- * A bi-directional channel between two nodes in the network.
+ * A bi-directional channel between two nodes in the network. <p />
+ * A [NetworkStream] is an extension of [BasicStream] that provides an identifying
+ * protocol for that stream.
  */
-interface NetworkStream {
+interface NetworkStream : BasicStream {
 
     /**
      * The protocol that this stream runs on.
      */
     val protocol: Protocol
-
-    /**
-     * @return the bytes from the underlying transport.
-     */
-    fun read(): ByteArray
-
-    /**
-     * Writes the given bytes to the underlying transport.
-     * @param byteArray the byte array to be written out.
-     * @return the number of bytes written.
-     */
-    fun write(byteArray: ByteArray): Long
-
-    /**
-     * Closes the underlying transport.
-     * @return true if the transport was successfully closed.
-     */
-    fun close(): Boolean
 }

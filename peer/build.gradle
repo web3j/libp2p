@@ -8,6 +8,10 @@ dependencies {
         exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
     }
 
+    compile("io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion") {
+        exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
+    }
+
     compile "com.github.walleth.kethereum:base58:$kethereumBase58Version"
     runtime "commons-codec:commons-codec:$commonsCodecVersion"
 }

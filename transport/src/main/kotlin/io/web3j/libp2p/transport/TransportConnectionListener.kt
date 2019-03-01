@@ -12,24 +12,14 @@
  */
 package io.web3j.libp2p.transport
 
-import io.ipfs.multiformats.multiaddr.Multiaddr
-
 /**
- * Represents a generic transport instance across any type of transport.
+ * Provides access to newly established connections in the transport layer.
  */
-interface RawConnection {
+interface TransportConnectionListener {
 
     /**
-     * Returns the multiaddrs for the peers in this connection.
-     * @return the addresses for the peers.
+     * Fired when a new transport is received on the transport layer.
+     * @param connection the transport that was established.
      */
-    fun getObservedAddrs(): List<Multiaddr>
-
-    /**
-     * @return the Transport instance that this connection belongs to.
-     */
-    fun getTransport(): Transport
-
-    // TODO[Sam]: Sort this out!
-    fun getPeerInfo(): Any = TODO("define return type")
+    fun onNewConnection(connection: TransportConnection): Unit
 }

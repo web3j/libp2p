@@ -27,5 +27,4 @@ class TCPTransportException : Exception {
     constructor(codeWithReason: CodeWithReason) : super(codeWithReason.reason) {
         this.codeWithReason = codeWithReason
     }
-
 }

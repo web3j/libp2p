@@ -22,7 +22,7 @@ class SimpleIntegrationTest {
 
     @Test
     @Disabled
-    fun testEchoMessagesAcrossTwoLocalNodes(): Unit {
+    fun testEchoMessagesAcrossTwoLocalNodes() {
 
         // Create node1 on: /ip4/127.0.0.1/tcp/0
         // Create node2 on: /ip4/127.0.0.1/tcp/0

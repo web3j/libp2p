@@ -17,7 +17,7 @@ import java.time.Duration
 /**
  * A muxed stream represents a line of communication over a RawConnection, using a specific protocol.
  */
-interface MuxedStream : BasicStream {
+interface MuxedStream {
 
     /**
      * Reset closes both ends of the stream. Use this to tell the remote
@@ -30,4 +30,22 @@ interface MuxedStream : BasicStream {
      * @param ttl the deadline/TTL.
      */
     fun setDeadline(ttl: Duration)
+
+    /**
+     * @return the bytes from the stream..
+     */
+    fun read(): ByteArray
+
+    /**
+     * Writes the given bytes to the stream.
+     * @param byteArray the byte array to be written out.
+     * @return the number of bytes written.
+     */
+    fun write(byteArray: ByteArray): Long
+
+    /**
+     * Closes the stream.
+     * @return true if the stream was successfully closed.
+     */
+    fun close(): Boolean
 }

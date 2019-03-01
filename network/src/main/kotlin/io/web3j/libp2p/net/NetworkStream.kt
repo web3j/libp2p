@@ -13,14 +13,16 @@
 package io.web3j.libp2p.net
 
 import io.ipfs.multiformats.multiaddr.Protocol
-import io.web3j.streammux.BasicStream
+import io.web3j.streammux.MuxedStream
 
 /**
  * A bi-directional channel between two nodes in the network. <p />
- * A [NetworkStream] is an extension of [BasicStream] that provides an identifying
- * protocol for that stream.
+ * A [NetworkStream] is an extension of [MuxedStream] that provides an identifying
+ * protocol for that stream. <br />
+ * Once a [MuxedStream] has been established, protocol negotiation then takes place and a [NetworkStream] is then
+ * created once a protocol has been (mutually) agreed upon.
  */
-interface NetworkStream : BasicStream {
+interface NetworkStream : MuxedStream {
 
     /**
      * The protocol that this stream runs on.

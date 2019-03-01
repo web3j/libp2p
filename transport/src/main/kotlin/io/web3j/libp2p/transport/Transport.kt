@@ -19,7 +19,6 @@ import io.ipfs.multiformats.multiaddr.Protocol
  * The Transport interface can be viewed as a factory that creates connections.
  *
  * @link [https://github.com/libp2p/interface-transport]
- *
  */
 interface Transport {
 

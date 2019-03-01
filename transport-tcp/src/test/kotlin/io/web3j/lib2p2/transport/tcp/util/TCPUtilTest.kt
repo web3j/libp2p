@@ -28,7 +28,7 @@ class TCPUtilTest {
      * Tests the conversion of an IPv4 address and port to a Multiaddr structure.
      */
     @Test
-    fun ip4AddressToMultiaddrTest(): Unit {
+    fun ip4AddressToMultiaddrTest() {
         val ip4Address = Inet4Address.getByAddress(byteArrayOf(127.toByte(), 0.toByte(), 0.toByte(), 1.toByte()))
         val port = 8080
         val addr = TCPUtil.createMultiaddr(ip4Address, port)
@@ -40,7 +40,7 @@ class TCPUtilTest {
      * Tests the conversion of an IPv6 address and port to a Multiaddr structure.
      */
     @Test
-    fun ip6AddressToMultiaddrTest(): Unit {
+    fun ip6AddressToMultiaddrTest() {
         val ip6Address = Inet6Address.getByAddress(
             byteArrayOf(
                 32.toByte(),
@@ -67,5 +67,4 @@ class TCPUtilTest {
         assertEquals("2001:db08:a0b:12f0:0:0:0:1", addr.valueForProtocol(Protocol.IP6.code), "Incorrect IP")
         assertEquals("8080", addr.valueForProtocol(Protocol.TCP.code), "Incorrect port")
     }
-
 }

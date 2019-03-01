@@ -34,5 +34,4 @@ class TCPTransport : Transport {
     override fun getProtocols(): Array<Protocol> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 }

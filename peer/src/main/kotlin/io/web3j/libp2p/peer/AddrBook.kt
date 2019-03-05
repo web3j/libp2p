@@ -41,6 +41,13 @@ interface AddrBook {
     fun addAddrs(peerID: PeerID, ttl: Duration? = null, vararg addrs: Multiaddr): Unit
 
     /**
+     * Resets the TTL (ignoring the existing value) for all the addresses for the given peer.
+     * @param peerID the peer ID.
+     * @param ttl the optional TTL for the address.
+     */
+    fun resetAddr(peerID: PeerID, ttl: Duration?): Unit
+
+    /**
      * Removes all previously stored addresses for the peer.
      * @param peerID the peer ID of the peer whose addresses are to be removed/cleared.
      */

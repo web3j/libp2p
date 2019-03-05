@@ -34,12 +34,10 @@ class TCPTransport : Transport {
         val isIpv4 = multiaddr.getProtocols().contains(Protocol.IP4)
         val isIpv6 = multiaddr.getProtocols().contains(Protocol.IP6)
 
-        return if (isIpv4) {
-            dialIpv4(multiaddr, options)
-        } else if (isIpv6) {
-            return dialIpv6(multiaddr, options)
-        } else {
-            throw TCPTransportException(
+        return when {
+            isIpv4 -> dialIpv4(multiaddr, options)
+            isIpv6 -> dialIpv6(multiaddr, options)
+            else -> throw TCPTransportException(
                 "Only IPv4 and IPv6 protocols are supported",
                 TCPErrorCodes.UNSUPPORTED_PROTOCOL
             )
@@ -88,11 +86,14 @@ class TCPTransport : Transport {
      */
     private fun dialIpv4(multiaddr: Multiaddr, options: Transport.TransportDialOptions?): TransportConnection {
         val host = multiaddr.valueForProtocol(Protocol.IP4.code)
+        val port = multiaddr.valueForProtocol(Protocol.TCP.code)
 
+        // https://github.com/multiformats/go-multiaddr-net/blob/master/net.go
         TODO("COntinue here")
 //        var d manet.Dialer
 //        return d.DialContext(
 //            ctx, raddr
 //                    TODO ("NOT IMPLEMENTED YET")
+        // TODO: return RawConnection?
     }
 }

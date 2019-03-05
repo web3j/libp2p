@@ -12,6 +12,10 @@ dependencies {
         exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
     }
 
-    compile "com.github.walleth.kethereum:base58:$kethereumBase58Version"
+    compile "com.github.walleth.kethereum:base58:$kethereumBase58Version",
+            "org.slf4j:slf4j-api:$slf4jVersion"
+
     runtime "commons-codec:commons-codec:$commonsCodecVersion"
+
+    testCompile project(':peer').sourceSets.test.output
 }

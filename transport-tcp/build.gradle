@@ -1,3 +1,7 @@
 description 'libp2p TCP transport'
 
-dependencies { compile project(':transport') }
+dependencies {
+    compile project(':transport')
+    compile "io.netty:netty-all:$nettyVersion"
+
+}

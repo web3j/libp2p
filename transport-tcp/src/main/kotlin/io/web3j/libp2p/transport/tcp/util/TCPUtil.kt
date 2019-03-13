@@ -14,9 +14,7 @@ package io.web3j.libp2p.transport.tcp.util
 
 import io.ipfs.multiformats.multiaddr.Multiaddr
 import io.ipfs.multiformats.multiaddr.Protocol
-import java.net.Inet4Address
-import java.net.Inet6Address
-import java.net.InetAddress
+import java.net.*
 
 /**
  * A set of utility functions for working with the TCP transport library.
@@ -36,6 +34,35 @@ object TCPUtil {
             TCPUtil.createMultiaddr(ipAddress as Inet6Address, port)
         }
     }
+
+    /**
+     * Converts the given multiaddr to the equivalent socket address.
+     * @param multiaddr the multiaddr.
+     * @return the socket address equivalent.
+     */
+    fun toSocketAddress(multiaddr: Multiaddr): SocketAddress {
+        val ip = multiaddr.valueForProtocol(Protocol.IP4.code)
+        val port = multiaddr.valueForProtocol(Protocol.TCP.code).toInt()
+        return InetSocketAddress(InetAddress.getByName(ip), port)
+    }
+
+    /**
+     * Creates a [Multiaddr] from the given socket address.
+     * @param socketAddress the socket address.
+     * @return the multiaddr created from this address.
+     */
+    fun createMultiaddr(socketAddress: InetSocketAddress): Multiaddr? {
+        return socketAddress.address?.let {
+            createMultiaddr(it, socketAddress.port)
+        }
+    }
+
+    /**
+     * Creates a [Multiaddr] that uses the loopback address on the given port.
+     * @param port the desired port.
+     * @return the multiaddr.
+     */
+    fun createLoopbackMultiaddr(port: Int): Multiaddr = createMultiaddr(InetAddress.getLoopbackAddress(), port)
 
     /**
      * Converts the given IPv4 address and port into an equivalent [Multiaddr].

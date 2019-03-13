@@ -10,18 +10,30 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.transport.tcp
-
-import io.web3j.libp2p.shared.env.CodeWithReason
+package io.web3j.libp2p.transport
 
 /**
- * All the error codes that can be thrown by the TCP Transport module.
+ * Represents the lifecycle of a connection.
  */
-object TCPErrorCodes {
+enum class ConnectionStatus {
 
-    val UNSUPPORTED_PROTOCOL = CodeWithReason(2001, "Protocol is not supported")
-    val PORT_IN_USE = CodeWithReason(2002, "Port is already in use")
-    val OBJECT_NOT_AVAILABLE = CodeWithReason(2003, "Object not available to complete operation")
+    /**
+     * The connection is closed.
+     */
+    CLOSED,
 
-    val UNIMPLEMENTED = CodeWithReason(2999, "No implementation available")
+    /**
+     * The connection is being closed.
+     */
+    CLOSING,
+
+    /**
+     * The connection is open.
+     */
+    OPEN,
+
+    /**
+     * The connection is being opened.
+     */
+    OPENING
 }

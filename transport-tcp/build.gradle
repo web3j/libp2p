@@ -4,4 +4,8 @@ dependencies {
     compile project(':transport')
     compile "io.netty:netty-all:$nettyVersion"
 
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.1.1'
+
+
 }

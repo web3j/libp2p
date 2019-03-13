@@ -25,10 +25,9 @@ interface Transport {
     /**
      * Dials (using the transport) to the peer on the given address.
      * @param multiaddr the destination address peer to be dialed.
-     * @param options the dial options.
      * @return the established transport.
      */
-    fun dial(multiaddr: Multiaddr, options: TransportDialOptions? = null): TransportConnection
+    fun dial(multiaddr: Multiaddr): TransportConnection
 
     /**
      * Checks whether the given address can be dialed with this transport implementation. <br />
@@ -39,18 +38,16 @@ interface Transport {
     fun canDial(multiaddr: Multiaddr): Boolean
 
     /**
-     * Registers a listener on the transport instance.
+     * Registers a listener on the transport instance at the given address.
+     * @param multiaddr the multiaddr to listen on.
      * @param listener a callback interface that is notified when a new transport is received.
+     * @return the multiaddr that the listener was started for.
      */
-    fun registerListener(listener: TransportConnectionListener): Unit
+    fun listen(multiaddr: Multiaddr, listener: TransportConnectionListener): Multiaddr
 
     /**
      * @return the set of protocols handled by this transport instance.
      */
     fun getProtocols(): Array<Protocol>
 
-    /**
-     * Contains the options to dial to a peer using the selected transport.
-     */
-    interface TransportDialOptions
 }

@@ -17,6 +17,13 @@ import io.ipfs.multiformats.multiaddr.Protocol
 import io.web3j.libp2p.transport.Transport
 import io.web3j.libp2p.transport.TransportConnection
 import io.web3j.libp2p.transport.TransportConnectionListener
+import io.web3j.libp2p.transport.tcp.provider.netty.NettyClientInfo
+import io.web3j.libp2p.transport.tcp.provider.netty.NettyFacade
+import io.web3j.libp2p.transport.tcp.provider.netty.NettyServerInfo
+import io.web3j.libp2p.transport.tcp.util.TCPUtil
+import org.slf4j.LoggerFactory
+import java.net.InetSocketAddress
+
 
 /**
  * An implementation of the [Transport] interface using TCP.
@@ -26,17 +33,17 @@ class TCPTransport : Transport {
     /**
      * Dials (using the transport) to the peer on the given address.
      * @param multiaddr the destination address peer to be dialed.
-     * @param options the dial options.
      * @return the established transport.
      */
-    override fun dial(multiaddr: Multiaddr, options: Transport.TransportDialOptions?): TransportConnection {
-
+    override fun dial(multiaddr: Multiaddr): TransportConnection {
         val isIpv4 = multiaddr.getProtocols().contains(Protocol.IP4)
         val isIpv6 = multiaddr.getProtocols().contains(Protocol.IP6)
 
         return when {
-            isIpv4 -> dialIpv4(multiaddr, options)
-            isIpv6 -> dialIpv6(multiaddr, options)
+            isIpv4 || isIpv6 -> {
+                val clientInfo: NettyClientInfo = NettyFacade.dial(TCPUtil.toSocketAddress(multiaddr))
+                TCPTransportConnection.build(clientInfo, this)
+            }
             else -> throw TCPTransportException(
                 "Only IPv4 and IPv6 protocols are supported",
                 TCPErrorCodes.UNSUPPORTED_PROTOCOL
@@ -55,11 +62,16 @@ class TCPTransport : Transport {
     }
 
     /**
-     * Registers a listener on the transport instance.
+     * Registers a listener on the transport instance at the given address.
+     * @param multiaddr the multiaddr to listen on.
      * @param listener a callback interface that is notified when a new transport is received.
+     * @return the multiaddr that the listener was started for.
      */
-    override fun registerListener(listener: TransportConnectionListener) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun listen(multiaddr: Multiaddr, listener: TransportConnectionListener): Multiaddr {
+        LOGGER.debug("Listening for connections on {}", multiaddr)
+        val serverInfo: NettyServerInfo = NettyFacade.startListener(TCPUtil.toSocketAddress(multiaddr), listener, this)
+        val socketAddress = serverInfo.serverChannel.localAddress()
+        return TCPUtil.createMultiaddr(socketAddress as InetSocketAddress)!!
     }
 
     /**
@@ -67,33 +79,7 @@ class TCPTransport : Transport {
      */
     override fun getProtocols(): Array<Protocol> = arrayOf(Protocol.TCP)
 
-    /**
-     * Helper function that dials the given IPv6 address.
-     * @param multiaddr the address to be dialed containing an IPv6 portion.
-     * @param options the dial options.
-     * @return the established transport.
-     */
-    private fun dialIpv6(multiaddr: Multiaddr, options: Transport.TransportDialOptions?): TransportConnection {
-        // TODO: implement!
-        throw TCPTransportException(TCPErrorCodes.UNIMPLEMENTED)
-    }
-
-    /**
-     * Helper function that dials the given IPv6 address.
-     * @param multiaddr the address to be dialed containing an IPv6 portion.
-     * @param options the dial options.
-     * @return the established transport.
-     */
-    private fun dialIpv4(multiaddr: Multiaddr, options: Transport.TransportDialOptions?): TransportConnection {
-        val host = multiaddr.valueForProtocol(Protocol.IP4.code)
-        val port = multiaddr.valueForProtocol(Protocol.TCP.code)
-
-        // https://github.com/multiformats/go-multiaddr-net/blob/master/net.go
-        TODO("COntinue here")
-//        var d manet.Dialer
-//        return d.DialContext(
-//            ctx, raddr
-//                    TODO ("NOT IMPLEMENTED YET")
-        // TODO: return RawConnection?
+    companion object {
+        val LOGGER = LoggerFactory.getLogger(TCPTransport::class.java)!!
     }
 }

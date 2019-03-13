@@ -30,4 +30,14 @@ interface TransportConnection : ConnectionSecurity, ConnectionMultiaddr {
      * @return information about the other peer on this connection.
      */
     fun getPeerInfo(): PeerInfo
+
+    /**
+     * Disconnects this connection.
+     */
+    fun disconnect(): Unit
+
+    /**
+     * @return the status of the connection.
+     */
+    fun getStatus() : ConnectionStatus
 }

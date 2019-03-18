@@ -4,8 +4,14 @@ include 'shared'
 include 'crypto'
 include 'network'
 include 'peer'
-include 'transport'
+include 'transport-definition'
 include 'transport-tcp'
-include 'protocol'
 include 'stream-muxer'
-include 'foundation'
+include 'stream-mplex'
+include 'protocol-muxer'
+
+project(':protocol-muxer').projectDir = new File('./protocol/muxer')
+project(':stream-muxer').projectDir = new File('./stream/muxer')
+project(':stream-mplex').projectDir = new File('./stream/mplex')
+project(':transport-definition').projectDir = new File('./transport/definition')
+project(':transport-tcp').projectDir = new File('./transport/tcp')

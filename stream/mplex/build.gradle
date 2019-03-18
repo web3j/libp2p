@@ -1,0 +1,7 @@
+description 'An mplex implementation.'
+
+dependencies {
+    compile("io.ipfs.multiformats:kotlin-multiaddr:$kotlinMultiaddrVersion") {
+        exclude group: 'io.ipfs.multiformats', module: 'kotlin-multibase'
+    }
+}

@@ -101,7 +101,7 @@ class MemoryAddressBook : AddrBook {
      * @param peerID the peer ID.
      * @param ttl the optional TTL for the address.
      */
-    override fun resetAddr(peerID: PeerID, ttl: Duration?): Unit {
+    override fun resetAddr(peerID: PeerID, ttl: Duration?) {
         synchronized(addressMap) {
             addressMap[peerID]?.reset(ttl)
         }
@@ -112,14 +112,15 @@ class MemoryAddressBook : AddrBook {
         /**
          * The logger instance.
          */
-        val LOGGER = LoggerFactory.getLogger(AddrBook::class.java!!)
-
+        val LOGGER = LoggerFactory.getLogger(AddrBook::class.java)!!
     }
 
     /**
      * Stores addresses for a single peer, along with TTL information on each address.
      */
-    private data class PeerAddressInfo(private val addressExpiryMap: MutableMap<Multiaddr, TimedAddress> = mutableMapOf()) {
+    private data class PeerAddressInfo(
+        private val addressExpiryMap: MutableMap<Multiaddr, TimedAddress> = mutableMapOf()
+    ) {
 
         /**
          * @return the unexpired addresses as at the current time.
@@ -153,7 +154,7 @@ class MemoryAddressBook : AddrBook {
          * Resets the TTL (ignoring the existing value) for all the addresses.
          * @param ttl the optional TTL for the address.
          */
-        fun reset(ttl: Duration?): Unit {
+        fun reset(ttl: Duration?) {
             this.addressExpiryMap.values.forEach {
                 it.reset(ttl)
             }
@@ -212,13 +213,12 @@ class MemoryAddressBook : AddrBook {
          * Resets the TTL (ignoring the existing value) for the address.
          * @param ttl the optional TTL for the address.
          */
-        fun reset(ttl: Duration?): Unit {
+        fun reset(ttl: Duration?) {
             if (ttl == null) {
                 epochExpiryTime = Long.MAX_VALUE
             } else {
                 epochExpiryTime = ttl.toMillis() + System.currentTimeMillis()
             }
-
         }
 
         /**
@@ -227,7 +227,6 @@ class MemoryAddressBook : AddrBook {
         override fun toString(): String {
             return "TimedAddress[addr={${this.address}, expiry=${this.epochExpiryTime}]"
         }
-
 
         companion object {
 
@@ -276,6 +275,4 @@ class MemoryAddressBook : AddrBook {
             }
         }
     }
-
-
 }

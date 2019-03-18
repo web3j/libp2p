@@ -16,5 +16,5 @@ dependencies {
 
     runtime "commons-codec:commons-codec:$commonsCodecVersion"
 
-    testCompile project(':peer').sourceSets.test.output
+    //    testCompile project(':peer').sourceSets.test.output
 }

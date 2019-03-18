@@ -1,8 +1,7 @@
 description 'libp2p network API'
 
 dependencies {
-    compile project(':protocol'),
-            project(':peer'),
+    compile project(':peer'),
             project(':crypto'),
             project(':stream-muxer')
 

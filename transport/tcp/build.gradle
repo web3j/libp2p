@@ -1,0 +1,11 @@
+description 'libp2p TCP transport'
+
+dependencies {
+    compile project(':transport-definition')
+    compile "io.netty:netty-all:$nettyVersion"
+
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.1.1'
+
+
+}

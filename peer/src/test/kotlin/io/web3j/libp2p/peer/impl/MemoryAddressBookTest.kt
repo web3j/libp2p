@@ -28,7 +28,7 @@ class MemoryAddressBookTest {
      * Tests addresses for different peers.
      */
     @Test
-    fun simplePeerWithAddressesTest(): Unit {
+    fun simplePeerWithAddressesTest() {
         val addrBook = MemoryAddressBook()
         val peer1 = PeerTestUtil.createPeer()
 
@@ -59,7 +59,7 @@ class MemoryAddressBookTest {
      * Tests peer address expiry.
      */
     @Test
-    fun addressExpiryTest(): Unit {
+    fun addressExpiryTest() {
         val addrBook = MemoryAddressBook()
         val peer1 = PeerTestUtil.createPeer()
 
@@ -93,7 +93,7 @@ class MemoryAddressBookTest {
      * Tests updating the TTL of an address to a finite value.
      */
     @Test
-    fun updateAddrTtlTest(): Unit {
+    fun updateAddrTtlTest() {
         val addrBook = MemoryAddressBook()
         val peer1 = PeerTestUtil.createPeer()
 
@@ -123,7 +123,7 @@ class MemoryAddressBookTest {
      * Tests updating the TTL of an address to various finite and infinite values.
      */
     @Test
-    fun updateAddrTtlTest2(): Unit {
+    fun updateAddrTtlTest2() {
         val addrBook = MemoryAddressBook()
         val peer1 = PeerTestUtil.createPeer()
 
@@ -161,7 +161,7 @@ class MemoryAddressBookTest {
      * Tests resetting the TTLs on all configured addresses for a peer.
      */
     @Test
-    fun resetAddrTest(): Unit {
+    fun resetAddrTest() {
         val addrBook = MemoryAddressBook()
         val peer1 = PeerTestUtil.createPeer()
 
@@ -193,5 +193,4 @@ class MemoryAddressBookTest {
         addrBook.resetAddr(PeerTestUtil.createPeer(), Duration.ofMinutes(10))
         assertEquals(1, addrBook.getPeersWithAddresses().size, "Expected 1 peer with an address")
     }
-
 }

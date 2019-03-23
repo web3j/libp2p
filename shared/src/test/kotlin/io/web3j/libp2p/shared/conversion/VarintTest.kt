@@ -38,6 +38,7 @@ class VarintTest {
         assertEquals(98839.toULong(), createULongFromHex("978406"))
         assertEquals(948820459.toULong(), createULongFromHex("EBB3B7C403"))
         assertEquals(9012390123902158445.toULong(), createULongFromHex("ED8CB5C396A29C897D"))
+        assertEquals(300.toULong(), createULongFromHex("AC02978406"))
     }
 
     /**
@@ -46,10 +47,9 @@ class VarintTest {
      * @return the hex value of the varint.
      */
     private fun createVarintHex(value: Long): String {
-        return with(Varint.writeUnsignedVarint(value.toULong())) {
-            return DatatypeConverter.printHexBinary(this)
-        }
+        return DatatypeConverter.printHexBinary(Varint.toVarint(value.toULong()))
     }
+
 
     /**
      * Helper function to create the unsigned int from a hex string.
@@ -57,8 +57,6 @@ class VarintTest {
      * @return the ulong value.
      */
     private fun createULongFromHex(hex: String): ULong {
-        return with(DatatypeConverter.parseHexBinary(hex)!!) {
-            Varint.readUnsignedVarint(this)
-        }
+        return Varint.fromVarint(DatatypeConverter.parseHexBinary(hex)!!)
     }
 }

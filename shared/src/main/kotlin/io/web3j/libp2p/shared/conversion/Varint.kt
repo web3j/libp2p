@@ -12,6 +12,10 @@
  */
 package io.web3j.libp2p.shared.conversion
 
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import kotlin.experimental.and
 
 /**
@@ -37,28 +41,79 @@ object Varint {
     private val _0x80 = 0x80.toULong()
 
     /**
-     * Converts the given byte array into an unsigned long.
-     * @param bytes the byte array.
+     * Reads an unsigned varint from the givne byte array.
+     * @param inputStream the byte array.
      * @return the equivalent unsigned long value.
      */
-    fun readUnsignedVarint(bytes: ByteArray): ULong {
+    fun readUnsignedVarint(inputStream: InputStream): ULong {
         var shift = 0
-        var result = UINT_0
+        val mask = 0x80.toByte()
 
-        bytes.forEach { byte ->
-            result += byte.and(0x7F).toULong().shl(shift)
+        val oneByteArray = ByteArray(1)
+        var numBytesRead = inputStream.read(oneByteArray)
+
+        var shouldReadMore = numBytesRead == 1 && oneByteArray[0].and(mask) == mask
+        var result = if (numBytesRead == 1) oneByteArray[0].and(0x7F).toULong().shl(shift) else UINT_0
+        shift += 7
+
+        while (shouldReadMore) {
+            numBytesRead = inputStream.read(oneByteArray)
+            if (numBytesRead == 1) {
+                result += oneByteArray[0].and(0x7F).toULong().shl(shift)
+            }
+
+            // Next iteration.
             shift += 7
+            shouldReadMore = numBytesRead == 1 && oneByteArray[0].and(mask) == mask
         }
 
         return result
     }
 
     /**
-     * Converts the given UInt value into a varint in a byte array.
-     * @param longVal the unsigned integer value.
-     * @return the byte array containing the varint representation.
+     * Creates an unsigned varint from the given long value.
+     * @param value the long value to be converted.
+     * @return the varint as a byte array.
      */
-    fun writeUnsignedVarint(longVal: ULong): ByteArray {
+    fun toVarint(value: ULong): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        outputStream.use {
+            Varint.writeUnsignedVarint(value, it)
+            return outputStream.toByteArray()
+        }
+    }
+
+    /**
+     * Creates the equivalent ULong value from the given varint.
+     * @param bytes the bytes of the varint.
+     * @return the ulong value.
+     */
+    fun fromVarint(bytes: ByteArray): ULong {
+        return ByteArrayInputStream(bytes).use { Varint.readUnsignedVarint(it) }
+    }
+
+    /**
+     * Converts the given int value into a varint and writes the bytes onto the output stream.
+     * @param intVal the int value.
+     * @param outputStream the output stream to write the varint to.
+     */
+    fun writeUnsignedVarint(intVal: Int, outputStream: OutputStream): Unit =
+        writeUnsignedVarint(intVal.toULong(), outputStream)
+
+    /**
+     * Converts the given long value into a varint and writes the bytes onto the output stream.
+     * @param longVal the unsigned long value.
+     * @param outputStream the output stream to write the varint to.
+     */
+    fun writeUnsignedVarint(longVal: Long, outputStream: OutputStream): Unit =
+        writeUnsignedVarint(longVal.toULong(), outputStream)
+
+    /**
+     * Converts the given ULong value into a varint and writes the bytes onto the output stream.
+     * @param longVal the unsigned long value.
+     * @param outputStream the output stream to write the varint to.
+     */
+    fun writeUnsignedVarint(longVal: ULong, outputStream: OutputStream): Unit {
         val byteList = mutableListOf<Byte>()
 
         var current = longVal
@@ -78,6 +133,6 @@ object Varint {
             }
         }
 
-        return byteList.toByteArray()
+        outputStream.write(byteList.toByteArray())
     }
 }

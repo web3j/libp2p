@@ -113,7 +113,7 @@ object Varint {
      * @param longVal the unsigned long value.
      * @param outputStream the output stream to write the varint to.
      */
-    fun writeUnsignedVarint(longVal: ULong, outputStream: OutputStream): Unit {
+    fun writeUnsignedVarint(longVal: ULong, outputStream: OutputStream) {
         val byteList = mutableListOf<Byte>()
 
         var current = longVal

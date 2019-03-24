@@ -50,7 +50,6 @@ class VarintTest {
         return DatatypeConverter.printHexBinary(Varint.toVarint(value.toULong()))
     }
 
-
     /**
      * Helper function to create the unsigned int from a hex string.
      * @param hex the hex value of the varint.

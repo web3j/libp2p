@@ -37,7 +37,6 @@ object MultiplexUtil {
     const val FLAG_RESET_RECEIVER = 0x05.toByte()
     const val FLAG_RESET_INITIATOR = 0x06.toByte()
 
-
     /**
      * Reads the protocol data from the input stream.
      * @param inputStream the stream to read from.
@@ -99,7 +98,7 @@ object MultiplexUtil {
      * @param data the data to be sent to the other party.
      * @param outputStream the stream to write the protocol data to.
      */
-    fun composeProtocolData(streamId: ULong, flags: Byte, data: ByteArray, outputStream: OutputStream): Unit {
+    fun composeProtocolData(streamId: ULong, flags: Byte, data: ByteArray, outputStream: OutputStream) {
         // Ensure we only have the last 3 bits sits.
         val flagsAsLong = flags.and(0x07).toULong()
 

@@ -15,6 +15,7 @@ package io.web3j.libp2p.stream.mplex
 import io.web3j.libp2p.stream.mplex.impl.MultiplexStreamStatus
 import io.web3j.libp2p.stream.mplex.impl.MultiplexUtil
 import io.web3j.libp2p.stream.mplex.model.MultiplexData
+import io.web3j.streammux.MuxedStream
 import org.slf4j.LoggerFactory
 import java.io.IOException
 
@@ -25,10 +26,18 @@ import java.io.IOException
  * @param id the ID of the stream.
  * @param initiator whether this peer is the stream initiator.
  * @param io the communications channel to be used by the stream.
+ * @param ownerSession the session that owns this stream.
  *
  * [@see https://github.com/libp2p/go-mplex/blob/master/stream.go]
  */
-class MultiplexStream(val id: ULong, val name: String, val initiator: Boolean, private val io: MultiplexStreamIO) {
+class MultiplexStream(
+    val id: ULong,
+    val name: String,
+    val initiator: Boolean,
+    private val io: MultiplexStreamIO,
+    private val ownerSession: MultiplexSession
+) :
+    MuxedStream {
 
     /**
      * The stream status.
@@ -63,12 +72,38 @@ class MultiplexStream(val id: ULong, val name: String, val initiator: Boolean, p
     }
 
     /**
+     * Writes the given bytes to the stream.
+     * @param byteArray the byte array to be written out.
+     * @return the number of bytes written.
+     */
+    override fun write(byteArray: ByteArray): Long {
+        write(if (initiator) MultiplexUtil.FLAG_MESSAGE_INITIATOR else MultiplexUtil.FLAG_MESSAGE_RECEIVER, byteArray)
+        return byteArray.size.toLong()
+    }
+
+    /**
      * Resets this stream so that no data ought to be subsequently sent nor received as a result of an error.
      */
-    fun reset() {
+    override fun reset() {
         status.markAsReset()
-        write(if (initiator) MultiplexUtil.FLAG_CLOSE_INITIATOR else MultiplexUtil.FLAG_MESSAGE_RECEIVER)
+        write(if (initiator) MultiplexUtil.FLAG_RESET_INITIATOR else MultiplexUtil.FLAG_RESET_RECEIVER)
         io.closeInError()
+    }
+
+    /**
+     * Closes the stream completely.
+     * @return true if the stream was successfully closed.
+     */
+    override fun close(): Boolean {
+        ownerSession.closeBothEnds(this)
+        return true
+    }
+
+    /**
+     * @return the bytes from the stream..
+     */
+    override fun read(): ByteArray {
+        TODO("NOT IMPLEMENTED YET")
     }
 
     /**
@@ -97,7 +132,6 @@ class MultiplexStream(val id: ULong, val name: String, val initiator: Boolean, p
             LOGGER.warn("Cannot write to a closed/reset stream")
             false
         }
-
     }
 
     /**

@@ -72,8 +72,7 @@ class MultiplexSession(
         return stream
     }
 
-
-    // TODO: onProtocolMessageReceived will be called by some listeneer that calls: MultiplexUtil.readProtocolData()
+    // TODO: onProtocolMessageReceived will be called by some listener that calls: MultiplexUtil.readProtocolData()
 
     /**
      * Fired when a message is received on a stream.
@@ -123,7 +122,10 @@ class MultiplexSession(
     private fun onNewStreamEvent(message: MultiplexData) {
         val existingStream = this.streamsById[message.streamId]
         if (existingStream != null) {
-            LOGGER.warn("Received a NEW_STREAM message for an existing stream with id=${message.streamId}, closing session")
+            LOGGER.warn(
+                "Received a NEW_STREAM message for an existing stream " +
+                        "with id=${message.streamId}, closing session"
+            )
             resetStreamInError(existingStream)
             return
         }
@@ -209,6 +211,15 @@ class MultiplexSession(
     }
 
     /**
+     * Closes the stream completely.
+     * @param stream the stream to be closed.
+     */
+    fun closeBothEnds(stream: MultiplexStream) {
+        // Because the CLOSE flag only closes one side, to close both sides we have to use the RESET flag.
+        stream.reset()
+    }
+
+    /**
      * TODO: implement!
      * Marks the given stream for removal from our managed set of streams.
      * <br />This allows us to handle the case where data is received for a stream
@@ -218,11 +229,9 @@ class MultiplexSession(
         // TODO: we should put streams into a TIMED_WAIT where we don't discard
         // them right away, but after a period of time.
         this.streamsById.remove(stream.id)
-
     }
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(MultiplexSession.javaClass)!!
     }
-
 }

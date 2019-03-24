@@ -26,5 +26,4 @@ enum class HeaderFlag(val value: Byte, val initiator: Boolean) {
     CloseInitiator(0x04.toByte(), true),
     ResetReceiver(0x05.toByte(), false),
     ResetInitiator(0x06.toByte(), true)
-
 }

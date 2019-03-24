@@ -29,8 +29,12 @@ interface MultiplexStreamIO {
     fun send(bytes: ByteArray): Unit
 
     /**
-     * Closes the stream because of an error that occurred
+     * Closes the stream because of an error that occurred.
      */
     fun closeInError(): Unit
 
+    /**
+     * Closes the stream in a normal fashion.
+     */
+    fun close(): Unit
 }

@@ -37,14 +37,14 @@ class MultiplexStreamStatus {
     /**
      * Marks the stream as locally closed, so writing cannot be performed.
      */
-    fun markClosedLocally(): Unit {
+    fun markClosedLocally() {
         closedLocally.set(true)
     }
 
     /**
      * Marks the stream as closed on the other end, so data will never be read.
      */
-    fun markClosedRemotely(): Unit {
+    fun markClosedRemotely() {
         closedRemotely.set(true)
     }
 
@@ -72,5 +72,4 @@ class MultiplexStreamStatus {
      * Marks the stream as reset.
      */
     fun markAsReset(): Unit = isReset.set(true)
-
 }

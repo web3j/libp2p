@@ -19,16 +19,11 @@ import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
-import io.netty.handler.codec.LengthFieldPrepender
-import io.netty.handler.codec.string.StringDecoder
-import io.netty.handler.codec.string.StringEncoder
-import io.netty.util.CharsetUtil
 import io.web3j.libp2p.transport.TransportConnectionListener
 import io.web3j.libp2p.transport.tcp.TCPTransport
 import io.web3j.libp2p.transport.tcp.TCPTransportConnection
@@ -61,10 +56,11 @@ object NettyFacade {
         val workerGroup = NioEventLoopGroup()
         try {
             val server = ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel::class.java)
-                    .childHandler(SimpleChannelHandler(listener, tcpTransport))
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .channel(NioServerSocketChannel::class.java)
+                .handler(MyChannelInitializer())
+                .childHandler(SimpleChannelHandler(listener, tcpTransport))
+                .option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
 
             // Bind immediately.
             val serverChannelFuture: ChannelFuture = server.bind(socketAddress).sync()
@@ -75,10 +71,10 @@ object NettyFacade {
 
             // Set up return object.
             return NettyServerInfo(
-                    serverChannel.localAddress(),
-                    serverChannel,
-                    bossGroup,
-                    workerGroup
+                serverChannel.localAddress(),
+                serverChannel,
+                bossGroup,
+                workerGroup
             )
         } finally {
             if (!started) {
@@ -103,26 +99,8 @@ object NettyFacade {
             b.group(workerGroup)
             b.channel(NioSocketChannel::class.java)
             b.option(ChannelOption.SO_KEEPALIVE, true)
-            b.handler(object : ChannelInitializer<SocketChannel>() {
-
-                @Throws(Exception::class)
-                public override fun initChannel(ch: SocketChannel) {
-                    LOGGER.debug("Client connection established to $socketAddress, channel=$ch")
-                    ch.pipeline()
-//                    .addLast("frameDecoder", LineBasedFrameDecoder(80));
-                            .addLast("stringDecoder", StringDecoder(CharsetUtil.UTF_8))
-                            .addLast(EchoInboundHandler())
-                            // Encoders
-//                        .addLast(EchoOutboundHandler())
-                            .addLast(LengthFieldPrepender(4, false))
-                            .addLast("stringEncoder", StringEncoder(CharsetUtil.UTF_8))
-
-//                    ch.pipeline().addLast(
-//                        RequestDataEncoder(),
-//                        ResponseDataDecoder(), ClientHandler()
-//                    )
-                }
-            })
+            b.option(ChannelOption.SO_BACKLOG, 128)
+            b.handler(MyChannelInitializer())
 
             val channelFuture: ChannelFuture = b.connect(socketAddress).sync()
             val clientChannel: Channel = channelFuture.channel()
@@ -133,7 +111,7 @@ object NettyFacade {
             // Set up return object.
             return NettyClientInfo(clientChannel)
         } finally {
-            if (!started) {
+            if (!started) { // TODO: why does this get triggered?
                 LOGGER.debug("Startup failed, shutting down gracefully ...")
                 workerGroup.shutdownGracefully()
             }

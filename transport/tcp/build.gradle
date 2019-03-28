@@ -1,7 +1,8 @@
 description 'libp2p TCP transport'
 
 dependencies {
-    compile project(':transport-definition')
+    compile project(':transport-definition'),
+            project(':secio') // This is temporary, and should be removed.
     compile "io.netty:netty-all:$nettyVersion"
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core

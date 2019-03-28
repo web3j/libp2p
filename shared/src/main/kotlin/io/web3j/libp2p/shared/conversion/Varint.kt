@@ -71,6 +71,16 @@ object Varint {
     }
 
     /**
+     * Returns the number of bytes required to store the given ULong as a varint.
+     * @param value the value.
+     * @return the number of bytes.
+     */
+    fun sizeOf(value: ULong): Int {
+        // TODO: this is bad, really really bad. Improve it.
+        return toVarint(value).size
+    }
+
+    /**
      * Creates an unsigned varint from the given long value.
      * @param value the long value to be converted.
      * @return the varint as a byte array.

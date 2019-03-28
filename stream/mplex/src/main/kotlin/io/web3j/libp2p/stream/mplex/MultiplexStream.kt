@@ -119,6 +119,14 @@ class MultiplexStream(
     fun canReceive(): Boolean = status.canRead()
 
     /**
+     * Resets this stream so that no data ought to be subsequently sent nor received as a result of an error.
+     */
+    fun closeLocally() {
+        status.markClosedLocally()
+        write(if (initiator) MultiplexUtil.FLAG_CLOSE_INITIATOR else MultiplexUtil.FLAG_CLOSE_RECEIVER)
+    }
+
+    /**
      * Writes the given bytes and flag as a message to the stream.
      * @param flag the flag to be written.
      * @param data the data to be written.

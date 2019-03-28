@@ -40,7 +40,7 @@ class MultiselectMuxerImpl : MultiselectMuxer {
 
     /**
      * Performs protocol negotiation and selection.
-     * @param stream the stream to perform negotation over.
+     * @param stream the stream to perform negotiation over.
      * @return a pair containing the selected protocol and handler; null if one was not successfully negotiated.
      */
     override fun negotiate(stream: MuxedStream): Pair<String, ProtocolHandler>? {

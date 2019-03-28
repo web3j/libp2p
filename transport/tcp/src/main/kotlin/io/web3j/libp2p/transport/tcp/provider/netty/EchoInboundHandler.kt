@@ -15,48 +15,45 @@ package io.web3j.libp2p.transport.tcp.provider.netty
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import org.slf4j.LoggerFactory
+import spipe.pb.Spipe
 
 class EchoInboundHandler : ChannelInboundHandlerAdapter() {
 
+    var inTheMiddleOfAStream = false
     // 1st: /multistream/1.0.0
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any?) {
         LOGGER.info("----- channelRead: $msg")
+        msg as ByteArray
+        val stringRead = String(msg)
+
+        LOGGER.info("READ STRING: \n'$stringRead'")
+
+        if (msg.size > 0 && !stringRead.startsWith("/")) {
+
+            try {
+                val propose = Spipe.Propose.parseFrom(msg)
+                LOGGER.debug("GOT PROPOPSE: {}", propose)
+            } catch (e: Exception) {
+                LOGGER.error("NOT A PROPOSE OBJECT");
+            }
+
+            try {
+                val exchange = Spipe.Exchange.parseFrom(msg)
+                LOGGER.debug("GOT EXCHANGE: {}", exchange)
+            } catch (e: Exception) {
+                LOGGER.error("NOT A EXCHANGE OBJECT");
+            }
+
+        }
+
         // TODO: handle multistream/1.0.0
         super.channelRead(ctx, msg)
-    }
-
-    override fun channelReadComplete(ctx: ChannelHandlerContext) {
-        LOGGER.info("----- channelReadComplete")
-//        val x = "ipfs/Qma3GsJmB47xYuyahPZPSadh1avvxfyYQwk8R3UnFrQ6aP"
-//
-//        ctx.channel().write("/$x/multistream/1.0.0\n").sync()
-        super.channelReadComplete(ctx)
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext?, cause: Throwable) {
         LOGGER.warn("----- exceptionCaught: ${cause.message}", cause)
         super.exceptionCaught(ctx, cause)
     }
-
-//    fun messageReceived(
-//        ctx: ChannelHandlerContext, e: MessageEvent
-//    ) {
-//        // Send back the received message to the remote peer.
-//        transferredBytes.addAndGet((e.getMessage() as ChannelBuffer).readableBytes())
-//        e.getChannel().write(e.getMessage())
-//    }
-//
-//    fun exceptionCaught(
-//        ctx: ChannelHandlerContext, e: ExceptionEvent
-//    ) {
-//        // Close the connection when an exception is raised.
-//        logger.log(
-//            Level.WARNING,
-//            "Unexpected exception from downstream.",
-//            e.getCause()
-//        )
-//        e.getChannel().close()
-//    }
 
     companion object {
         val LOGGER = LoggerFactory.getLogger(EchoInboundHandler::class.java.name)!!

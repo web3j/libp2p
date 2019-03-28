@@ -15,12 +15,21 @@ package io.web3j.libp2p.transport.tcp.provider.netty
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelOutboundHandlerAdapter
 import io.netty.channel.ChannelPromise
+import io.web3j.libp2p.shared.conversion.Varint
 
 class EchoOutboundHandler : ChannelOutboundHandlerAdapter() {
 
-    override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
+    override fun write(ctx: ChannelHandlerContext, msg: Any, promise: ChannelPromise) {
 
-        // TODO: send <len>/multistream/1.0.0
-        super.write(ctx, msg, promise)
+        if (msg is String) {
+            val protoLengthByteArray = Varint.toVarint(msg.length.toULong())
+
+            val newArray = ByteArray(protoLengthByteArray.size + msg.length)
+            System.arraycopy(protoLengthByteArray, 0, newArray, 0, protoLengthByteArray.size)
+            System.arraycopy(msg.toByteArray(), 0, newArray, protoLengthByteArray.size, msg.length)
+            super.write(ctx, newArray, promise)
+        } else {
+            super.write(ctx, msg, promise)
+        }
     }
 }

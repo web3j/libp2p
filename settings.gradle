@@ -9,9 +9,12 @@ include 'transport-tcp'
 include 'stream-muxer'
 include 'stream-mplex'
 include 'protocol-muxer'
+include 'secio'
 
 project(':protocol-muxer').projectDir = new File('./protocol/muxer')
 project(':stream-muxer').projectDir = new File('./stream/muxer')
 project(':stream-mplex').projectDir = new File('./stream/mplex')
 project(':transport-definition').projectDir = new File('./transport/definition')
 project(':transport-tcp').projectDir = new File('./transport/tcp')
+project(':crypto').projectDir = new File('./security/crypto')
+project(':secio').projectDir = new File('./security/secio')

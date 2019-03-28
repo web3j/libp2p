@@ -12,7 +12,6 @@
  */
 package io.web3j.libp2p.protocol.muxer
 
-import io.web3j.libp2p.protocol.muxer.util.MultistreamSelectException
 import io.web3j.streammux.MuxedStream
 
 /**

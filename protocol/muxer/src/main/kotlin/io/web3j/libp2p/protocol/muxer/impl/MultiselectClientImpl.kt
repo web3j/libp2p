@@ -14,8 +14,7 @@ package io.web3j.libp2p.protocol.muxer.impl
 
 import io.web3j.libp2p.protocol.muxer.MultiselectClient
 import io.web3j.libp2p.protocol.muxer.MultistreamErrorCodes
-import io.web3j.libp2p.protocol.muxer.util.MultistreamCommunicator
-import io.web3j.libp2p.protocol.muxer.util.MultistreamSelectException
+import io.web3j.libp2p.protocol.muxer.MultistreamSelectException
 import io.web3j.streammux.MuxedStream
 import org.slf4j.LoggerFactory
 

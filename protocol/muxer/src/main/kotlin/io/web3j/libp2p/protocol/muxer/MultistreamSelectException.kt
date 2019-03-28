@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package io.web3j.libp2p.protocol.muxer.util
+package io.web3j.libp2p.protocol.muxer
 
 import io.web3j.libp2p.shared.env.CodeWithReason
 

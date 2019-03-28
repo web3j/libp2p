@@ -12,33 +12,83 @@
  */
 package io.web3j.libp2p.protocol.muxer
 
+import io.web3j.libp2p.crypto.unmarshalPrivateKey
+import io.web3j.libp2p.crypto.unmarshalPublicKey
+import io.web3j.libp2p.security.secio.model.ProposeMessage
 import io.web3j.libp2p.transport.tcp.TCPTransport
 import io.web3j.libp2p.transport.tcp.TCPTransportConnection
 import io.web3j.libp2p.transport.tcp.util.TCPUtil
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
+import java.util.*
 
 class SimpleClient {
 
     @Test
-    @Disabled("WIP")
+//    @Disabled("WIP")
     fun start() {
         val listenerAddr = TCPUtil.createLoopbackMultiaddr(10333)
+        LOGGER.info("Setting up the connection to $listenerAddr ...")
 
-        println("Creating connection ...")
         val connection = TCPTransport().dial(listenerAddr) as TCPTransportConnection
 
         println("Connection available: $connection")
+        println("-- SENDING OUR PROTOCOL FIRST")
 
-        Thread.sleep(1000)
-//        val x = "ipfs/Qma3GsJmB47xYuyahPZPSadh1avvxfyYQwk8R3UnFrQ6aP"
-        val proto = "/multistream/1.0.0"
-//
+//        sendAsync("/multistream/1.0.0\n", connection)
+//        sendAsync("/secio/1.0.0\n", connection)
 
-//        ctx.channel().write("/$x/multistream/1.0.0\n").sync()
-
-        connection.channel.write("$proto\n").sync()
-
+        println("Waiting some more")
         Thread.sleep(60000)
+        println("Done")
+    }
+
+
+    fun sendSync(message: String, connection: TCPTransportConnection): String {
+        val cf = connection.channel.write(message).sync()
+
+//        cf.addListener { future1 ->
+//            if (future1.isSuccess) {
+//                println("WRITE COMPLETED")
+//            } else {
+//                println("WRITE FAILED: " + future1.cause())
+//                throw future1.cause()
+//            }
+//        }.
+//
+//        connection.channel.flush()
+        return "TODO"
+    }
+
+    fun sendAsync(message: String, connection: TCPTransportConnection) {
+        val cf = connection.channel.write(message)
+        cf.addListener { future1 ->
+            if (future1.isSuccess) {
+                println("WRITE COMPLETED")
+            } else {
+                println("WRITE FAILED: " + future1.cause())
+                throw future1.cause()
+            }
+        }
+
+        connection.channel.flush()
+    }
+
+    fun sendAsync(bytes: ByteArray, connection: TCPTransportConnection) {
+        val cf = connection.channel.write(bytes)
+        cf.addListener { future1 ->
+            if (future1.isSuccess) {
+                println("WRITE COMPLETED")
+            } else {
+                println("WRITE FAILED: " + future1.cause())
+                throw future1.cause()
+            }
+        }
+
+        connection.channel.flush()
+    }
+
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(SimpleClient.javaClass)!!
     }
 }

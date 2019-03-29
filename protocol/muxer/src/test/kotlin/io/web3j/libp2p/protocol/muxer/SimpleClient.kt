@@ -12,20 +12,17 @@
  */
 package io.web3j.libp2p.protocol.muxer
 
-import io.web3j.libp2p.crypto.unmarshalPrivateKey
-import io.web3j.libp2p.crypto.unmarshalPublicKey
-import io.web3j.libp2p.security.secio.model.ProposeMessage
 import io.web3j.libp2p.transport.tcp.TCPTransport
 import io.web3j.libp2p.transport.tcp.TCPTransportConnection
 import io.web3j.libp2p.transport.tcp.util.TCPUtil
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
-import java.util.*
 
 class SimpleClient {
 
     @Test
-//    @Disabled("WIP")
+    @Disabled("WIP")
     fun start() {
         val listenerAddr = TCPUtil.createLoopbackMultiaddr(10333)
         LOGGER.info("Setting up the connection to $listenerAddr ...")
@@ -42,7 +39,6 @@ class SimpleClient {
         Thread.sleep(60000)
         println("Done")
     }
-
 
     fun sendSync(message: String, connection: TCPTransportConnection): String {
         val cf = connection.channel.write(message).sync()

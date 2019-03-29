@@ -28,21 +28,19 @@ class ProtocolDataHandler : ChannelInboundHandlerAdapter() {
         super.channelRead(ctx, msg)
     }
 
-    private fun tryParse(byteArray: ByteArray): Unit {
+    private fun tryParse(byteArray: ByteArray) {
         try {
             val propose = Spipe.Propose.parseFrom(byteArray)
             AccumulatorInboundHandler.LOGGER.debug("GOT PROPOSE: {}", propose)
         } catch (e: Exception) {
-            AccumulatorInboundHandler.LOGGER.error("NOT A PROPOSE OBJECT");
+            AccumulatorInboundHandler.LOGGER.error("NOT A PROPOSE OBJECT")
         }
 
         try {
             val exchange = Spipe.Exchange.parseFrom(byteArray)
             AccumulatorInboundHandler.LOGGER.debug("GOT EXCHANGE: {}", exchange)
         } catch (e: Exception) {
-            AccumulatorInboundHandler.LOGGER.error("NOT A EXCHANGE OBJECT");
+            AccumulatorInboundHandler.LOGGER.error("NOT A EXCHANGE OBJECT")
         }
-
     }
-
 }

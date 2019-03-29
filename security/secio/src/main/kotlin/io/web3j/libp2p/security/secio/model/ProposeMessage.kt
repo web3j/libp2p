@@ -17,7 +17,7 @@ import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.marshalPublicKey
 import io.web3j.libp2p.crypto.unmarshalPublicKey
 import spipe.pb.Spipe
-import java.util.*
+import java.util.Base64
 
 /**
  * Serves as a wrapper around the prototype [spipe.pb.Spipe.Propose] class.
@@ -138,7 +138,6 @@ class ProposeMessage(val publicKey: PubKey, val random: ByteArray) {
         return result
     }
 
-
     companion object {
 
         /**
@@ -157,6 +156,5 @@ class ProposeMessage(val publicKey: PubKey, val random: ByteArray) {
 
             return result
         }
-
     }
 }

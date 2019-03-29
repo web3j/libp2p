@@ -52,7 +52,6 @@ func (sg *Transport) SecureOutbound(ctx context.Context, insecure net.Conn, p pe
             .build()
             .toByteArray()
 
-
 //        proposeIn := new(pb.Propose)
 //        if err = proto.Unmarshal(proposeInBytes, proposeIn); err != nil {
 //            return err
@@ -65,7 +64,6 @@ func (sg *Transport) SecureOutbound(ctx context.Context, insecure net.Conn, p pe
         .build()
         .toByteArray()
          */
-
     }
 
     companion object {

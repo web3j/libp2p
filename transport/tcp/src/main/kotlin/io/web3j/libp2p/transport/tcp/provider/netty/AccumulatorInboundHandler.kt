@@ -22,7 +22,7 @@ import io.web3j.libp2p.shared.conversion.Varint
 import org.slf4j.LoggerFactory
 import spipe.pb.Spipe
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
 
 class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
 
@@ -36,7 +36,6 @@ class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
     var sentSecioPropose = false
     var proposedByPeer: ProposeMessage? = null
 
-
     // 1st: /multistream/1.0.0
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any?) {
         msg as ByteArray
@@ -49,13 +48,10 @@ class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
             processProtocolMesssage(msg, ctx)
         }
 
-
 //                LOGGER.warn("0 bytes indicated by leading varint")
 //                val proposedFromBytes = PrototypeUtil.parseProposeMessage(msg)
 //                sendProposeMessage(ctx.channel()!!)
 //                super.channelRead(ctx, msg)
-
-
     }
 
     private fun processMultistream(msg: ByteArray, ctx: ChannelHandlerContext) {
@@ -109,7 +105,6 @@ class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
         } else {
             LOGGER.error("UNHANDLED PROTOCOL MESSAGE")
         }
-
     }
 
     private fun sendSecioPropose(ctx: ChannelHandlerContext) {
@@ -144,7 +139,6 @@ class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
             val sizeOfVarintInBytes = Varint.sizeOf(expectedByteCount)
             val dataPortion = msg.drop(sizeOfVarintInBytes)
 
-
             if (numBytesJustReceived == sizeOfVarintInBytes + expectedByteCount.toInt()) {
                 // Have the entire stream!
                 return dataPortion.toByteArray()
@@ -160,8 +154,7 @@ class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
         throw RuntimeException(description)
     }
 
-
-    private fun sendAsync(step: String, message: Any, ctx: ChannelHandlerContext): Unit {
+    private fun sendAsync(step: String, message: Any, ctx: ChannelHandlerContext) {
         val cf = ctx.channel().write(message)
         cf.addListener { future1 ->
             if (future1.isSuccess) {
@@ -172,14 +165,15 @@ class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
             }
         }
         ctx.flush()
-
     }
 
     fun createOurProposal(): Spipe.Propose {
+        /* ktlint-disable */
         val privateKeyB64 =
             "CAASvQIwggE5AgEAAkEApenMpr5Uvx1hzLOkhT8o6vC6smF/RNOsIgZXUauqkGjlhhmuGC+b7GFEBzLfXlz0XsgXsX29Dl4Q80/AAbaDqwIDAQABAkAsXMj7Vs4LMfyKAwi9FifHNin9c2NX0G9ow6BKdqfLJ8rcutKjzNEIjBKtdaeaOeLDLjImQjsiVxFCLnRonpOtAiEA1TKgWeSmIimxjLChxT64G6kztk9bN8GeNV6ze7quZccCIQDHOPh4+GLQwkD92ueK1VuJ+S7jHmqyoz0iqB/3EWyi/QIgcOiC65igM2+JTE0vH1r7/go6DM8yK/EqbHFe9KQFQHkCICc2BFmy8agLA8WzJy2BLuIqJFtZakC8tlSy6I+1Yz91AiAr1lVJlso8Wprhqy3scXOhOJ/V9khJkDADSUGhqAnMKQ=="
         val publicKeyB64 =
             "CAASXjBcMA0GCSqGSIb3DQEBAQUAA0sAMEgCQQCl6cymvlS/HWHMs6SFPyjq8LqyYX9E06wiBldRq6qQaOWGGa4YL5vsYUQHMt9eXPReyBexfb0OXhDzT8ABtoOrAgMBAAE="
+        /* ktlint-enable */
 
         val privBytes = Base64.getDecoder().decode(privateKeyB64.toByteArray())
         val privkey = unmarshalPrivateKey(privBytes)
@@ -193,7 +187,6 @@ class AccumulatorInboundHandler : ChannelInboundHandlerAdapter() {
             .withCiphers("AES-128", "AES-256")
             .withHashes("SHA256", "SHA512")
             .withExchanges("P-256", "P-384", "P-521")
-
 
         return pm.asPropose()
     }

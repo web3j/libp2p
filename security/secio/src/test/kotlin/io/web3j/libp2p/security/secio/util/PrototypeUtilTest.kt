@@ -22,13 +22,19 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.FileInputStream
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
 
 class PrototypeUtilTest {
 
     @Test
     fun testSecondPartOfproposeSeq() {
-        val inputB64 = "AAABRgpBBB95JgzmVwiJT0Qf57JgeGdBTnTJ2MUPgY42JU9KWu4bwjJNAhArn4IZDuOijnjt09lko4nkDaj3vbQ2TZBODj8SgAJ39ZYYq+mlzfO4/06xcNpIMHPboEnF7BguYbcBZQamShFFxeIriXyKY/F7jQxjGtDVaDMgO9npFFygucWQZnwFfIOzrBqUjXQdElmmCHZqktXM5F7P65m9m3LEdlnNoU5khPYhGtcKEXcIXT+PUbmm96qghn+N47fGE1f0xQBY58NEcx6YjZ9WK1rTUd0ZyFvrgod3pNMe2aYwmJm5mbMbJ1APHzROnbpo5X3+mPcCD4StLYtS+8tkmCeESu6iIWyif7JpJ9Jr2ynEiRhH+h24/HTRXosLHxFDBJox70BmcDLq1mxHZa/cvPUpLI9aceY7OxI/iwmU+xR8WUf+vici"
+        val inputB64 = "AAABRgpBBB95JgzmVwiJT0Qf57JgeGdBTnTJ2MUPgY42JU9KWu4bwjJNAh" +
+                "Arn4IZDuOijnjt09lko4nkDaj3vbQ2TZBODj8SgAJ39ZYYq+mlzfO4/06xcNpIMHP" +
+                "boEnF7BguYbcBZQamShFFxeIriXyKY/F7jQxjGtDVaDMgO9npFFygucWQZnwFfIOz" +
+                "rBqUjXQdElmmCHZqktXM5F7P65m9m3LEdlnNoU5khPYhGtcKEXcIXT+PUbmm96qgh" +
+                "n+N47fGE1f0xQBY58NEcx6YjZ9WK1rTUd0ZyFvrgod3pNMe2aYwmJm5mbMbJ1APHz" +
+                "ROnbpo5X3+mPcCD4StLYtS+8tkmCeESu6iIWyif7JpJ9Jr2ynEiRhH+h24/HTRXos" +
+                "LHxFDBJox70BmcDLq1mxHZa/cvPUpLI9aceY7OxI/iwmU+xR8WUf+vici"
         val inputBytes = Base64.getDecoder().decode(inputB64)
         val result = PrototypeUtil.parseExchangeMessage(inputBytes)
         assertNotNull(result, "Null!")
@@ -56,7 +62,12 @@ class PrototypeUtilTest {
 
         assertEquals("QJLd77t1DO9ZVseiUyM9xQ==", proposedFromBytes.randomInBase64, "Incorrect random bytes")
         assertEquals(
-            "CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLZZcGcbe4urMBVlcHgN0fpBymY+xcr14ewvamG70QZODJ1h9sljlExZ7byLiqRB3SjGbfpZ1FweznwNxWtWpjHkQjTVXeoM4EEgDSNO/Cg7KNlU0EJvgPJXeEPycAZX9qASbVJ6EECQ40VR/7+SuSqsdL1hrmG1phpIju+D64gLyWpw9WEALfzMpH5I/KvdYDW3N4g6zOD2mZNp5y1gHeXINHWzMF596O72/6cxwyiXV1eJ000k1NVnUyrPjXtqWdVLRk5IU1LFpoQoXZU5X1hKj1a2qt/lZfH5eOrF/ramHcwhrYYw1txf8JHXWO/bbNnyemTHAvutZpTNrsWATfAgMBAAE=",
+            "CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLZZcGcbe4urMBVlcHgN0f" +
+                    "pBymY+xcr14ewvamG70QZODJ1h9sljlExZ7byLiqRB3SjGbfpZ1FweznwNxWtWpjHkQjTVXeo" +
+                    "M4EEgDSNO/Cg7KNlU0EJvgPJXeEPycAZX9qASbVJ6EECQ40VR/7+SuSqsdL1hrmG1phpIju+D" +
+                    "64gLyWpw9WEALfzMpH5I/KvdYDW3N4g6zOD2mZNp5y1gHeXINHWzMF596O72/6cxwyiXV1eJ0" +
+                    "00k1NVnUyrPjXtqWdVLRk5IU1LFpoQoXZU5X1hKj1a2qt/lZfH5eOrF/ramHcwhrYYw1txf8J" +
+                    "HXWO/bbNnyemTHAvutZpTNrsWATfAgMBAAE=",
             proposedFromBytes.publicKeyInBase64,
             "Incorrect public key"
         )
@@ -76,7 +87,12 @@ class PrototypeUtilTest {
         // Create an identical Propose message.
         val randB64 = "QJLd77t1DO9ZVseiUyM9xQ=="
         val publicKeyB64 =
-            "CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLZZcGcbe4urMBVlcHgN0fpBymY+xcr14ewvamG70QZODJ1h9sljlExZ7byLiqRB3SjGbfpZ1FweznwNxWtWpjHkQjTVXeoM4EEgDSNO/Cg7KNlU0EJvgPJXeEPycAZX9qASbVJ6EECQ40VR/7+SuSqsdL1hrmG1phpIju+D64gLyWpw9WEALfzMpH5I/KvdYDW3N4g6zOD2mZNp5y1gHeXINHWzMF596O72/6cxwyiXV1eJ000k1NVnUyrPjXtqWdVLRk5IU1LFpoQoXZU5X1hKj1a2qt/lZfH5eOrF/ramHcwhrYYw1txf8JHXWO/bbNnyemTHAvutZpTNrsWATfAgMBAAE="
+            "CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLZZcGcbe4urMBVlcHgN0fp" +
+                    "BymY+xcr14ewvamG70QZODJ1h9sljlExZ7byLiqRB3SjGbfpZ1FweznwNxWtWpjHk" +
+                    "QjTVXeoM4EEgDSNO/Cg7KNlU0EJvgPJXeEPycAZX9qASbVJ6EECQ40VR/7+SuSqsd" +
+                    "L1hrmG1phpIju+D64gLyWpw9WEALfzMpH5I/KvdYDW3N4g6zOD2mZNp5y1gHeXINH" +
+                    "WzMF596O72/6cxwyiXV1eJ000k1NVnUyrPjXtqWdVLRk5IU1LFpoQoXZU5X1hKj1a" +
+                    "2qt/lZfH5eOrF/ramHcwhrYYw1txf8JHXWO/bbNnyemTHAvutZpTNrsWATfAgMBAAE="
 
         val pubKey = unmarshalPublicKey(Base64.getDecoder().decode(publicKeyB64.toByteArray()))
         val random = Base64.getDecoder().decode(randB64.toByteArray())

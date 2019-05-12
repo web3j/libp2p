@@ -34,16 +34,15 @@ class EchoInboundHandler : ChannelInboundHandlerAdapter() {
                 val propose = Spipe.Propose.parseFrom(msg)
                 LOGGER.debug("GOT PROPOPSE: {}", propose)
             } catch (e: Exception) {
-                LOGGER.error("NOT A PROPOSE OBJECT");
+                LOGGER.error("NOT A PROPOSE OBJECT")
             }
 
             try {
                 val exchange = Spipe.Exchange.parseFrom(msg)
                 LOGGER.debug("GOT EXCHANGE: {}", exchange)
             } catch (e: Exception) {
-                LOGGER.error("NOT A EXCHANGE OBJECT");
+                LOGGER.error("NOT A EXCHANGE OBJECT")
             }
-
         }
 
         // TODO: handle multistream/1.0.0

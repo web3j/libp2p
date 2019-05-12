@@ -39,7 +39,8 @@ object PrototypeUtil {
         }
 
         if (dataByteCount + 4 != byteArray.size) {
-            LOGGER.warn("Propose message stream does not contain the expected byte count: expected $dataByteCount but got ${byteArray.size - 4}")
+            LOGGER.warn("Propose message stream does not contain the expected byte count:" +
+                    " expected $dataByteCount but got ${byteArray.size - 4}")
             throw SecioException(SecioErrorCodes.INVALID_PROPOSAL_STRUCTURE)
         }
 
@@ -73,7 +74,6 @@ object PrototypeUtil {
                 Spipe.Propose.parseFrom(this)
             }
         }
-
     }
 
     /**
@@ -105,7 +105,8 @@ object PrototypeUtil {
         }
 
         if (dataByteCount + 4 != byteArray.size) {
-            LOGGER.warn("Propose message stream does not contain the expected byte count: expected $dataByteCount but got ${byteArray.size - 4}")
+            LOGGER.warn("Propose message stream does not contain the expected byte count: " +
+                    "expected $dataByteCount but got ${byteArray.size - 4}")
             throw SecioException(SecioErrorCodes.INVALID_PROPOSAL_STRUCTURE)
         }
 
@@ -139,7 +140,6 @@ object PrototypeUtil {
                 Spipe.Exchange.parseFrom(this)
             }
         }
-
     }
 
     /**
@@ -159,5 +159,4 @@ object PrototypeUtil {
     fun parseExchangeMessageStream(inputStream: InputStream): ExchangeMessage {
         return ExchangeMessage.fromPrototype(parsePrototypeExchangeMessageStream(inputStream))
     }
-
 }

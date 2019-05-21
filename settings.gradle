@@ -1,10 +1,20 @@
 rootProject.name = 'libp2p'
 
-include 'libp2p-shared'
-include 'libp2p-crypto'
-include 'libp2p-net'
-include 'libp2p-peer'
-include 'libp2p-tcp'
-include 'libp2p-transport'
-include 'libp2p-protocol'
+include 'shared'
+include 'crypto'
+include 'network'
+include 'peer'
+include 'transport-definition'
+include 'transport-tcp'
 include 'stream-muxer'
+include 'stream-mplex'
+include 'protocol-muxer'
+include 'secio'
+
+project(':protocol-muxer').projectDir = new File('./protocol/muxer')
+project(':stream-muxer').projectDir = new File('./stream/muxer')
+project(':stream-mplex').projectDir = new File('./stream/mplex')
+project(':transport-definition').projectDir = new File('./transport/definition')
+project(':transport-tcp').projectDir = new File('./transport/tcp')
+project(':crypto').projectDir = new File('./security/crypto')
+project(':secio').projectDir = new File('./security/secio')

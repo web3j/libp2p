@@ -1,0 +1,7 @@
+description 'libp2p protocol muxer (multistream-select)'
+
+dependencies {
+
+    compile project(':stream-muxer'), project(':shared')
+    testCompile project(':transport-tcp'), project(':stream-muxer')
+}

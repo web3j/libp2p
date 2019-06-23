@@ -592,7 +592,7 @@ object Varint {
 
         while (shouldReadMore) {
             val byteRead = readNext()
-            if (byteRead == null) {
+            if (byteRead != null) {
                 byteRead!!
                 result += byteRead.and(0x7F).toULong().shl(shift)
                 shouldReadMore = byteRead.and(mask) == mask

@@ -42,14 +42,14 @@ object MultiplexUtil {
      * @param inputStream the stream to read from.
      * @return a triple containing the stream ID, flags, and data as a byte array.
      */
-    fun readProtocolData(inputStream: InputStream): Triple<ULong, Byte, ByteArray> {
+    fun readProtocolData(inputStream: InputStream): Triple<Long, Byte, ByteArray> {
         // header.
-        val headerVarint: ULong = Varint.readUnsignedVarint(inputStream)
-        val flags: ULong = headerVarint.and(0x07.toULong())
-        val streamId: ULong = headerVarint.shr(3)
+        val headerVarint: Long = Varint.getVarLong(inputStream)
+        val flags: Long = headerVarint.and(0x07.toLong())
+        val streamId: Long = headerVarint.shr(3)
 
         // data length.
-        val dataLength: ULong = Varint.readUnsignedVarint(inputStream)
+        val dataLength: Long = Varint.getVarLong(inputStream)
         val dataLengthAsInt = dataLength.toInt()
 
         // Data!
@@ -68,7 +68,7 @@ object MultiplexUtil {
      * @param byteArray the byte array to read from.
      * @return a triple containing the stream ID, flags, and data as a byte array.
      */
-    fun readProtocolData(byteArray: ByteArray): Triple<ULong, Byte, ByteArray> {
+    fun readProtocolData(byteArray: ByteArray): Triple<Long, Byte, ByteArray> {
         return ByteArrayInputStream(byteArray).use {
             return readProtocolData(
                 it
@@ -83,7 +83,7 @@ object MultiplexUtil {
      * @param data the data to be sent to the other party.
      * @return a byte array that can be written out that encapsulates the given parameters.
      */
-    fun composeProtocolData(streamId: ULong, flags: Byte, data: ByteArray = ByteArray(0)): ByteArray {
+    fun composeProtocolData(streamId: Long, flags: Byte, data: ByteArray = ByteArray(0)): ByteArray {
         val outputStream = ByteArrayOutputStream()
         outputStream.use {
             composeProtocolData(streamId, flags, data, outputStream)
@@ -98,16 +98,18 @@ object MultiplexUtil {
      * @param data the data to be sent to the other party.
      * @param outputStream the stream to write the protocol data to.
      */
-    fun composeProtocolData(streamId: ULong, flags: Byte, data: ByteArray, outputStream: OutputStream) {
+    fun composeProtocolData(streamId: Long, flags: Byte, data: ByteArray, outputStream: OutputStream) {
         // Ensure we only have the last 3 bits sits.
-        val flagsAsLong = flags.and(0x07).toULong()
+        val flagsAsLong = flags.and(0x07).toLong()
+
+        // TODO: sort out whether we are going to use ULong or Long.
 
         // The last 3 bits contain the flags, the remaining bits contain the stream ID.
-        val header: ByteArray = Varint.toVarint(streamId.shl(3).or(flagsAsLong))
+        val header: ByteArray = Varint.toVarLong(streamId.shl(3).or(flagsAsLong))
         val headerLength = header.size
 
         val dataLength = data.size
-        val lengthOfDataAsVarint: ByteArray = Varint.toVarint(dataLength.toULong())
+        val lengthOfDataAsVarint: ByteArray = Varint.toVarULong(dataLength.toULong())
         val lengthOfDataVarint = lengthOfDataAsVarint.size
 
         // Concatenate the arrays.

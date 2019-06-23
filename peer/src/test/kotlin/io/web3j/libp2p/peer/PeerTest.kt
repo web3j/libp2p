@@ -14,7 +14,7 @@ package io.web3j.libp2p.peer
 
 import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
-import io.web3j.libp2p.crypto.KEY_TYPE
+import io.web3j.libp2p.crypto.KeyType
 import io.web3j.libp2p.crypto.PrivKey
 import io.web3j.libp2p.crypto.PubKey
 import io.web3j.libp2p.crypto.generateKeyPair
@@ -86,7 +86,7 @@ class PeerTest {
         assertNull(pk)
 
         // Shouldn't work for, e.g. RSA keys (too large)
-        val keyPair1 = generateKeyPair(KEY_TYPE.RSA, 2048)
+        val keyPair1 = generateKeyPair(KeyType.RSA, 2048)
         val pubKey1 = keyPair1.second
         val rsaId = PeerID.idFromPublicKey(pubKey1)
         val extractedRsaPub = rsaId.extractPublicKey()
@@ -126,7 +126,7 @@ class PeerTest {
             var generatedPairs = AtomicInteger(0)
 
             fun generate(): Keyset {
-                val keyPair = generateKeyPair(KEY_TYPE.RSA, 512)
+                val keyPair = generateKeyPair(KeyType.RSA, 512)
 
                 val privKey = keyPair.first
                 val pubKey = keyPair.second

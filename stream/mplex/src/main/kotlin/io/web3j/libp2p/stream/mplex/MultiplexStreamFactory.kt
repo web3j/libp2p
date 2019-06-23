@@ -24,5 +24,5 @@ interface MultiplexStreamFactory {
      * @param initiator whether this peer is the initiator.
      * @param name an optional name for the stream.
      */
-    fun create(streamId: ULong, initiator: Boolean, name: String? = null): MultiplexStream
+    fun create(streamId: Long, initiator: Boolean, name: String? = null): MultiplexStream
 }

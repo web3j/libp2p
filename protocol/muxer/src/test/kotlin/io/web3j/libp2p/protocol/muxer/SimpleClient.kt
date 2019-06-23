@@ -15,27 +15,27 @@ package io.web3j.libp2p.protocol.muxer
 import io.web3j.libp2p.transport.tcp.TCPTransport
 import io.web3j.libp2p.transport.tcp.TCPTransportConnection
 import io.web3j.libp2p.transport.tcp.util.TCPUtil
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 
 class SimpleClient {
 
     @Test
-//    @Disabled("WIP")
+    @Disabled("Run this manually")
     fun start() {
-        val listenerAddr = TCPUtil.createLoopbackMultiaddr(10333)
+        val listenerAddr = TCPUtil.createLoopbackMultiaddr(61291)
         LOGGER.info("Setting up the connection to $listenerAddr ...")
 
         val connection = TCPTransport().dial(listenerAddr) as TCPTransportConnection
 
         println("Connection available: $connection")
-        println("-- SENDING OUR PROTOCOL FIRST")
 
 //        sendAsync("/multistream/1.0.0\n", connection)
 //        sendAsync("/secio/1.0.0\n", connection)
 
         println("Waiting some more")
-        Thread.sleep(60000)
+        Thread.sleep(6000000)
         println("Done")
     }
 

@@ -43,7 +43,7 @@ class Ed25519PrivateKey(private val priv: Ed25519PrivateKeyParameters) : PrivKey
 /**
  * @param pub the public key backing this instance.
  */
-class Ed25519PublicKey(private val pub: Ed25519PublicKeyParameters) : PubKey(Crypto.KeyType.Ed25519) {
+class Ed25519PublicKey(val pub: Ed25519PublicKeyParameters) : PubKey(Crypto.KeyType.Ed25519) {
 
     override fun raw(): ByteArray = pub.encoded
 

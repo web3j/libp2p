@@ -16,6 +16,7 @@ import io.web3j.libp2p.security.secio.SecioErrorCodes
 import io.web3j.libp2p.security.secio.SecioException
 import io.web3j.libp2p.security.secio.model.ExchangeMessage
 import io.web3j.libp2p.security.secio.model.ProposeMessage
+import io.web3j.libp2p.shared.ext.toBytes
 import org.slf4j.LoggerFactory
 import spipe.pb.Spipe
 import java.io.InputStream
@@ -105,7 +106,7 @@ object PrototypeUtil {
         }
 
         if (dataByteCount + 4 != byteArray.size) {
-            LOGGER.warn("Propose message stream does not contain the expected byte count: " +
+            LOGGER.warn("Exchange message stream does not contain the expected byte count: " +
                     "expected $dataByteCount but got ${byteArray.size - 4}")
             throw SecioException(SecioErrorCodes.INVALID_PROPOSAL_STRUCTURE)
         }
@@ -158,5 +159,14 @@ object PrototypeUtil {
      */
     fun parseExchangeMessageStream(inputStream: InputStream): ExchangeMessage {
         return ExchangeMessage.fromPrototype(parsePrototypeExchangeMessageStream(inputStream))
+    }
+
+    /**
+     * This is the counterpart to [#parsePrototypeProposeMessage]
+     */
+    fun serializeProposeMessage(proposal: ProposeMessage): ByteArray {
+        val proposalBytes = proposal.asPropose().toByteArray()
+        val numProposalBytes = proposalBytes.size
+        return numProposalBytes.toBytes() + proposalBytes
     }
 }

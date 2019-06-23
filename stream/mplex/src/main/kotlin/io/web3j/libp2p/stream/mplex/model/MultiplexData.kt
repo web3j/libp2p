@@ -15,7 +15,7 @@ package io.web3j.libp2p.stream.mplex.model
 /**
  * Represents a message that is sent across between peers in the mplex protocol.
  */
-data class MultiplexData(val streamId: ULong, val flags: HeaderFlag, val data: ByteArray) {
+data class MultiplexData(val streamId: Long, val flags: HeaderFlag, val data: ByteArray) {
 
     /**
      * @return the stream name; null if one is  not available in this message.

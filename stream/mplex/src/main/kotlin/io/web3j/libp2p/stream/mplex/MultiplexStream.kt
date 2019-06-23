@@ -31,7 +31,7 @@ import java.io.IOException
  * [@see https://github.com/libp2p/go-mplex/blob/master/stream.go]
  */
 class MultiplexStream(
-    val id: ULong,
+    val id: Long,
     val name: String,
     val initiator: Boolean,
     private val io: MultiplexStreamIO,

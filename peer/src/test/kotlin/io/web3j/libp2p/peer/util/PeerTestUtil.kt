@@ -16,7 +16,7 @@ import io.ipfs.multiformats.multiaddr.Multiaddr
 import io.ipfs.multiformats.multiaddr.Protocol
 import io.ipfs.multiformats.multihash.Multihash
 import io.ipfs.multiformats.multihash.Type
-import io.web3j.libp2p.crypto.KEY_TYPE
+import io.web3j.libp2p.crypto.KeyType
 import io.web3j.libp2p.crypto.generateKeyPair
 import io.web3j.libp2p.peer.PeerID
 import java.security.MessageDigest
@@ -37,7 +37,7 @@ object PeerTestUtil {
      * @return a random [PeerID] instance.
      */
     fun createPeer(): PeerID {
-        val pubKeyBytes = generateKeyPair(KEY_TYPE.RSA, 512).second.bytes()
+        val pubKeyBytes = generateKeyPair(KeyType.RSA, 512).second.bytes()
         val sha256Bytes: ByteArray = with(MessageDigest.getInstance("SHA-256")) {
             update(pubKeyBytes)
             digest()

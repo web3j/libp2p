@@ -17,6 +17,7 @@ import io.web3j.libp2p.transport.ConnectionStatus
 import io.web3j.libp2p.transport.tcp.TCPTransport
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 
@@ -29,6 +30,7 @@ class TCPTransportTest {
      * Tests spawning a  (server), and connecting another peer to that
      */
     @Test
+    @Disabled("WIP")
     fun testSimplePeerConnectivity() {
         // Start the listener.
         val listenerConnectionHolder = TCPTransportUtil.startListener()

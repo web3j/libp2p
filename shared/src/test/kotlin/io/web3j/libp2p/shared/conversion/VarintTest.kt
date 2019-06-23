@@ -12,9 +12,11 @@
  */
 package io.web3j.libp2p.shared.conversion
 
+import io.web3j.libp2p.shared.ext.toBase64String
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import javax.xml.bind.DatatypeConverter
+import java.io.ByteArrayInputStream
+import java.nio.ByteBuffer
 
 class VarintTest {
 
@@ -22,40 +24,52 @@ class VarintTest {
      * Tests the conversion of a ULong into a varint.
      */
     @Test
-    fun toVarintTest1() {
-        assertEquals("AC02", createVarintHex(300))
-        assertEquals("978406", createVarintHex(98839))
-        assertEquals("EBB3B7C403", createVarintHex(948820459))
-        assertEquals("ED8CB5C396A29C897D", createVarintHex(9012390123902158445))
+    fun varintTest1() {
+        doVarintTest(300, "rAI=")
+        doVarintTest(98839, "l4QG")
     }
 
-    /**
-     * Tests the conversion of a varint back into a ULong.
-     */
     @Test
-    fun fromVarintTest1() {
-        assertEquals(300.toULong(), createULongFromHex("AC02"))
-        assertEquals(98839.toULong(), createULongFromHex("978406"))
-        assertEquals(948820459.toULong(), createULongFromHex("EBB3B7C403"))
-        assertEquals(9012390123902158445.toULong(), createULongFromHex("ED8CB5C396A29C897D"))
-        assertEquals(300.toULong(), createULongFromHex("AC02978406"))
+    fun varlongTest1() {
+        doVarlongTest(300L, "rAI=")
+        doVarlongTest(98839L, "l4QG")
+        doVarlongTest(948820459L, "67O3xAM=")
+        doVarlongTest(9012390123902158445L, "7Yy1w5ainIl9")
     }
 
-    /**
-     * Helper function to create the varint as a hex string.
-     * @param value the long value to be tested.
-     * @return the hex value of the varint.
-     */
-    private fun createVarintHex(value: Long): String {
-        return DatatypeConverter.printHexBinary(Varint.toVarint(value.toULong()))
+    private fun doVarintTest(inputInt: Int, expectedVarintB64: String) {
+        // First, create a byte array.
+        val bytes: ByteArray = Varint.putVarInt(inputInt)
+        assertEquals(expectedVarintB64, bytes.toBase64String())
+
+        // Now convert the byte array.
+        val fromBytes: Int = Varint.getVarInt(bytes)
+        assertEquals(inputInt, fromBytes)
+
+        // Convert the byte buffer.
+        val fromByteBuffer: Int = Varint.getVarInt(ByteBuffer.wrap(bytes))
+        assertEquals(inputInt, fromByteBuffer)
+
+        // Convert the stream.
+        val fromStream: Int = Varint.getVarInt(ByteArrayInputStream(bytes))
+        assertEquals(inputInt, fromStream)
     }
 
-    /**
-     * Helper function to create the unsigned int from a hex string.
-     * @param hex the hex value of the varint.
-     * @return the ulong value.
-     */
-    private fun createULongFromHex(hex: String): ULong {
-        return Varint.fromVarint(DatatypeConverter.parseHexBinary(hex)!!)
+    private fun doVarlongTest(inputLong: Long, expectedVarintB64: String) {
+        // First, create a byte array.
+        val bytes: ByteArray = Varint.putVarLong(inputLong)
+        assertEquals(expectedVarintB64, bytes.toBase64String())
+
+        // Now convert the byte array.
+        val fromBytes: Long = Varint.getVarLong(bytes)
+        assertEquals(inputLong, fromBytes)
+
+        // Convert the byte buffer.
+        val fromByteBuffer: Long = Varint.getVarLong(ByteBuffer.wrap(bytes))
+        assertEquals(inputLong, fromByteBuffer)
+
+        // Convert the stream.
+        val fromStream: Long = Varint.getVarLong(ByteArrayInputStream(bytes))
+        assertEquals(inputLong, fromStream)
     }
 }

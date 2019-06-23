@@ -23,13 +23,13 @@ class MultiplexUtilTest {
 
     @Test
     fun simpleReflexiveNewStreamWithNameTest() {
-        runFullCircleAndAssert(23408923848089283.toULong(), MultiplexUtil.FLAG_CLOSE_INITIATOR, ByteArray(0))
+        runFullCircleAndAssert(23408923848089283.toLong(), MultiplexUtil.FLAG_CLOSE_INITIATOR, ByteArray(0))
         runFullCircleAndAssert(
-            73.toULong(),
+            73.toLong(),
             MultiplexUtil.FLAG_NEW_STREAM,
             "this is A new Stream's NAME".toByteArray()
         )
-        runFullCircleAndAssert(10.toULong(), MultiplexUtil.FLAG_RESET_INITIATOR, "FooBarDoe".toByteArray())
+        runFullCircleAndAssert(10.toLong(), MultiplexUtil.FLAG_RESET_INITIATOR, "FooBarDoe".toByteArray())
     }
 
     /**
@@ -39,12 +39,12 @@ class MultiplexUtilTest {
      * @param flags the flags.
      * @param streamData the stream data.
      */
-    private fun runFullCircleAndAssert(streamId: ULong, flags: Byte, streamData: ByteArray) {
+    private fun runFullCircleAndAssert(streamId: Long, flags: Byte, streamData: ByteArray) {
         // Convert to a byte array.
         val bytes = MultiplexUtil.composeProtocolData(streamId, flags, streamData)
 
         // Parse the byte array and assert the parsed parameters.
-        val triple: Triple<ULong, Byte, ByteArray> = MultiplexUtil.readProtocolData(bytes)
+        val triple: Triple<Long, Byte, ByteArray> = MultiplexUtil.readProtocolData(bytes)
         assertEquals(streamId, triple.first, "Incorrect stream ID")
         assertEquals(flags, triple.second, "Incorrect flag")
         assertTrue(streamData.contentEquals(triple.third), "Incorrect stream data")

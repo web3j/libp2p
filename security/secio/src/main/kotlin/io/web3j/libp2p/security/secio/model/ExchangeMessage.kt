@@ -12,16 +12,18 @@
  */
 package io.web3j.libp2p.security.secio.model
 
-import io.web3j.libp2p.crypto.PubKey
-import io.web3j.libp2p.crypto.marshalPublicKey
-import io.web3j.libp2p.crypto.unmarshalPublicKey
+import io.web3j.libp2p.crypto.Libp2pCrypto
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
+import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.spec.ECPublicKeySpec
 import spipe.pb.Spipe
+import java.security.KeyFactory
 import java.util.Base64
 
 /**
  * Serves as a wrapper around the prototype [spipe.pb.Spipe.Exchange] class.
  */
-class ExchangeMessage(val publicKey: PubKey, val signature: ByteArray) {
+class ExchangeMessage(val publicKey: BCECPublicKey, val signature: ByteArray) {
 
     /**
      * The value of `signature` in base-64 encoding.
@@ -31,7 +33,7 @@ class ExchangeMessage(val publicKey: PubKey, val signature: ByteArray) {
     /**
      * The value of the public key in base-64 encoding.
      */
-    val publicKeyInBase64: String = String(Base64.getEncoder().encode(marshalPublicKey(publicKey)))
+    val publicKeyInBase64: String = String(Base64.getEncoder().encode(publicKey.encoded))
 
     companion object {
 
@@ -41,10 +43,11 @@ class ExchangeMessage(val publicKey: PubKey, val signature: ByteArray) {
          * @return a wrapper around that message.
          */
         fun fromPrototype(exchange: Spipe.Exchange): ExchangeMessage {
-            return ExchangeMessage(
-                unmarshalPublicKey(exchange.epubkey.toByteArray()),
-                exchange.signature.toByteArray()
-            )
+            val params = ECNamedCurveTable.getParameterSpec("prime256v1")
+            val pubKey = ECPublicKeySpec(params.curve.decodePoint(exchange.epubkey.toByteArray()), params)
+            val kf = KeyFactory.getInstance("ECDH", Libp2pCrypto.provider)
+            val bcPubKey: BCECPublicKey = kf.generatePublic(pubKey) as BCECPublicKey
+            return ExchangeMessage(bcPubKey, exchange.signature.toByteArray())
         }
     }
 }

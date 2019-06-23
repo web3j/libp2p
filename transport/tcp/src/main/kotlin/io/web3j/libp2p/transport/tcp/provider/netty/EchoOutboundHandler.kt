@@ -22,7 +22,7 @@ class EchoOutboundHandler : ChannelOutboundHandlerAdapter() {
     override fun write(ctx: ChannelHandlerContext, msg: Any, promise: ChannelPromise) {
 
         if (msg is String) {
-            val protoLengthByteArray = Varint.toVarint(msg.length.toULong())
+            val protoLengthByteArray = Varint.toVarInt(msg.length)
 
             val newArray = ByteArray(protoLengthByteArray.size + msg.length)
             System.arraycopy(protoLengthByteArray, 0, newArray, 0, protoLengthByteArray.size)

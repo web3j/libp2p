@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.FileInputStream
@@ -135,6 +136,7 @@ class PrototypeUtilTest {
     }
 
     @Test
+    @Disabled("WIP")
     fun loadAndParseExchange() {
         // TODO: add support for exchange messages.
         val file = File(javaClass.classLoader.getResource("secio-exchange-1.bin").file)

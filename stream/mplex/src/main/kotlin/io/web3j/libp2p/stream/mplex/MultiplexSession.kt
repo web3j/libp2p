@@ -47,7 +47,7 @@ class MultiplexSession(
     /**
      * Maps stream ID to the stream instance.
      */
-    private val streamsById = ConcurrentHashMap<ULong, MultiplexStream>()
+    private val streamsById = ConcurrentHashMap<Long, MultiplexStream>()
 
     /**
      * A lock to control write access to our channels map.
@@ -60,7 +60,7 @@ class MultiplexSession(
      * @return the new stream.
      */
     fun createNewStream(name: String = ""): MultiplexStream {
-        val streamId = sessionIdGenerator.getAndIncrement().toULong()
+        val streamId = sessionIdGenerator.getAndIncrement().toLong()
         val stream = streamFactory.create(streamId, true, name)
         stream.initiateNewStream()
 

@@ -60,6 +60,16 @@ class ProposeMessage(val publicKey: PubKey, val random: ByteArray) {
     }
 
     /**
+     * @return the nonce value.
+     */
+    fun getNonce(): ByteArray = random
+
+    /**
+     * @return the ciphers.
+     */
+    fun getCiphers(): Array<String> = this.ciphers.toTypedArray()
+
+    /**
      * Adds hashes to this message.
      * @param hashes the hashes to add.
      * @return this instance.
@@ -70,6 +80,11 @@ class ProposeMessage(val publicKey: PubKey, val random: ByteArray) {
     }
 
     /**
+     * @return the hashes.
+     */
+    fun getHashes(): Array<String> = this.hashes.toTypedArray()
+
+    /**
      * Adds hashes to this message.
      * @param hashes the hashes to add.
      * @return this instance.
@@ -78,6 +93,11 @@ class ProposeMessage(val publicKey: PubKey, val random: ByteArray) {
         this.exchanges.addAll(hashes)
         return this
     }
+
+    /**
+     * @return the exchanges.
+     */
+    fun getExchanges(): Array<String> = this.exchanges.toTypedArray()
 
     /**
      * Checks if the given hash is included in this proposal.

@@ -39,8 +39,8 @@ import java.security.PublicKey as JavaPublicKey
 /**
  * @param sk the private key backing this instance.
  * @param pk the public key backing this instance.
- */
-class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKey) : PrivKey(Crypto.KeyType.RSA) {
+ */ // TODO: reinstate private
+class RsaPrivateKey(val sk: JavaPrivateKey, val pk: JavaPublicKey) : PrivKey(Crypto.KeyType.RSA) {
 
     private val rsaPublicKey = RsaPublicKey(pk)
     private val pkcs1PrivateKeyBytes: ByteArray
@@ -72,8 +72,8 @@ class RsaPrivateKey(private val sk: JavaPrivateKey, private val pk: JavaPublicKe
 
 /**
  * @param k the public key backing this instance.
- */
-class RsaPublicKey(private val k: JavaPublicKey) : PubKey(Crypto.KeyType.RSA) {
+ */ // TODO: re-instate private
+class RsaPublicKey(val k: JavaPublicKey) : PubKey(Crypto.KeyType.RSA) {
 
     override fun raw(): ByteArray = k.encoded
 

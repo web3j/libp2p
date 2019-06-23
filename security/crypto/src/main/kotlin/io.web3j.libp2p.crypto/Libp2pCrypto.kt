@@ -29,6 +29,8 @@ const val ED25519_ALGORITHM = "ED25519"
 const val SECP_256K1_ALGORITHM = "secp256k1"
 
 const val P256_CURVE = "P-256"
+const val P384_CURVE = "P-384"
+const val P521_CURVE = "P-521"
 
 const val SHA_256_WITH_RSA = "SHA256withRSA"
 const val SHA_256_WITH_ECDSA = "SHA256withECDSA"

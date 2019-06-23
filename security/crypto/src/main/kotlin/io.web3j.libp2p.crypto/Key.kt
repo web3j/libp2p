@@ -15,21 +15,26 @@ package io.web3j.libp2p.crypto
 import com.google.protobuf.ByteString
 import crypto.pb.Crypto
 import io.web3j.libp2p.crypto.keys.generateEcdsaKeyPair
-import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
 import io.web3j.libp2p.crypto.keys.generateRsaKeyPair
+import io.web3j.libp2p.crypto.keys.generateEd25519KeyPair
 import io.web3j.libp2p.crypto.keys.generateSecp256k1KeyPair
-import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPrivateKey
-import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPublicKey
-import io.web3j.libp2p.crypto.keys.unmarshalEd25519PrivateKey
-import io.web3j.libp2p.crypto.keys.unmarshalEd25519PublicKey
-import io.web3j.libp2p.crypto.keys.unmarshalRsaPrivateKey
 import io.web3j.libp2p.crypto.keys.unmarshalRsaPublicKey
-import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PublicKey
 import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPublicKey
+import io.web3j.libp2p.crypto.keys.unmarshalRsaPrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEd25519PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalSecp256k1PrivateKey
+import io.web3j.libp2p.crypto.keys.unmarshalEcdsaPrivateKey
+import io.web3j.libp2p.shared.env.Libp2pException
+import org.bouncycastle.math.ec.ECCurve
+import org.bouncycastle.math.ec.custom.sec.SecP256R1Curve
+import org.bouncycastle.math.ec.custom.sec.SecP384R1Curve
+import org.bouncycastle.math.ec.custom.sec.SecP521R1Curve
 import crypto.pb.Crypto.PrivateKey as PbPrivateKey
 import crypto.pb.Crypto.PublicKey as PbPublicKey
 
-enum class KEY_TYPE {
+enum class KeyType {
 
     /**
      * RSA is an enum for the supported RSA key type
@@ -116,13 +121,13 @@ class BadKeyTypeException : Exception("Invalid or unsupported key type")
  * @param type the type key to be generated.
  * @param bits the number of bits desired for the key (only applicable for RSA).
  */
-fun generateKeyPair(type: KEY_TYPE, bits: Int): Pair<PrivKey, PubKey> {
+fun generateKeyPair(type: KeyType, bits: Int): Pair<PrivKey, PubKey> {
 
     return when (type) {
-        KEY_TYPE.RSA -> generateRsaKeyPair(bits)
-        KEY_TYPE.ED25519 -> generateEd25519KeyPair()
-        KEY_TYPE.SECP256K1 -> generateSecp256k1KeyPair()
-        KEY_TYPE.ECDSA -> generateEcdsaKeyPair()
+        KeyType.RSA -> generateRsaKeyPair(bits)
+        KeyType.ED25519 -> generateEd25519KeyPair()
+        KeyType.SECP256K1 -> generateSecp256k1KeyPair()
+        KeyType.ECDSA -> generateEcdsaKeyPair()
     }
 }
 
@@ -187,3 +192,18 @@ fun marshalPrivateKey(privKey: PrivKey): ByteArray =
         .setData(ByteString.copyFrom(privKey.raw()))
         .build()
         .toByteArray()
+
+/**
+ * Generates an ephemeral public key and returns it.
+ * @param curveName the name of the curve.
+ */
+fun generateEKeyPair(curveName: String): String? {
+    val curve: ECCurve = when (curveName) {
+        P256_CURVE -> SecP256R1Curve()
+        P384_CURVE -> SecP384R1Curve()
+        P521_CURVE -> SecP521R1Curve()
+        else -> throw Libp2pException("Invalid curve name: $curveName")
+    }
+
+    return null
+}
